@@ -1,0 +1,35 @@
+<svg width="128" height="128" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="magicCap" x1="60" y1="20" x2="60" y2="70" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ef4444" />
+      <stop offset="1" stop-color="#991b1b" />
+    </linearGradient>
+    <radialGradient id="goldAura" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(60 60) rotate(90) scale(60)">
+      <stop stop-color="#F59E0B" stop-opacity="0.3" /> 
+      <stop offset="0.8" stop-color="#7C3AED" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Aura (Simplified) -->
+  <circle cx="60" cy="65" r="50" fill="url(#goldAura)" />
+
+  <!-- Mushroom Shape -->
+  <g transform="translate(0, 5)">
+    <!-- Stem -->
+    <path d="M 50 65 Q 48 95 45 100 L 75 100 Q 72 95 70 65" fill="#FFF9E5" />
+    <path d="M 50 65 L 70 65 L 70 100 L 45 100 Z" fill="rgba(0,0,0,0.05)" />
+    <path d="M 50 70 Q 60 80 70 70 L 72 66 L 48 66 Z" fill="#FFF" />
+    
+    <!-- Cap -->
+    <g>
+      <path d="M 25 65 C 25 25, 95 25, 95 65 Q 60 55 25 65 Z" fill="url(#magicCap)" />
+      <!-- Spots -->
+      <g fill="#FFFFFF" fill-opacity="0.9">
+        <ellipse cx="45" cy="40" rx="5" ry="3" transform="rotate(-20 45 40)" />
+        <circle cx="65" cy="35" r="4" />
+        <circle cx="82" cy="50" r="3" />
+        <circle cx="35" cy="55" r="2.5" />
+      </g>
+    </g>
+  </g>
+</svg>
