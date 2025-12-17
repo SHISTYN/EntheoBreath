@@ -180,6 +180,9 @@ const App: React.FC = () => {
   // Theme State
   const [theme, setTheme] = useState<ThemeMode>('dark');
 
+  // PWA Install Prompt State
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
   // Timer State
   const [timerState, setTimerState] = useState<BreathState>({
     currentPhase: BreathingPhase.Ready,
@@ -223,6 +226,38 @@ const App: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // --- PWA INSTALL LISTENER ---
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: any) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      setDeferredPrompt(e);
+      console.log('PWA Install Prompt captured');
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    
+    // Show the install prompt
+    deferredPrompt.prompt();
+    
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response to the install prompt: ${outcome}`);
+    
+    // We've used the prompt, and can't use it again, throw it away
+    setDeferredPrompt(null);
+    setShowMobileMenu(false); // Close mobile menu if open
+  };
+
   // --- THEME LOGIC ---
   useEffect(() => {
     if (theme === 'dark') {
@@ -234,6 +269,24 @@ const App: React.FC = () => {
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
+  const handleShare = async () => {
+      if (navigator.share) {
+          try {
+              await navigator.share({
+                  title: 'EntheoBreath',
+                  text: 'Дыхание, Измененные Состояния Сознания и AI-анализ.',
+                  url: window.location.href,
+              });
+          } catch (error) {
+              console.log('Error sharing', error);
+          }
+      } else {
+          // Fallback to clipboard
+          navigator.clipboard.writeText(window.location.href);
+          alert("Ссылка скопирована в буфер обмена!");
+      }
   };
 
   // --- WAKE LOCK LOGIC (KEEPS SCREEN ON) ---
@@ -758,6 +811,18 @@ const App: React.FC = () => {
 
                 {/* --- DESKTOP MENU (Hidden on Mobile) --- */}
                 <div className="hidden md:flex items-center gap-4">
+                    
+                    {/* INSTALL PWA BUTTON (Desktop) */}
+                    {deferredPrompt && (
+                        <button 
+                            onClick={handleInstallClick}
+                            className="flex items-center gap-3 px-5 py-2.5 rounded-full text-xs font-bold bg-zen-accent/10 border border-zen-accent/30 text-zen-accent hover:bg-zen-accent/20 transition-all duration-300 hover:shadow-glow-cyan backdrop-blur-md animate-pulse-slow"
+                        >
+                            <i className="fas fa-download"></i>
+                            <span className="tracking-wide">Установить</span>
+                        </button>
+                    )}
+
                     <button 
                         onClick={() => setShowPhilosophy(true)}
                         className="flex items-center gap-3 px-5 py-2.5 rounded-full text-xs font-bold bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/5 text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white hover:border-premium-purple/30 transition-all duration-300 hover:shadow-glow-purple backdrop-blur-md"
@@ -814,10 +879,11 @@ const App: React.FC = () => {
                     </div>
 
                     <button 
-                        onClick={() => setShowMobileFaq(true)} 
-                        className="w-12 h-12 flex items-center justify-center rounded-2xl text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+                        onClick={handleShare} 
+                        className="w-12 h-12 flex items-center justify-center rounded-2xl text-gray-400 hover:text-zen-accent dark:hover:text-zen-accent transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+                        title="Поделиться"
                     >
-                        <i className="far fa-question-circle text-xl"></i>
+                        <i className="fas fa-share-alt text-xl"></i>
                     </button>
                 </div>
 
@@ -833,6 +899,18 @@ const App: React.FC = () => {
                 {showMobileMenu && (
                     <div className="absolute top-full right-0 mt-4 w-64 bg-white/95 dark:bg-[#121212]/95 backdrop-blur-2xl border border-gray-200 dark:border-white/10 rounded-3xl shadow-2xl p-4 z-50 animate-fade-in origin-top-right md:hidden">
                         <div className="flex flex-col gap-2">
+                            
+                            {/* Install Button (Mobile Menu) */}
+                            {deferredPrompt && (
+                                <button 
+                                    onClick={handleInstallClick}
+                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold bg-zen-accent/10 text-zen-accent hover:bg-zen-accent/20 transition-colors animate-pulse-slow"
+                                >
+                                    <i className="fas fa-download w-5 text-center"></i>
+                                    <span className="tracking-wide">Установить приложение</span>
+                                </button>
+                            )}
+
                             {/* Philosophy */}
                             <button 
                                 onClick={() => { setShowPhilosophy(true); setShowMobileMenu(false); }}
@@ -842,12 +920,21 @@ const App: React.FC = () => {
                                 <span className="tracking-wide">Философия</span>
                             </button>
 
+                            {/* Share Mobile */}
+                            <button 
+                                onClick={() => { handleShare(); setShowMobileMenu(false); }} 
+                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold bg-gray-50 dark:bg-white/5 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                            >
+                                <i className="fas fa-share-alt text-zen-accent w-5 text-center"></i>
+                                <span className="tracking-wide">Поделиться</span>
+                            </button>
+
                             {/* FAQ */}
                             <button 
                                 onClick={() => { setShowMobileFaq(true); setShowMobileMenu(false); }} 
                                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold bg-gray-50 dark:bg-white/5 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
                             >
-                                <i className="far fa-question-circle text-zen-accent w-5 text-center"></i>
+                                <i className="far fa-question-circle text-gray-400 w-5 text-center"></i>
                                 <span className="tracking-wide">Помощь</span>
                             </button>
 

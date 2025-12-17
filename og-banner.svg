@@ -1,0 +1,81 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background: Deep Void -->
+    <rect width="1200" height="630" fill="#050505"/>
+    
+    <!-- Background Gradients (Aurora Effect) -->
+    <g opacity="0.4">
+        <circle cx="200" cy="100" r="400" fill="url(#purpleGlow)" />
+        <circle cx="1000" cy="500" r="400" fill="url(#cyanGlow)" />
+        <circle cx="600" cy="315" r="200" fill="url(#goldGlow)" />
+    </g>
+
+    <!-- Grid Texture (Subtle) -->
+    <mask id="gridMask">
+        <rect width="1200" height="630" fill="url(#gridPattern)" />
+    </mask>
+    <rect width="1200" height="630" fill="#ffffff" fill-opacity="0.03" mask="url(#gridMask)" />
+
+    <!-- Central Content Group -->
+    <g transform="translate(600, 315)">
+        
+        <!-- Large Logo Scale -->
+        <g transform="translate(-100, -140) scale(2)">
+             <!-- Logo Logic Copied & Simplified from App -->
+             <circle cx="60" cy="65" r="50" fill="url(#logoAura)" opacity="0.6" />
+             <!-- Stem -->
+             <path d="M 50 65 Q 48 95 45 100 L 75 100 Q 72 95 70 65" fill="#FFF9E5" />
+             <path d="M 50 70 Q 60 80 70 70 L 72 66 L 48 66 Z" fill="#FFF" />
+             <!-- Cap -->
+             <path d="M 25 65 C 25 25, 95 25, 95 65 Q 60 55 25 65 Z" fill="url(#magicCap)" />
+             <!-- Spots -->
+             <g fill="#FFFFFF" fill-opacity="0.9">
+                <ellipse cx="45" cy="40" rx="5" ry="3" transform="rotate(-20 45 40)" />
+                <circle cx="65" cy="35" r="4" />
+                <circle cx="82" cy="50" r="3" />
+             </g>
+        </g>
+
+        <!-- Typography -->
+        <g transform="translate(0, 100)" text-anchor="middle">
+            <text x="0" y="0" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="90" fill="white" letter-spacing="-2">
+                Entheo<tspan fill="url(#textGradient)">Breath</tspan>
+            </text>
+            <text x="0" y="60" font-family="system-ui, -apple-system, sans-serif" font-weight="300" font-size="32" fill="#9ca3af" letter-spacing="8" text-transform="uppercase">
+                Дыхание и Сознание
+            </text>
+        </g>
+
+    </g>
+
+    <!-- Definitions -->
+    <defs>
+        <linearGradient id="magicCap" x1="60" y1="20" x2="60" y2="70" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#ef4444" />
+            <stop offset="1" stop-color="#991b1b" />
+        </linearGradient>
+        <radialGradient id="logoAura" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(60 60) rotate(90) scale(60)">
+            <stop stop-color="#F59E0B" stop-opacity="0.4" /> 
+            <stop offset="0.8" stop-color="#7C3AED" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="purpleGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="rotate(90) scale(400)">
+            <stop stop-color="#7C3AED" stop-opacity="0.4" />
+            <stop offset="1" stop-color="#7C3AED" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="cyanGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="rotate(90) scale(400)">
+            <stop stop-color="#22d3ee" stop-opacity="0.3" />
+            <stop offset="1" stop-color="#22d3ee" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="goldGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="rotate(90) scale(200)">
+            <stop stop-color="#F59E0B" stop-opacity="0.2" />
+            <stop offset="1" stop-color="#F59E0B" stop-opacity="0" />
+        </radialGradient>
+        <linearGradient id="textGradient" x1="0" y1="0" x2="100%" y2="0" gradientUnits="userSpaceOnUse">
+             <stop offset="0" stop-color="#22d3ee" />
+             <stop offset="0.5" stop-color="#7C3AED" />
+             <stop offset="1" stop-color="#F59E0B" />
+        </linearGradient>
+        <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1" />
+        </pattern>
+    </defs>
+</svg>

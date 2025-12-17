@@ -1,0 +1,17 @@
+{
+  "name": "EntheoBreath",
+  "short_name": "EntheoBreath",
+  "description": "Энтеогенные дыхательные практики и таймеры сознания",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    }
+  ]
+}
