@@ -170,7 +170,7 @@ const App: React.FC = () => {
   const [activePattern, setActivePattern] = useState<BreathingPattern>(DEFAULT_PATTERNS[0]);
   const [rounds, setRounds] = useState<number>(0); 
   const [view, setView] = useState<'timer' | 'library'>('library');
-  const [infoTab, setInfoTab] = useState<'about' | 'guide' | 'safety'>('about'); 
+  const [infoTab, setInfoTab] = useState<'about' | 'guide'>('about'); 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [isLoadingApp, setIsLoadingApp] = useState(true);
@@ -1026,16 +1026,16 @@ const App: React.FC = () => {
                                     </h3>
                                 </div>
                                 
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                     {patterns.map((p, idx) => (
                                         <SpotlightCard 
                                             key={p.id} 
                                             onClick={() => selectPattern(p)}
-                                            className="bg-white/80 dark:bg-[#0f0f10]/60 backdrop-blur-xl rounded-[24px] p-6 cursor-pointer shadow-sm hover:shadow-2xl dark:shadow-black/50 border border-gray-200 dark:border-white/5"
+                                            className="bg-white/80 dark:bg-[#0f0f10]/60 backdrop-blur-xl rounded-[24px] p-6 cursor-pointer shadow-sm hover:shadow-2xl dark:shadow-black/50 border border-gray-200 dark:border-white/5 flex flex-col h-full min-h-[280px]"
                                         >
                                             <div className="flex justify-between items-start mb-4">
-                                                <h3 className="text-xl font-display font-bold text-gray-900 dark:text-white group-hover:text-zen-accent dark:group-hover:text-zen-accent transition-colors leading-tight">{p.name}</h3>
-                                                <span className={`text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg border border-transparent dark:border-white/5 ${
+                                                <h3 className="text-lg font-display font-bold text-gray-900 dark:text-white group-hover:text-zen-accent dark:group-hover:text-zen-accent transition-colors leading-tight line-clamp-2">{p.name}</h3>
+                                                <span className={`text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg border border-transparent dark:border-white/5 shrink-0 ml-2 ${
                                                     p.difficulty === 'Новичок' ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' :
                                                     p.difficulty === 'Средний' ? 'bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400' :
                                                     'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400'
@@ -1043,20 +1043,17 @@ const App: React.FC = () => {
                                                     {p.difficulty}
                                                 </span>
                                             </div>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 h-auto line-clamp-3 leading-relaxed font-light">{p.description}</p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 line-clamp-4 leading-relaxed font-light">{p.description}</p>
                                             
-                                            <div className="flex flex-wrap gap-2 mb-4">
-                                                {p.benefits && p.benefits.slice(0, 3).map((b, i) => (
-                                                    <span key={i} className="text-[10px] text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/5 px-2.5 py-1 rounded-md border border-gray-100 dark:border-white/5">
+                                            <div className="flex flex-wrap gap-2 mb-4 mt-auto">
+                                                {p.benefits && p.benefits.slice(0, 2).map((b, i) => (
+                                                    <span key={i} className="text-[10px] text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/5 px-2.5 py-1 rounded-md border border-gray-100 dark:border-white/5 truncate max-w-full">
                                                         {b}
                                                     </span>
                                                 ))}
-                                                {p.benefits && p.benefits.length > 3 && (
-                                                     <span className="text-[10px] text-gray-400 dark:text-gray-500 px-1 py-1">+ еще</span>
-                                                )}
                                             </div>
 
-                                            <div className="flex items-center gap-3 text-xs font-mono text-gray-400 dark:text-gray-500 border-t border-gray-100 dark:border-white/5 pt-4 group-hover:text-zen-accent dark:group-hover:text-zen-accent transition-colors mt-auto">
+                                            <div className="flex items-center gap-3 text-xs font-mono text-gray-400 dark:text-gray-500 border-t border-gray-100 dark:border-white/5 pt-4 group-hover:text-zen-accent dark:group-hover:text-zen-accent transition-colors">
                                                 <i className="far fa-clock"></i>
                                                 {p.mode === 'wim-hof' ? (
                                                     <span>Протокол: 3 Фазы</span>
@@ -1150,58 +1147,54 @@ const App: React.FC = () => {
                 {/* INFO PANEL (Full width in manual mode, else split) */}
                 <div className={`w-full ${activePattern.mode === 'manual' ? 'lg:w-full' : 'lg:w-[480px]'} bg-white/80 dark:bg-[#0a0a0b]/80 backdrop-blur-3xl border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-white/5 flex flex-col relative z-20 shadow-2xl h-auto lg:h-full lg:overflow-y-auto custom-scrollbar order-1 transition-all duration-500`}>
                     {/* Header Area */}
-                    <div className="p-8 border-b border-gray-200 dark:border-white/5 bg-white/50 dark:bg-[#0a0a0b]/50 sticky top-0 z-30 backdrop-blur-xl transition-colors duration-300">
+                    <div className="px-6 py-6 md:px-8 md:py-6 border-b border-gray-200 dark:border-white/5 bg-white/50 dark:bg-[#0a0a0b]/50 sticky top-0 z-30 backdrop-blur-xl transition-colors duration-300">
                         <button 
                             onClick={() => setView('library')}
-                            className="flex items-center gap-2 text-gray-500 hover:text-black dark:hover:text-white transition-colors text-xs font-bold uppercase tracking-widest mb-8 group"
+                            className="flex items-center gap-2 text-gray-500 hover:text-black dark:hover:text-white transition-colors text-[10px] font-bold uppercase tracking-widest mb-4 group"
                         >
                             <i className="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Меню
                         </button>
 
-                        <h2 className="text-3xl md:text-4xl font-display font-bold text-gray-900 dark:text-white mb-3 leading-none tracking-tight">{activePattern.name}</h2>
-                        <div className="flex items-center gap-2 text-sm text-zen-accent font-bold mb-6">
-                            <i className={`fas fa-${categoryIcons[activePattern.category]}`}></i>
-                            <span>{categoryNames[activePattern.category]}</span>
+                        <div className="flex items-baseline justify-between mb-2">
+                            <h2 className="text-2xl md:text-3xl font-display font-bold text-gray-900 dark:text-white leading-none tracking-tight">{activePattern.name}</h2>
+                            <div className="flex items-center gap-2 text-xs text-zen-accent font-bold">
+                                <i className={`fas fa-${categoryIcons[activePattern.category]}`}></i>
+                                <span className="hidden sm:inline">{categoryNames[activePattern.category]}</span>
+                            </div>
                         </div>
                         
-                        <div className="flex p-1.5 bg-gray-100/80 dark:bg-white/5 rounded-2xl border border-gray-200 dark:border-white/5">
+                        <div className="flex p-1 bg-gray-100/80 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/5 mt-4">
                             <button 
                                 onClick={() => setInfoTab('about')}
-                                className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all uppercase tracking-wide ${infoTab === 'about' ? 'bg-white dark:bg-white/10 text-gray-900 dark:text-white shadow-md' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                                className={`flex-1 py-2 text-[10px] sm:text-xs font-bold rounded-lg transition-all uppercase tracking-wide ${infoTab === 'about' ? 'bg-white dark:bg-white/10 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                             >
                                 Обзор
                             </button>
                             <button 
                                 onClick={() => setInfoTab('guide')}
-                                className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all uppercase tracking-wide ${infoTab === 'guide' ? 'bg-white dark:bg-white/10 text-gray-900 dark:text-white shadow-md' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                                className={`flex-1 py-2 text-[10px] sm:text-xs font-bold rounded-lg transition-all uppercase tracking-wide ${infoTab === 'guide' ? 'bg-white dark:bg-white/10 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                             >
                                 Техника
-                            </button>
-                            <button 
-                                onClick={() => setInfoTab('safety')}
-                                className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all uppercase tracking-wide ${infoTab === 'safety' ? 'bg-rose-50 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-500/20' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
-                            >
-                                <i className="fas fa-shield-alt mr-1"></i> Безопасность
                             </button>
                         </div>
                     </div>
 
-                    <div className={`p-8 pb-10 ${activePattern.mode === 'manual' ? 'max-w-4xl mx-auto w-full' : ''}`}>
+                    <div className={`p-6 md:p-8 pb-10 ${activePattern.mode === 'manual' ? 'max-w-4xl mx-auto w-full' : ''}`}>
                          {infoTab === 'about' && (
-                             <div className="space-y-10 animate-fade-in">
+                             <div className="space-y-8 animate-fade-in">
                                  <div>
-                                     <h4 className="text-[10px] font-bold text-zen-accent uppercase tracking-[0.2em] mb-4 opacity-80">Суть практики</h4>
-                                     <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg font-light">{activePattern.description}</p>
+                                     <h4 className="text-[10px] font-bold text-zen-accent uppercase tracking-[0.2em] mb-3 opacity-80">Суть практики</h4>
+                                     <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-base md:text-lg font-light">{activePattern.description}</p>
                                  </div>
                                  
                                  {activePattern.benefits && activePattern.benefits.length > 0 && (
                                      <div>
-                                         <h4 className="text-[10px] font-bold text-premium-purple uppercase tracking-[0.2em] mb-4 opacity-80">Ключевые эффекты</h4>
-                                         <ul className="space-y-4">
+                                         <h4 className="text-[10px] font-bold text-premium-purple uppercase tracking-[0.2em] mb-3 opacity-80">Ключевые эффекты</h4>
+                                         <ul className="space-y-3">
                                              {activePattern.benefits.map((benefit, i) => (
-                                                 <li key={i} className="flex items-start gap-4 text-gray-700 dark:text-gray-300 font-light">
+                                                 <li key={i} className="flex items-start gap-3 text-gray-700 dark:text-gray-300 font-light">
                                                      <div className="mt-2 w-1.5 h-1.5 rounded-full bg-premium-purple flex-shrink-0 shadow-glow-purple"></div>
-                                                     <span className="text-lg">{benefit}</span>
+                                                     <span className="text-base md:text-lg">{benefit}</span>
                                                  </li>
                                              ))}
                                          </ul>
@@ -1209,13 +1202,13 @@ const App: React.FC = () => {
                                  )}
                                  
                                  <div className="grid grid-cols-2 gap-4 mt-6">
-                                     <div className="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl border border-gray-200 dark:border-white/5">
-                                         <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-2 font-bold">Категория</div>
-                                         <div className="text-gray-900 dark:text-white font-display font-bold text-lg">{activePattern.category}</div>
+                                     <div className="bg-gray-50 dark:bg-white/5 p-3 rounded-xl border border-gray-200 dark:border-white/5">
+                                         <div className="text-[9px] text-gray-400 uppercase tracking-wider mb-1 font-bold">Категория</div>
+                                         <div className="text-gray-900 dark:text-white font-display font-bold text-sm">{activePattern.category}</div>
                                      </div>
-                                     <div className="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl border border-gray-200 dark:border-white/5">
-                                         <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-2 font-bold">Сложность</div>
-                                         <div className="text-gray-900 dark:text-white font-display font-bold text-lg">{activePattern.difficulty}</div>
+                                     <div className="bg-gray-50 dark:bg-white/5 p-3 rounded-xl border border-gray-200 dark:border-white/5">
+                                         <div className="text-[9px] text-gray-400 uppercase tracking-wider mb-1 font-bold">Сложность</div>
+                                         <div className="text-gray-900 dark:text-white font-display font-bold text-sm">{activePattern.difficulty}</div>
                                      </div>
                                  </div>
 
@@ -1224,9 +1217,9 @@ const App: React.FC = () => {
                                          <button 
                                             onClick={handleDeepAnalysis}
                                             disabled={isAnalyzing}
-                                            className="w-full flex items-center justify-center gap-3 px-6 py-5 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 dark:from-cyan-900/40 dark:to-purple-900/40 border border-cyan-200 dark:border-cyan-500/30 text-cyan-700 dark:text-cyan-200 rounded-2xl text-sm font-bold hover:bg-white dark:hover:from-cyan-900/60 dark:hover:to-purple-900/60 transition-all shadow-lg hover:shadow-cyan-500/20 active:scale-[0.98]"
+                                            className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 dark:from-cyan-900/40 dark:to-purple-900/40 border border-cyan-200 dark:border-cyan-500/30 text-cyan-700 dark:text-cyan-200 rounded-xl text-xs font-bold hover:bg-white dark:hover:from-cyan-900/60 dark:hover:to-purple-900/60 transition-all shadow-lg hover:shadow-cyan-500/20 active:scale-[0.98]"
                                          >
-                                            <i className="fas fa-sparkles text-lg animate-pulse"></i>
+                                            <i className="fas fa-sparkles text-base animate-pulse"></i>
                                             {isAnalyzing ? 'Анализирую...' : 'AI Анализ (Подробнее)'}
                                          </button>
                                      </div>
@@ -1238,26 +1231,37 @@ const App: React.FC = () => {
                              <div className="animate-fade-in">
                                  <ReactMarkdown
                                     components={{
-                                        p: ({node, ...props}) => <p className="mb-6 text-gray-700 dark:text-gray-300 leading-relaxed font-light text-lg" {...props} />,
-                                        strong: ({node, ...props}) => <span className="text-cyan-700 dark:text-zen-accent font-bold block mb-2 uppercase text-xs tracking-[0.1em]" {...props} />,
-                                        ol: ({node, ...props}) => <ol className="space-y-6 mb-8 list-decimal pl-5 text-gray-700 dark:text-gray-300 text-lg" {...props} />,
-                                        ul: ({node, ...props}) => <ul className="space-y-3 list-disc pl-6 mb-6 text-gray-700 dark:text-gray-300 marker:text-cyan-500 text-lg" {...props} />,
-                                        li: ({node, ...props}) => <li className="pl-2 mb-2" {...props} />,
-                                        h3: ({node, ...props}) => <h3 className="text-xl font-display font-bold text-gray-900 dark:text-white mt-10 mb-6 border-b border-gray-200 dark:border-white/10 pb-3" {...props} />,
-                                        h4: ({node, ...props}) => <h4 className="text-lg font-bold text-gray-800 dark:text-gray-200 mt-8 mb-4" {...props} />,
-                                        blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-premium-purple/50 pl-4 py-2 my-6 bg-premium-purple/5 italic text-gray-600 dark:text-gray-400" {...props} />
+                                        p: ({node, ...props}) => <p className="mb-5 text-gray-700 dark:text-gray-300 leading-relaxed font-light text-base md:text-lg" {...props} />,
+                                        strong: ({node, ...props}) => <span className="text-cyan-700 dark:text-zen-accent font-bold block mb-1 uppercase text-[10px] tracking-[0.1em] mt-6" {...props} />,
+                                        ol: ({node, ...props}) => <ol className="space-y-4 mb-8 list-decimal pl-4 text-gray-700 dark:text-gray-300 text-base md:text-lg" {...props} />,
+                                        ul: ({node, ...props}) => <ul className="space-y-2 list-disc pl-5 mb-6 text-gray-700 dark:text-gray-300 marker:text-cyan-500 text-base md:text-lg" {...props} />,
+                                        li: ({node, ...props}) => <li className="pl-1 mb-1" {...props} />,
+                                        h3: ({node, ...props}) => <h3 className="text-lg md:text-xl font-display font-bold text-gray-900 dark:text-white mt-8 mb-4 border-b border-gray-200 dark:border-white/10 pb-2" {...props} />,
+                                        h4: ({node, ...props}) => <h4 className="text-base font-bold text-gray-800 dark:text-gray-200 mt-6 mb-2" {...props} />,
+                                        blockquote: ({node, ...props}) => <blockquote className="border-l-2 border-premium-purple/50 pl-4 py-2 my-4 bg-premium-purple/5 italic text-gray-600 dark:text-gray-400 text-sm" {...props} />
                                     }}
                                  >
                                     {activePattern.instruction}
                                  </ReactMarkdown>
+                                 
+                                 {/* Safety Warning merged into Guide */}
+                                 {activePattern.safetyWarning && (
+                                     <div className="mt-8 bg-rose-50 dark:bg-rose-900/10 border-l-4 border-rose-500 p-5 rounded-r-xl">
+                                         <h4 className="text-xs font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                             <i className="fas fa-exclamation-triangle"></i> Важно
+                                         </h4>
+                                         <p className="text-rose-900 dark:text-rose-100 leading-relaxed font-medium text-sm md:text-base">{activePattern.safetyWarning}</p>
+                                     </div>
+                                 )}
+
                                  {activePattern.musicLinks && activePattern.musicLinks.length > 0 && (
-                                     <div className="mt-10 p-6 bg-gradient-to-r from-purple-100/50 to-cyan-100/50 dark:from-purple-900/30 dark:to-cyan-900/30 border border-purple-200 dark:border-white/10 rounded-2xl">
-                                         <h4 className="text-base font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-3">
+                                     <div className="mt-8 p-5 bg-gradient-to-r from-purple-100/50 to-cyan-100/50 dark:from-purple-900/30 dark:to-cyan-900/30 border border-purple-200 dark:border-white/10 rounded-xl">
+                                         <h4 className="text-xs font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2 uppercase tracking-wider">
                                              <i className="fas fa-book-reader text-purple-600 dark:text-premium-purple"></i> Материалы
                                          </h4>
-                                         <div className="space-y-3">
+                                         <div className="space-y-2">
                                              {activePattern.musicLinks.map((link, idx) => (
-                                                 <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3 w-full text-center py-4 bg-black dark:bg-white text-white dark:text-black font-bold rounded-xl hover:scale-[1.02] transition-transform shadow-xl">
+                                                 <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full text-center py-3 bg-black dark:bg-white text-white dark:text-black font-bold rounded-lg hover:scale-[1.01] transition-transform shadow-md text-xs uppercase tracking-wide">
                                                      {link.icon && <i className={`fas fa-${link.icon}`}></i>} {link.label}
                                                  </a>
                                              ))}
@@ -1266,22 +1270,12 @@ const App: React.FC = () => {
                                  )}
                              </div>
                          )}
-
-                         {infoTab === 'safety' && (
-                             <div className="space-y-10 animate-fade-in">
-                                 {activePattern.safetyWarning && (
-                                     <div className="bg-rose-50 dark:bg-rose-900/10 border border-rose-200 dark:border-rose-500/20 p-6 rounded-2xl">
-                                         <p className="text-rose-900 dark:text-rose-100 leading-relaxed font-medium text-lg">{activePattern.safetyWarning}</p>
-                                     </div>
-                                 )}
-                             </div>
-                         )}
                     </div>
 
                     {/* Footer - Only visible at bottom of info panel */}
-                    <div className="p-6 border-t border-gray-200 dark:border-white/5 text-center text-gray-500 dark:text-gray-500 bg-white/50 dark:bg-[#0a0a0b]/50 backdrop-blur-xl mt-auto">
+                    <div className="p-4 md:p-6 border-t border-gray-200 dark:border-white/5 text-center text-gray-500 dark:text-gray-500 bg-white/50 dark:bg-[#0a0a0b]/50 backdrop-blur-xl mt-auto">
                         <div className="flex flex-col items-center gap-3">
-                            <div className="text-xs font-bold tracking-[0.1em] opacity-50">
+                            <div className="text-[10px] font-bold tracking-[0.1em] opacity-50">
                                 СОЗДАНО С 
                                 <a 
                                     href="https://t.me/+D78P1fpaduBlOTc6" 
@@ -1289,7 +1283,7 @@ const App: React.FC = () => {
                                     rel="noopener noreferrer"
                                     className="inline-block mx-1 align-middle cursor-default"
                                 >
-                                    <span className="text-rose-500 animate-pulse text-lg">❤️</span>
+                                    <span className="text-rose-500 animate-pulse text-sm">❤️</span>
                                 </a> 
                                 — <a href="https://t.me/nikolaiovchinnikov" target="_blank" rel="noopener noreferrer" className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 transition-colors border-b border-transparent hover:border-cyan-500">НИКОЛАЙ ОВЧИННИКОВ</a>
                             </div>
@@ -1297,7 +1291,7 @@ const App: React.FC = () => {
                                 href="https://t.me/nikolaiovchinnikov" 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className="text-[9px] uppercase font-bold tracking-[0.2em] text-gray-400 hover:text-cyan-500 transition-colors border border-gray-200 dark:border-white/5 px-4 py-2 rounded-full"
+                                className="text-[8px] uppercase font-bold tracking-[0.2em] text-gray-400 hover:text-cyan-500 transition-colors border border-gray-200 dark:border-white/5 px-3 py-1.5 rounded-full"
                             >
                                 <i className="fab fa-telegram mr-2"></i>
                                 Обратная связь
