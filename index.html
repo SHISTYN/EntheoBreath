@@ -1,38 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PranaFlow</title>
+    <title>EntheoBreath</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- PREMIUM FONTS: Space Grotesk (Display) & Manrope (UI/Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
+            fontFamily: {
+              sans: ['Manrope', 'sans-serif'],
+              display: ['Space Grotesk', 'sans-serif'],
+            },
             colors: {
-              'zen-dark': '#1c1c1e',
-              'zen-panel': '#2c2c2e',
-              'zen-accent': '#64d2ff',
-              'zen-text': '#e5e5ea',
-              'zen-muted': '#aeaeb2'
+              'zen-dark': '#050505',
+              'zen-card': '#0f0f10',
+              'zen-accent': '#22d3ee',
+              'premium-purple': '#7C3AED',
+              'premium-gold': '#F59E0B',
+            },
+            boxShadow: {
+              'glow-cyan': '0 0 30px rgba(34, 211, 238, 0.4)',
+              'glow-purple': '0 0 30px rgba(124, 58, 237, 0.4)',
+              'glow-gold': '0 0 30px rgba(245, 158, 11, 0.3)',
+              'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.3)',
+              'glass-inset': 'inset 0 0 20px rgba(255, 255, 255, 0.05)',
             },
             animation: {
-              'breathe-in': 'expand 4s ease-in-out forwards',
-              'breathe-out': 'contract 4s ease-in-out forwards',
-              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-              'fade-in': 'fadeIn 0.5s ease-out',
-              'fade-in-up': 'fadeInUp 0.6s ease-out'
+              'pulse-slow': 'pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'fade-in': 'fadeIn 1s cubic-bezier(0.16, 1, 0.3, 1)',
+              'fade-in-up': 'fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1)',
+              'float': 'float 8s ease-in-out infinite',
+              'flow': 'flow 3s linear infinite',
+              'aurora': 'aurora 25s linear infinite',
+              'mushroom-breath': 'mushroomBreath 6s ease-in-out infinite',
+              'mycelium-pulse': 'myceliumPulse 4s ease-in-out infinite',
+              'spores': 'spores 5s linear infinite',
+              'orbit': 'orbit 12s linear infinite',
+              'orbit-reverse': 'orbitReverse 15s linear infinite',
+              'shimmer': 'shimmer 2s linear infinite',
             },
             keyframes: {
-              expand: {
-                '0%': { transform: 'scale(1)' },
-                '100%': { transform: 'scale(1.5)' },
-              },
-              contract: {
-                '0%': { transform: 'scale(1.5)' },
-                '100%': { transform: 'scale(1)' },
-              },
               fadeIn: {
                 '0%': { opacity: '0' },
                 '100%': { opacity: '1' }
@@ -40,6 +57,44 @@
               fadeInUp: {
                 '0%': { opacity: '0', transform: 'translateY(20px)' },
                 '100%': { opacity: '1', transform: 'translateY(0)' }
+              },
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-10px)' }
+              },
+              flow: {
+                '0%': { strokeDashoffset: '20' },
+                '100%': { strokeDashoffset: '0' }
+              },
+              aurora: {
+                '0%': { transform: 'rotate(0deg) scale(1)' },
+                '50%': { transform: 'rotate(180deg) scale(1.1)' },
+                '100%': { transform: 'rotate(360deg) scale(1)' }
+              },
+              mushroomBreath: {
+                '0%, 100%': { transform: 'scale(1)' },
+                '50%': { transform: 'scale(1.05)' } 
+              },
+              myceliumPulse: {
+                '0%, 100%': { opacity: '0.4', strokeWidth: '1' },
+                '50%': { opacity: '1', strokeWidth: '1.5' }
+              },
+              spores: {
+                '0%': { transform: 'translate(0, 0)', opacity: '0' },
+                '20%': { opacity: '0.8' },
+                '100%': { transform: 'translate(40px, -15px)', opacity: '0' }
+              },
+              orbit: {
+                '0%': { transform: 'rotate(0deg)' },
+                '100%': { transform: 'rotate(360deg)' }
+              },
+              orbitReverse: {
+                '0%': { transform: 'rotate(360deg)' },
+                '100%': { transform: 'rotate(0deg)' }
+              },
+              shimmer: {
+                '0%': { backgroundPosition: '200% 0' },
+                '100%': { backgroundPosition: '-200% 0' }
               }
             }
           }
@@ -48,53 +103,91 @@
     </script>
     <style>
       body {
-        background-color: #050505;
-        color: #fff;
+        @apply bg-slate-50 text-gray-900 dark:bg-[#050505] dark:text-gray-100 transition-colors duration-700 font-sans antialiased;
       }
-      /* Noise texture to fix gradient banding */
+      
+      /* Cinematic Noise Texture - Ultra Fine & Subtle */
       .bg-noise {
         position: fixed;
         top: 0;
         left: 0;
-        width: 100vw;
-        height: 100vh;
+        width: 100%;
+        height: 100%;
         pointer-events: none;
         z-index: 0;
-        opacity: 0.03;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        opacity: 0.04;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        mix-blend-mode: overlay;
       }
-      /* Custom scrollbar */
+
+      /* Smooth Scroll */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Premium Selection */
+      ::selection {
+        background: rgba(124, 58, 237, 0.3); /* Purple tint */
+        color: #fff;
+      }
+
+      /* Glass Scrollbar */
       .custom-scrollbar::-webkit-scrollbar {
-        width: 6px;
+        width: 4px;
       }
       .custom-scrollbar::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.02);
+        background: transparent;
       }
       .custom-scrollbar::-webkit-scrollbar-thumb {
         background: rgba(255, 255, 255, 0.1);
         border-radius: 10px;
       }
       .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(124, 58, 237, 0.5); /* Purple hover */
       }
-      .no-scrollbar::-webkit-scrollbar {
-          display: none;
+
+      /* Card Spotlight Effect Utilities */
+      .spotlight-card {
+        position: relative;
+        overflow: hidden;
       }
-      .no-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
+      /* Inner Glow on Hover */
+      .spotlight-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(
+          600px circle at var(--mouse-x) var(--mouse-y),
+          rgba(255, 255, 255, 0.06),
+          transparent 40%
+        );
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+        z-index: 3;
+      }
+      .spotlight-card:hover::before {
+        opacity: 1;
+      }
+      
+      /* Typography enhancements */
+      .text-glow {
+        text-shadow: 0 0 20px rgba(255,255,255,0.3);
       }
     </style>
 <script type="importmap">
 {
   "imports": {
-    "vite": "https://esm.sh/vite@^7.3.0",
     "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react-markdown": "https://esm.sh/react-markdown@^10.1.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
     "react/": "https://esm.sh/react@^19.2.3/",
     "react": "https://esm.sh/react@^19.2.3",
-    "@google/genai": "https://esm.sh/@google/genai@^1.33.0",
-    "react-markdown": "https://esm.sh/react-markdown@^10.1.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+    "vite": "https://esm.sh/vite@^7.3.0"
   }
 }
 </script>

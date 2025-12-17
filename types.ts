@@ -17,6 +17,13 @@ export interface BreathPreset {
   breathCount?: number; // Override default breath count
 }
 
+export interface MusicLink {
+  label: string;
+  url: string;
+  icon: string; // FontAwesome icon name (e.g., 'telegram', 'cloud')
+  color?: string; // Optional specific color class
+}
+
 export interface BreathingPattern {
   name: string;
   description: string; // Short summary text
@@ -29,16 +36,21 @@ export interface BreathingPattern {
   conditions?: string[]; // When/How: "Empty stomach", "Lying down", "Safe for driving?"
   
   id: string;
-  mode: 'loop' | 'wim-hof'; // 'loop' = standard cycle, 'wim-hof' = breaths count -> retention -> recovery
+  // Added 'manual' for Castaneda/Tensegrity techniques
+  mode: 'loop' | 'wim-hof' | 'stopwatch' | 'manual'; 
   inhale: number;
   holdIn: number;
   exhale: number;
   holdOut: number;
   breathCount?: number; // Target breaths for Wim Hof mode (e.g., 30)
   
-  audioUrl?: string; // Link to external music playlist (Yandex Disk, Spotify, etc.)
+  // Optional override for the pattern display text (e.g., "0-0-0-0")
+  displayLabel?: string; 
+
+  audioUrl?: string; // Legacy Link (Single)
+  musicLinks?: MusicLink[]; // NEW: Multiple links support
   
-  category: 'Calm' | 'Energy' | 'Balance' | 'Sleep' | 'Focus' | 'Health' | 'Transcendence';
+  category: 'Calm' | 'Energy' | 'Balance' | 'Sleep' | 'Focus' | 'Health' | 'Transcendence' | 'Toltec';
   difficulty: 'Новичок' | 'Средний' | 'Профи';
   presets?: BreathPreset[]; // Optional list of presets
 }

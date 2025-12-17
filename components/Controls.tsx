@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BreathingPattern } from '../types';
 
 interface ControlsProps {
@@ -9,54 +9,85 @@ interface ControlsProps {
   readOnly?: boolean;
 }
 
-const PhaseControl: React.FC<{ label: string; value: number; min: number; max: number; step: number; onChange: (val: number) => void; color: string; unit?: string }> = ({ label, value, min, max, step, onChange, color, unit = 'c' }) => {
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const val = e.target.value === '' ? 0 : parseFloat(e.target.value);
-      onChange(isNaN(val) ? 0 : val);
-  };
+// Ultra-Compact Input (Glass Capsule Style)
+const MinimalInput: React.FC<{ 
+    label: string; 
+    value: number; 
+    step: number; 
+    onChange: (val: number) => void; 
+    color: string;
+}> = ({ label, value, step, onChange, color }) => {
 
-  return (
-    <div className="flex flex-col items-center p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors">
-        <div className="text-[10px] font-bold uppercase tracking-widest mb-2 opacity-70" style={{ color: color }}>
-            {label}
-        </div>
-        
-        <div className="flex items-center gap-3 w-full justify-between">
-            <button 
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-black/20 text-gray-400 hover:text-white hover:bg-black/40 transition-colors"
-                onClick={() => onChange(Math.max(min, Number((value - step).toFixed(1))))}
-            >
-                <i className="fas fa-minus text-[10px]"></i>
-            </button>
-            
-            <div className="flex items-center">
-                <input
-                    type="number"
-                    min="0"
-                    step={step}
-                    value={value}
-                    onChange={handleInputChange}
-                    className="w-12 bg-transparent text-center text-xl font-mono text-white font-bold focus:outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none translate-y-[1px]"
-                />
-                {unit && <span className="text-[10px] text-gray-500 font-mono ml-1">{unit}</span>}
+    const [localValue, setLocalValue] = useState(value.toString());
+
+    useEffect(() => {
+        setLocalValue(value.toString());
+    }, [value]);
+
+    const handleBlur = () => {
+        let val = parseFloat(localValue);
+        if (isNaN(val)) val = 0;
+        val = Math.round(val * 10) / 10;
+        setLocalValue(val.toString());
+        onChange(val);
+    };
+
+    return (
+        <div className="flex flex-col items-center justify-center group p-1">
+            {/* Label */}
+            <span className="text-[9px] font-bold uppercase tracking-wider mb-1.5 opacity-60 transition-opacity group-hover:opacity-100" style={{ color: color }}>
+                {label}
+            </span>
+
+            {/* Controls Capsule */}
+            <div className="flex items-center justify-center gap-1 w-full bg-white/5 border border-white/5 rounded-full p-1 transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:shadow-lg">
+                {/* Minus */}
+                <button 
+                    onClick={() => onChange(Math.max(0, Number((value - step).toFixed(1))))}
+                    className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors active:scale-90"
+                >
+                    <i className="fas fa-minus text-[10px]"></i>
+                </button>
+
+                {/* Value */}
+                <div className="w-14 text-center">
+                    <input
+                        type="number"
+                        inputMode="decimal"
+                        step={step}
+                        value={localValue}
+                        onChange={(e) => setLocalValue(e.target.value)}
+                        onBlur={handleBlur}
+                        className="w-full bg-transparent text-center text-xl font-display font-bold text-gray-900 dark:text-white outline-none p-0 appearance-none leading-none border-none focus:ring-0 drop-shadow-sm"
+                        style={{ MozAppearance: 'textfield' }}
+                    />
+                </div>
+
+                {/* Plus */}
+                <button 
+                    onClick={() => onChange(Number((value + step).toFixed(1)))}
+                    className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors active:scale-90"
+                >
+                    <i className="fas fa-plus text-[10px]"></i>
+                </button>
             </div>
-
-            <button 
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-black/20 text-gray-400 hover:text-white hover:bg-black/40 transition-colors"
-                onClick={() => onChange(Math.min(max, Number((value + step).toFixed(1))))}
-            >
-                <i className="fas fa-plus text-[10px]"></i>
-            </button>
+            
+            <style>{`
+                input[type=number]::-webkit-inner-spin-button, 
+                input[type=number]::-webkit-outer-spin-button { 
+                    -webkit-appearance: none; 
+                    margin: 0; 
+                }
+            `}</style>
         </div>
-    </div>
-  );
+    );
 };
 
 const Controls: React.FC<ControlsProps> = ({ pattern, onChange, rounds, onRoundsChange, readOnly = false }) => {
   
+  // Logic to find presets
   const findCurrentPresetIndex = () => {
     if (!pattern.presets) return -1;
-    // Simple equality check is tricky with breaths, but good enough for now
     return pattern.presets.findIndex(p => 
         p.inhale === pattern.inhale && 
         p.holdIn === pattern.holdIn && 
@@ -82,133 +113,72 @@ const Controls: React.FC<ControlsProps> = ({ pattern, onChange, rounds, onRounds
       });
   };
 
-  const handlePrevLevel = () => {
-      if (!pattern.presets) return;
-      if (currentPresetIndex > 0) applyPreset(currentPresetIndex - 1);
-      else if (currentPresetIndex === -1) applyPreset(0);
-  };
-
-  const handleNextLevel = () => {
-      if (!pattern.presets) return;
-      if (currentPresetIndex < pattern.presets.length - 1) applyPreset(currentPresetIndex + 1);
-      else if (currentPresetIndex === -1) applyPreset(0);
-  };
-
   if (readOnly) return null;
 
   return (
-    <div className="w-full animate-fade-in flex flex-col items-center">
+    <div className="w-full animate-fade-in flex flex-col gap-6">
       
-      {/* 1. Level / Preset Selector */}
-      {pattern.presets && pattern.presets.length > 0 && (
-          <div className="flex items-center justify-between bg-white/5 p-1.5 rounded-full mb-6 border border-white/5 w-full max-w-sm shadow-lg shadow-black/20">
-              <button 
-                onClick={handlePrevLevel}
-                disabled={currentPresetIndex <= 0 && !isCustom}
-                className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white disabled:opacity-30 transition-all"
-              >
-                  <i className="fas fa-chevron-left text-xs"></i>
-              </button>
-
-              <div className="text-center px-2 flex-1 overflow-hidden">
-                  <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">Уровень</div>
-                  <div className="font-bold text-white text-sm whitespace-nowrap overflow-x-auto no-scrollbar">
-                      {isCustom ? 'Пользовательский' : pattern.presets[currentPresetIndex]?.name}
-                  </div>
+      {/* 1. TOP BAR: Presets & Rounds (Glass Pill) */}
+      <div className="flex flex-wrap items-center justify-between gap-3 w-full px-2">
+          
+          {/* Presets Selector */}
+          {pattern.presets && pattern.presets.length > 0 ? (
+              <div className="flex items-center gap-2 bg-white/50 dark:bg-white/5 rounded-xl px-2 py-1.5 border border-gray-200 dark:border-white/5 flex-grow min-w-[200px] shadow-sm backdrop-blur-md">
+                  <button 
+                    onClick={() => pattern.presets && applyPreset(currentPresetIndex > 0 ? currentPresetIndex - 1 : 0)}
+                    disabled={currentPresetIndex <= 0 && !isCustom}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-gray-400 hover:text-white disabled:opacity-20 transition-all"
+                  >
+                      <i className="fas fa-chevron-left text-[10px]"></i>
+                  </button>
+                  <span className="text-xs font-bold text-gray-900 dark:text-white truncate text-center flex-1 tracking-wide">
+                      {isCustom ? 'Свой' : pattern.presets[currentPresetIndex]?.name}
+                  </span>
+                  <button 
+                    onClick={() => pattern.presets && applyPreset(currentPresetIndex < pattern.presets.length - 1 ? currentPresetIndex + 1 : 0)}
+                    disabled={currentPresetIndex >= (pattern.presets?.length || 0) - 1}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-gray-400 hover:text-white disabled:opacity-20 transition-all"
+                  >
+                      <i className="fas fa-chevron-right text-[10px]"></i>
+                  </button>
               </div>
+          ) : <div className="flex-1"></div>}
 
-              <button 
-                onClick={handleNextLevel}
-                disabled={currentPresetIndex >= (pattern.presets.length - 1)}
-                className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white disabled:opacity-30 transition-all"
-              >
-                  <i className="fas fa-chevron-right text-xs"></i>
-              </button>
-          </div>
-      )}
-
-      {/* 2. Unified Control Panel */}
-      <div className="bg-[#1c1c1e]/80 backdrop-blur-md rounded-3xl p-6 border border-white/5 shadow-2xl w-full max-w-2xl">
-          <div className="flex items-center justify-between mb-4 px-2">
-              <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Настройки цикла</h3>
-              {/* Rounds Counter Inline */}
-              <div className="flex items-center gap-3 bg-black/20 px-3 py-1 rounded-lg border border-white/5">
-                    <span className="text-[10px] text-gray-500 font-bold uppercase">Раунды</span>
-                    <button onClick={() => onRoundsChange(Math.max(0, rounds - 1))} className="text-gray-400 hover:text-white">-</button>
-                    <span className="font-mono font-bold text-white min-w-[20px] text-center">{rounds === 0 ? '∞' : rounds}</span>
-                    <button onClick={() => onRoundsChange(rounds + 1)} className="text-gray-400 hover:text-white">+</button>
+          {/* Rounds Selector */}
+          {pattern.mode !== 'stopwatch' && (
+              <div className="flex items-center gap-2 bg-white/50 dark:bg-white/5 rounded-xl px-3 py-1.5 border border-gray-200 dark:border-white/5 ml-auto shadow-sm backdrop-blur-md">
+                  <span className="text-[9px] font-bold uppercase text-gray-400">Раунды</span>
+                  <div className="w-px h-3 bg-gray-300 dark:bg-white/10 mx-1"></div>
+                  <button onClick={() => onRoundsChange(Math.max(0, rounds - 1))} className="text-gray-400 hover:text-white w-6 h-6 flex items-center justify-center hover:bg-white/10 rounded"><i className="fas fa-minus text-[8px]"></i></button>
+                  <span className="font-mono text-sm font-bold text-gray-900 dark:text-white w-5 text-center">{rounds === 0 ? '∞' : rounds}</span>
+                  <button onClick={() => onRoundsChange(rounds + 1)} className="text-gray-400 hover:text-white w-6 h-6 flex items-center justify-center hover:bg-white/10 rounded"><i className="fas fa-plus text-[8px]"></i></button>
               </div>
-          </div>
+          )}
+      </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-             {pattern.mode === 'wim-hof' ? (
-                 // Special controls for Wim Hof
-                 <>
-                    <PhaseControl 
-                        label="Вдохов" 
-                        color="#22d3ee" 
-                        value={pattern.breathCount || 30} 
-                        min={10} max={100} step={5} 
-                        unit=""
-                        onChange={(v) => onChange({ ...pattern, breathCount: v })} 
-                    />
-                    <PhaseControl 
-                        label="Темп (сек)" 
-                        color="#a1a1aa" 
-                        value={pattern.inhale} 
-                        min={0.8} max={4.0} step={0.1} 
-                        unit=""
-                        onChange={(v) => onChange({ ...pattern, inhale: v, exhale: v * 0.6 })} // Keep ratio roughly
-                    />
-                    <PhaseControl 
-                        label="Задержка (База)" 
-                        color="#ffffff" 
-                        value={pattern.holdOut} 
-                        min={15} max={300} step={15} 
-                        onChange={(v) => onChange({ ...pattern, holdOut: v })} 
-                    />
-                    <PhaseControl 
-                        label="Восстан." 
-                        color="#818cf8" 
-                        value={pattern.holdIn} 
-                        min={10} max={60} step={5} 
-                        onChange={(v) => onChange({ ...pattern, holdIn: v })} 
-                    />
-                 </>
-             ) : (
-                 // Standard controls
-                 <>
-                    <PhaseControl 
-                        label="Вдох" 
-                        color="#22d3ee" 
-                        value={pattern.inhale} 
-                        min={0} max={180} step={0.5} 
-                        onChange={(v) => onChange({ ...pattern, inhale: v })} 
-                    />
-                    <PhaseControl 
-                        label="Задержка" 
-                        color="#ffffff" 
-                        value={pattern.holdIn} 
-                        min={0} max={300} step={0.5} 
-                        onChange={(v) => onChange({ ...pattern, holdIn: v })} 
-                    />
-                    <PhaseControl 
-                        label="Выдох" 
-                        color="#818cf8" 
-                        value={pattern.exhale} 
-                        min={0} max={180} step={0.5} 
-                        onChange={(v) => onChange({ ...pattern, exhale: v })} 
-                    />
-                    <PhaseControl 
-                        label="Пауза" 
-                        color="#9ca3af" 
-                        value={pattern.holdOut} 
-                        min={0} max={300} step={0.5} 
-                        onChange={(v) => onChange({ ...pattern, holdOut: v })} 
-                    />
-                 </>
-             )}
-          </div>
+      {/* 2. MAIN CONTROLS GRID */}
+      <div className="w-full bg-white/50 dark:bg-[#121212]/50 border border-gray-200 dark:border-white/5 rounded-2xl p-6 backdrop-blur-xl shadow-glass">
+         {pattern.mode === 'stopwatch' ? (
+             <div className="text-center text-xs text-gray-500 py-2">Режим секундомера</div> 
+         ) : (
+             <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-6 gap-x-4">
+                 {pattern.mode === 'wim-hof' ? (
+                     <>
+                        <MinimalInput label="Вдохи" value={pattern.breathCount || 30} step={5} color="#22d3ee" onChange={(v) => onChange({ ...pattern, breathCount: v })} />
+                        <MinimalInput label="Темп" value={pattern.inhale} step={0.1} color="#94a3b8" onChange={(v) => onChange({ ...pattern, inhale: v, exhale: v * 0.6 })} />
+                        <MinimalInput label="Задержка" value={pattern.holdOut} step={15} color="#F59E0B" onChange={(v) => onChange({ ...pattern, holdOut: v })} />
+                        <MinimalInput label="Восстан." value={pattern.holdIn} step={5} color="#7C3AED" onChange={(v) => onChange({ ...pattern, holdIn: v })} />
+                     </>
+                 ) : (
+                     <>
+                        <MinimalInput label="Вдох" value={pattern.inhale} step={0.5} color="#22d3ee" onChange={(v) => onChange({ ...pattern, inhale: v })} />
+                        <MinimalInput label="Задержка" value={pattern.holdIn} step={0.5} color="#F59E0B" onChange={(v) => onChange({ ...pattern, holdIn: v })} />
+                        <MinimalInput label="Выдох" value={pattern.exhale} step={0.5} color="#7C3AED" onChange={(v) => onChange({ ...pattern, exhale: v })} />
+                        <MinimalInput label="Пауза" value={pattern.holdOut} step={0.5} color="#fb7185" onChange={(v) => onChange({ ...pattern, holdOut: v })} />
+                     </>
+                 )}
+             </div>
+         )}
       </div>
 
     </div>
