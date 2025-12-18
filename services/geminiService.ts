@@ -1,21 +1,13 @@
 import { GoogleGenAI, Modality } from "@google/genai";
 
-const getClient = () => {
-    // Support both standard process.env (local/node) and Vite's import.meta.env (production/web)
-    const apiKey = process.env.API_KEY || (import.meta as any).env?.VITE_API_KEY;
-    
-    if (!apiKey) {
-        console.error("API Key is missing. Make sure to set API_KEY or VITE_API_KEY in your environment variables.");
-        throw new Error("API Key not found");
-    }
-    return new GoogleGenAI({ apiKey });
-};
-
 export const getBreathingAnalysis = async (exerciseName: string, pattern: string): Promise<string> => {
     try {
-        const ai = getClient();
+        // Initialization using strictly process.env.API_KEY as per guidelines
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+            // Updated to Gemini 3 Pro for deeper reasoning and analysis
+            model: "gemini-3-pro-preview",
             contents: `Проведи глубокий, всесторонний анализ дыхательной техники: "${exerciseName}" (Паттерн: ${pattern}). 
             Включи исторические корни (Пранаяма, если применимо), физиологические преимущества, ментальную пользу и подробные советы по правильному выполнению.
             Используй Google Search для поиска самых точных и свежих научных исследований или культурного контекста.
@@ -26,10 +18,10 @@ export const getBreathingAnalysis = async (exerciseName: string, pattern: string
             },
         });
 
-        // Handle grounding chunks if present, but primarily return the text
+        // Correct property access for text
         const text = response.text || "Не удалось сгенерировать анализ.";
         
-        // Append source links if available
+        // Handling Google Search grounding metadata to display sources
         const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
         let sources = "";
         if (chunks) {
@@ -49,7 +41,7 @@ export const getBreathingAnalysis = async (exerciseName: string, pattern: string
 
 export const generateVoiceGuidance = async (text: string): Promise<string | null> => {
     try {
-        const ai = getClient();
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash-preview-tts",
             contents: [{ parts: [{ text }] }],
@@ -76,7 +68,7 @@ export const generateVoiceGuidance = async (text: string): Promise<string | null
 
 export const askChatbot = async (query: string): Promise<string> => {
      try {
-        const ai = getClient();
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
         const response = await ai.models.generateContent({
             model: "gemini-3-pro-preview", 
             contents: query,
