@@ -50,7 +50,7 @@ export interface BreathingPattern {
   audioUrl?: string; // Legacy Link (Single)
   musicLinks?: MusicLink[]; // NEW: Multiple links support
   
-  category: 'Calm' | 'Energy' | 'Balance' | 'Sleep' | 'Focus' | 'Health' | 'Transcendence' | 'Toltec';
+  category: 'Calm' | 'Energy' | 'Balance' | 'Sleep' | 'Focus' | 'Health' | 'Transcendence' | 'Toltec' | 'Qigong' | 'Tao';
   difficulty: 'Новичок' | 'Средний' | 'Профи';
   presets?: BreathPreset[]; // Optional list of presets
 }

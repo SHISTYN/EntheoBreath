@@ -170,7 +170,7 @@ const App: React.FC = () => {
   const [activePattern, setActivePattern] = useState<BreathingPattern>(DEFAULT_PATTERNS[0]);
   const [rounds, setRounds] = useState<number>(0); 
   const [view, setView] = useState<'timer' | 'library'>('library');
-  const [infoTab, setInfoTab] = useState<'about' | 'guide'>('about'); 
+  const [infoTab, setInfoTab] = useState<'about' | 'guide' | 'safety'>('about'); 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [isLoadingApp, setIsLoadingApp] = useState(true);
@@ -1176,6 +1176,15 @@ const App: React.FC = () => {
                             >
                                 Техника
                             </button>
+                            {/* SAFETY TAB: Only for non-Toltec/non-Manual exercises */}
+                            {activePattern.mode !== 'manual' && activePattern.category !== 'Toltec' && (
+                                <button 
+                                    onClick={() => setInfoTab('safety')}
+                                    className={`flex-1 py-2 text-[10px] sm:text-xs font-bold rounded-lg transition-all uppercase tracking-wide ${infoTab === 'safety' ? 'bg-rose-50 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-500/20' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                                >
+                                    <i className="fas fa-shield-alt mr-1"></i> Важно
+                                </button>
+                            )}
                         </div>
                     </div>
 
@@ -1244,8 +1253,8 @@ const App: React.FC = () => {
                                     {activePattern.instruction}
                                  </ReactMarkdown>
                                  
-                                 {/* Safety Warning merged into Guide */}
-                                 {activePattern.safetyWarning && (
+                                 {/* Safety Warning merged into Guide ONLY for Toltec/Manual */}
+                                 {(activePattern.mode === 'manual' || activePattern.category === 'Toltec') && activePattern.safetyWarning && (
                                      <div className="mt-8 bg-rose-50 dark:bg-rose-900/10 border-l-4 border-rose-500 p-5 rounded-r-xl">
                                          <h4 className="text-xs font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider mb-2 flex items-center gap-2">
                                              <i className="fas fa-exclamation-triangle"></i> Важно
@@ -1266,6 +1275,46 @@ const App: React.FC = () => {
                                                  </a>
                                              ))}
                                          </div>
+                                     </div>
+                                 )}
+                             </div>
+                         )}
+
+                         {/* Dedicated Safety Tab Content (For non-Toltec exercises) */}
+                         {infoTab === 'safety' && (
+                             <div className="space-y-8 animate-fade-in">
+                                 {activePattern.safetyWarning && (
+                                     <div className="bg-rose-50 dark:bg-rose-900/10 border border-rose-200 dark:border-rose-500/20 p-6 rounded-2xl">
+                                         <h4 className="text-xs font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider mb-3">Главное предупреждение</h4>
+                                         <p className="text-rose-900 dark:text-rose-100 leading-relaxed font-medium text-lg">{activePattern.safetyWarning}</p>
+                                     </div>
+                                 )}
+                                 
+                                 {activePattern.contraindications && activePattern.contraindications.length > 0 && (
+                                     <div>
+                                         <h4 className="text-[10px] font-bold text-rose-500 uppercase tracking-[0.2em] mb-3 opacity-80">Противопоказания</h4>
+                                         <ul className="space-y-3">
+                                             {activePattern.contraindications.map((c, i) => (
+                                                 <li key={i} className="flex items-start gap-3 text-gray-700 dark:text-gray-300 font-light">
+                                                     <i className="fas fa-times-circle text-rose-500 mt-1"></i>
+                                                     <span className="text-base md:text-lg">{c}</span>
+                                                 </li>
+                                             ))}
+                                         </ul>
+                                     </div>
+                                 )}
+
+                                 {activePattern.conditions && activePattern.conditions.length > 0 && (
+                                     <div>
+                                         <h4 className="text-[10px] font-bold text-premium-gold uppercase tracking-[0.2em] mb-3 opacity-80">Условия</h4>
+                                         <ul className="space-y-3">
+                                             {activePattern.conditions.map((c, i) => (
+                                                 <li key={i} className="flex items-start gap-3 text-gray-700 dark:text-gray-300 font-light">
+                                                     <i className="fas fa-check-circle text-premium-gold mt-1"></i>
+                                                     <span className="text-base md:text-lg">{c}</span>
+                                                 </li>
+                                             ))}
+                                         </ul>
                                      </div>
                                  )}
                              </div>
