@@ -1107,7 +1107,7 @@ const App: React.FC = () => {
 
         {view === 'timer' && (
             // REFACTORED MOBILE LAYOUT
-            <div className="flex-grow flex flex-col lg:flex-row h-screen lg:overflow-hidden relative">
+            <div className="flex-grow flex flex-col lg:flex-row min-h-[100dvh] lg:h-screen lg:overflow-hidden relative">
                 
                 {/* --- MANUAL STOPWATCH OVERLAY (NEW) --- */}
                 {manualStopwatchOpen && (
@@ -1191,8 +1191,10 @@ const App: React.FC = () => {
                     </div>
 
                     <div className={`p-6 md:p-8 pb-10 ${activePattern.mode === 'manual' ? 'max-w-4xl mx-auto w-full' : ''}`}>
+                         {/* ... Info Content ... */}
                          {infoTab === 'about' && (
                              <div className="space-y-8 animate-fade-in">
+                                 {/* ... About Content ... */}
                                  <div>
                                      <h4 className="text-[10px] font-bold text-zen-accent uppercase tracking-[0.2em] mb-3 opacity-80">Суть практики</h4>
                                      <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-base md:text-lg font-light">{activePattern.description}</p>
@@ -1323,8 +1325,8 @@ const App: React.FC = () => {
                          )}
                     </div>
 
-                    {/* Footer - Only visible at bottom of info panel */}
-                    <div className="p-4 md:p-6 border-t border-gray-200 dark:border-white/5 text-center text-gray-500 dark:text-gray-500 bg-white/50 dark:bg-[#0a0a0b]/50 backdrop-blur-xl mt-auto">
+                    {/* Footer - Visible at bottom of info panel ON DESKTOP ONLY */}
+                    <div className="hidden lg:block p-4 md:p-6 border-t border-gray-200 dark:border-white/5 text-center text-gray-500 dark:text-gray-500 bg-white/50 dark:bg-[#0a0a0b]/50 backdrop-blur-xl mt-auto">
                         <div className="flex flex-col items-center gap-3">
                             <div className="text-[10px] font-bold tracking-[0.1em] opacity-50">
                                 СОЗДАНО С 
@@ -1353,7 +1355,7 @@ const App: React.FC = () => {
 
                 {/* TIMER PANEL (Bottom on Mobile, Right on Desktop) - HIDDEN IN MANUAL MODE */}
                 {activePattern.mode !== 'manual' && (
-                    <div className="flex-1 flex flex-col min-h-screen lg:min-h-0 lg:h-full relative overflow-hidden order-2">
+                    <div className="flex-1 flex flex-col min-h-[100dvh] lg:min-h-0 lg:h-full relative overflow-x-hidden lg:overflow-hidden order-2">
                     
                         {/* Ghost Gradient */}
                         <div 
@@ -1423,7 +1425,7 @@ const App: React.FC = () => {
                             </div>
 
                             {/* 3. BOTTOM BLOCK: Play Buttons & Controls */}
-                            <div className="flex flex-col items-center gap-8 flex-shrink-0 w-full max-w-3xl mx-auto px-4 lg:px-8 pb-4">
+                            <div className="flex flex-col items-center gap-8 flex-shrink-0 w-full max-w-3xl mx-auto px-4 lg:px-8">
                                 {/* PLAY BUTTONS */}
                                 <div className="flex items-center gap-8">
                                     <button 
@@ -1464,6 +1466,24 @@ const App: React.FC = () => {
                                     />
                                 </div>
                             </div>
+                            
+                            {/* Footer - Mobile Only (At the very bottom of the timer scroll view) */}
+                            <div className="lg:hidden p-6 text-center text-gray-500/50 mt-12 pb-12">
+                                <div className="flex flex-col items-center gap-3">
+                                    <div className="text-[10px] font-bold tracking-[0.1em] opacity-50">
+                                        СОЗДАНО С 
+                                        <a href="https://t.me/+D78P1fpaduBlOTc6" target="_blank" rel="noopener noreferrer" className="inline-block mx-1 align-middle cursor-default">
+                                            <span className="text-rose-500 animate-pulse text-sm">❤️</span>
+                                        </a> 
+                                        — <a href="https://t.me/nikolaiovchinnikov" target="_blank" rel="noopener noreferrer" className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 transition-colors border-b border-transparent hover:border-cyan-500">НИКОЛАЙ ОВЧИННИКОВ</a>
+                                    </div>
+                                    <a href="https://t.me/nikolaiovchinnikov" target="_blank" rel="noopener noreferrer" className="text-[8px] uppercase font-bold tracking-[0.2em] text-gray-400 hover:text-cyan-500 transition-colors border border-gray-200 dark:border-white/5 px-3 py-1.5 rounded-full">
+                                        <i className="fab fa-telegram mr-2"></i>
+                                        Обратная связь
+                                    </a>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 )}
