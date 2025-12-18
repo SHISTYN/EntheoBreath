@@ -36,7 +36,7 @@ export interface BreathingPattern {
   conditions?: string[]; // When/How: "Empty stomach", "Lying down", "Safe for driving?"
   
   id: string;
-  // Added 'manual' for Castaneda/Tensegrity techniques
+  // Added 'manual' for Castaneda/Tensegrity/Qigong techniques
   mode: 'loop' | 'wim-hof' | 'stopwatch' | 'manual'; 
   inhale: number;
   holdIn: number;
