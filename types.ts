@@ -15,6 +15,7 @@ export interface BreathPreset {
   exhale: number;
   holdOut: number;
   breathCount?: number; // Override default breath count
+  retentionProfile?: number[]; // Custom retention times per round
 }
 
 export interface MusicLink {
@@ -43,6 +44,7 @@ export interface BreathingPattern {
   exhale: number;
   holdOut: number;
   breathCount?: number; // Target breaths for Wim Hof mode (e.g., 30)
+  retentionProfile?: number[]; // Array of seconds for retention per round [30, 60, 90...]
   
   // Optional override for the pattern display text (e.g., "0-0-0-0")
   displayLabel?: string; 
@@ -63,6 +65,7 @@ export interface BreathState {
   currentBreath: number; // For counting breaths in Wim Hof mode
   isActive: boolean;
   isPaused: boolean;
+  sessionResults: number[]; // Stores retention times for WHM
 }
 
 export interface GeminiAnalysis {

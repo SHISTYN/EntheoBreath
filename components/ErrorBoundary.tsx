@@ -15,6 +15,13 @@ class ErrorBoundary extends React.Component<Props, State> {
     error: null,
   };
 
+  public readonly props: Props;
+
+  constructor(props: Props) {
+    super(props);
+    this.props = props;
+  }
+
   public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }

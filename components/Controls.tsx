@@ -16,7 +16,8 @@ const MinimalInput: React.FC<{
     step: number; 
     onChange: (val: number) => void; 
     color: string;
-}> = ({ label, value, step, onChange, color }) => {
+    subLabel?: string;
+}> = ({ label, value, step, onChange, color, subLabel }) => {
 
     const [localValue, setLocalValue] = useState(value.toString());
 
@@ -35,9 +36,12 @@ const MinimalInput: React.FC<{
     return (
         <div className="flex flex-col items-center justify-center group p-1">
             {/* Label */}
-            <span className="text-[9px] font-bold uppercase tracking-wider mb-1.5 opacity-60 transition-opacity group-hover:opacity-100" style={{ color: color }}>
-                {label}
-            </span>
+            <div className="flex flex-col items-center mb-1.5 opacity-60 transition-opacity group-hover:opacity-100">
+                <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: color }}>
+                    {label}
+                </span>
+                {subLabel && <span className="text-[8px] text-gray-500 mt-0.5">{subLabel}</span>}
+            </div>
 
             {/* Controls Capsule */}
             <div className="flex items-center justify-center gap-1 w-full bg-white/5 border border-white/5 rounded-full p-1 transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:shadow-lg">
@@ -109,7 +113,8 @@ const Controls: React.FC<ControlsProps> = ({ pattern, onChange, rounds, onRounds
           holdIn: p.holdIn, 
           exhale: p.exhale, 
           holdOut: p.holdOut,
-          breathCount: p.breathCount ?? pattern.breathCount
+          breathCount: p.breathCount ?? pattern.breathCount,
+          retentionProfile: p.retentionProfile ?? pattern.retentionProfile
       });
   };
 
@@ -144,7 +149,7 @@ const Controls: React.FC<ControlsProps> = ({ pattern, onChange, rounds, onRounds
               </div>
           ) : <div className="flex-1"></div>}
 
-          {/* Rounds Selector */}
+          {/* Rounds Selector (AVAILABLE IN ALL MODES EXCEPT SIMPLE STOPWATCH) */}
           {pattern.mode !== 'stopwatch' && (
               <div className="flex items-center gap-2 bg-white/50 dark:bg-white/5 rounded-xl px-3 py-1.5 border border-gray-200 dark:border-white/5 ml-auto shadow-sm backdrop-blur-md">
                   <span className="text-[9px] font-bold uppercase text-gray-400">Раунды</span>
@@ -161,23 +166,36 @@ const Controls: React.FC<ControlsProps> = ({ pattern, onChange, rounds, onRounds
          {pattern.mode === 'stopwatch' ? (
              <div className="text-center text-xs text-gray-500 py-2">Режим секундомера</div> 
          ) : (
-             <div className={`grid grid-cols-2 ${pattern.mode === 'wim-hof' ? 'sm:grid-cols-5' : 'sm:grid-cols-4'} gap-y-6 gap-x-4`}>
-                 {pattern.mode === 'wim-hof' ? (
-                     <>
-                        <MinimalInput label="Вдохи" value={pattern.breathCount || 30} step={5} color="#22d3ee" onChange={(v) => onChange({ ...pattern, breathCount: v })} />
-                        <MinimalInput label="Вдох" value={pattern.inhale} step={0.1} color="#94a3b8" onChange={(v) => onChange({ ...pattern, inhale: v })} />
-                        <MinimalInput label="Выдох" value={pattern.exhale} step={0.1} color="#94a3b8" onChange={(v) => onChange({ ...pattern, exhale: v })} />
-                        <MinimalInput label="Задержка" value={pattern.holdOut} step={15} color="#F59E0B" onChange={(v) => onChange({ ...pattern, holdOut: v })} />
-                        <MinimalInput label="Восстан." value={pattern.holdIn} step={5} color="#7C3AED" onChange={(v) => onChange({ ...pattern, holdIn: v })} />
-                     </>
-                 ) : (
-                     <>
-                        <MinimalInput label="Вдох" value={pattern.inhale} step={0.5} color="#22d3ee" onChange={(v) => onChange({ ...pattern, inhale: v })} />
-                        <MinimalInput label="Задержка" value={pattern.holdIn} step={0.5} color="#F59E0B" onChange={(v) => onChange({ ...pattern, holdIn: v })} />
-                        <MinimalInput label="Выдох" value={pattern.exhale} step={0.5} color="#7C3AED" onChange={(v) => onChange({ ...pattern, exhale: v })} />
-                        <MinimalInput label="Пауза" value={pattern.holdOut} step={0.5} color="#fb7185" onChange={(v) => onChange({ ...pattern, holdOut: v })} />
-                     </>
-                 )}
+             <div className="flex flex-col gap-6">
+                 {/* Main Inputs Grid */}
+                 <div className={`grid grid-cols-2 ${pattern.mode === 'wim-hof' ? 'sm:grid-cols-4' : 'sm:grid-cols-4'} gap-y-6 gap-x-4`}>
+                     {pattern.mode === 'wim-hof' ? (
+                         <>
+                            <MinimalInput label="Вдохи" value={pattern.breathCount || 30} step={5} color="#22d3ee" onChange={(v) => onChange({ ...pattern, breathCount: v })} />
+                            {/* Combined Pace Control */}
+                            <MinimalInput 
+                                label="Темп" 
+                                subLabel="(Вдох)"
+                                value={pattern.inhale} 
+                                step={0.1} 
+                                color="#94a3b8" 
+                                onChange={(v) => onChange({ ...pattern, inhale: v, exhale: v * 0.6 })} // Auto-adjust exhale to keep ratio
+                            />
+                            {/* Recovery is usually fixed in UI logic but let's allow edit */}
+                            <MinimalInput label="Восстан." value={pattern.holdIn} step={5} color="#7C3AED" onChange={(v) => onChange({ ...pattern, holdIn: v })} />
+                            
+                            {/* Spacer to align grid */}
+                            <div className="hidden sm:block"></div> 
+                         </>
+                     ) : (
+                         <>
+                            <MinimalInput label="Вдох" value={pattern.inhale} step={0.5} color="#22d3ee" onChange={(v) => onChange({ ...pattern, inhale: v })} />
+                            <MinimalInput label="Задержка" value={pattern.holdIn} step={0.5} color="#F59E0B" onChange={(v) => onChange({ ...pattern, holdIn: v })} />
+                            <MinimalInput label="Выдох" value={pattern.exhale} step={0.5} color="#7C3AED" onChange={(v) => onChange({ ...pattern, exhale: v })} />
+                            <MinimalInput label="Пауза" value={pattern.holdOut} step={0.5} color="#fb7185" onChange={(v) => onChange({ ...pattern, holdOut: v })} />
+                         </>
+                     )}
+                 </div>
              </div>
          )}
       </div>

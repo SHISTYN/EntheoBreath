@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BreathingPhase } from '../types';
 
@@ -35,10 +36,13 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
 
   // --- Progress Calculations ---
   // 1. Time Progress (Standard)
-  const timeProgress = totalTimeForPhase > 0 ? (totalTimeForPhase - timeLeft) / totalTimeForPhase : 0;
+  // For standard timer: 1 -> 0. For stopwatch: we keep ring full or specific animation.
+  let timeProgress = totalTimeForPhase > 0 ? (totalTimeForPhase - timeLeft) / totalTimeForPhase : 0;
   
-  // 2. Breath Count Progress (Wim Hof Specific)
-  const breathProgress = isWimHofBreathing ? (currentBreath / totalBreaths) : 0;
+  // Override for Wim Hof Retention (Stopwatch mode) -> Always full ring (pulsing)
+  if (isWimHofRetention) {
+      timeProgress = 0; // Keep full ring
+  }
 
   // --- Color Logic ---
   let phaseColorClass = '';
@@ -47,28 +51,23 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
 
   if (isWimHof) {
       if (isWimHofBreathing) {
-          // Cold / Energy Charge
           phaseColorClass = 'text-cyan-400';
-          glowColor = '#22d3ee'; // Cyan-400
+          glowColor = '#22d3ee'; 
           strokeColor = '#22d3ee';
       } else if (isWimHofRetention) {
-          // Fire / Retention
-          phaseColorClass = 'text-orange-500';
-          glowColor = '#f97316'; // Orange-500
+          phaseColorClass = 'text-white'; // White for stopwatch clarity
+          glowColor = '#f97316'; // Orange glow
           strokeColor = '#f97316';
       } else if (isWimHofRecovery) {
-          // Recovery / Balance
           phaseColorClass = 'text-purple-400';
-          glowColor = '#a855f7'; // Purple-500
+          glowColor = '#a855f7'; 
           strokeColor = '#a855f7';
       } else {
-          // Ready / Done
           phaseColorClass = 'text-white';
           glowColor = '#9ca3af';
           strokeColor = '#ffffff';
       }
   } else {
-      // Standard Colors for other modes
       switch (phase) {
           case BreathingPhase.Inhale:
               phaseColorClass = 'text-zen-accent'; 
@@ -101,6 +100,7 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
   let mainValue = timeLeft.toFixed(1);
   let subText = label;
   let bottomText = "";
+  let phaseTimerText = ""; 
 
   if (mode === 'stopwatch') {
       const totalSeconds = timeLeft;
@@ -114,16 +114,13 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
           mainValue = `${currentBreath}`;
           subText = phase === BreathingPhase.Inhale ? "ВДОХ" : "ВЫДОХ";
           bottomText = `РАУНД ${currentRound} • ЦЕЛЬ: ${totalBreaths}`;
+          phaseTimerText = `${timeLeft.toFixed(1)}с`;
       } else if (isWimHofRetention) {
-          // Show timer for retention
+          // STRICT STOPWATCH FORMAT (MM:SS)
           const m = Math.floor(timeLeft / 60);
           const s = Math.floor(timeLeft % 60);
-          // If retention is long, show MM:SS, otherwise just SS.s
-          if (timeLeft > 60) {
-              mainValue = `${m}:${s.toString().padStart(2, '0')}`;
-          } else {
-              mainValue = timeLeft.toFixed(1);
-          }
+          mainValue = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+          
           subText = "ЗАДЕРЖКА";
           bottomText = `РАУНД ${currentRound} • РАССЛАБЛЕНИЕ`;
       } else if (isWimHofRecovery) {
@@ -131,15 +128,17 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
           subText = "ВОССТАНОВЛЕНИЕ";
           bottomText = "ВДОХ И ДЕРЖАТЬ";
       } else {
-           // Ready / Done
            mainValue = timeLeft.toFixed(0);
            subText = label;
       }
-  } else if (Number.isInteger(timeLeft)) {
-      mainValue = timeLeft.toString();
+  } else {
+      if (Number.isInteger(timeLeft)) {
+          mainValue = timeLeft.toString();
+      }
+      phaseTimerText = "";
   }
 
-  // --- Nose Logic (Legacy for Anuloma/Surya/Chandra) ---
+  // --- Nose Logic (Legacy) ---
   const isAnuloma = patternId === 'anuloma-viloma-base';
   const isSurya = patternId === 'surya-bhedana';
   const isChandra = patternId === 'chandra-bhedana';
@@ -149,7 +148,7 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
   
   if (isNoseTechnique && !isWimHof) {
       const isOddRound = currentRound % 2 !== 0; 
-      subText = label; // Reset subtext if nose logic overrides it
+      subText = label; 
       if (isAnuloma) {
           if (phase === BreathingPhase.Inhale) {
               if (isOddRound) { closeRight = true; subText = "ВДОХ ЛЕВОЙ"; } 
@@ -169,12 +168,19 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
       }
   }
 
-  // --- Visual Scaling ---
+  // --- Visual Scaling (Breathing Animation) ---
   let scale = 1;
-  // Subtle pulse on inhale/exhale for all modes
-  if (!isWimHof && mode !== 'stopwatch') {
-      if (phase === BreathingPhase.Inhale) scale = 1.05;
-      if (phase === BreathingPhase.Exhale) scale = 0.95;
+
+  if (mode !== 'stopwatch') {
+      if (phase === BreathingPhase.Inhale) {
+          scale = 1.15;
+      } else if (phase === BreathingPhase.Exhale) {
+          scale = 0.85;
+      }
+      
+      if (isWimHofBreathing) {
+          scale = phase === BreathingPhase.Inhale ? 1.1 : 0.9;
+      }
   }
 
   const containerSize = "w-[70vmin] h-[70vmin] max-w-[300px] max-h-[300px] md:w-[400px] md:h-[400px]";
@@ -185,10 +191,11 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
         
         {/* 1. Ambient Glow (Pulsing) */}
         <div 
-            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] rounded-full blur-[80px] transition-all duration-1000 pointer-events-none ${isWimHofRetention ? 'opacity-50 animate-pulse' : 'opacity-30 animate-pulse-slow'}`}
+            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] rounded-full blur-[80px] pointer-events-none transition-all ease-out ${isWimHofRetention ? 'opacity-60 animate-pulse' : 'opacity-30'}`}
             style={{ 
                 backgroundColor: glowColor,
-                transform: `translate(-50%, -50%) scale(${scale})` 
+                transform: `translate(-50%, -50%) scale(${scale})`,
+                transitionDuration: '1s'
             }}
         />
 
@@ -204,51 +211,31 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
             className={`absolute inset-0 w-full h-full rotate-[-90deg] pointer-events-none overflow-visible z-0`}
             viewBox="0 0 200 200"
         >
-            {/* WIM HOF: BREATH COUNT RING (OUTER) */}
-            {isWimHofBreathing && (
-                <>
-                    <circle cx="100" cy="100" r="98" fill="none" stroke={theme === 'light' ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.1)"} strokeWidth="2" />
-                    <circle
-                        cx="100"
-                        cy="100"
-                        r="98"
-                        fill="none"
-                        stroke={strokeColor}
-                        strokeWidth="4"
-                        strokeLinecap="round"
-                        strokeDasharray={2 * Math.PI * 98}
-                        strokeDashoffset={2 * Math.PI * 98 * (1 - breathProgress)}
-                        className="transition-all duration-300 ease-linear"
-                        style={{ filter: `drop-shadow(0 0 8px ${glowColor})`, opacity: 0.8 }}
-                    />
-                </>
-            )}
-
-            {/* WIM HOF: INDIVIDUAL BREATH TIME (INNER) or STANDARD TIME RING */}
-            {/* Radius is smaller (84) for inner ring during WHM breathing, or normal (98) for others */}
+            {/* STANDARD RING */}
             <circle
                 cx="100"
                 cy="100"
-                r={isWimHofBreathing ? "84" : "98"}
+                r="98"
                 fill="none"
                 stroke={theme === 'light' ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.05)"}
-                strokeWidth={isWimHofBreathing ? "2" : "1"}
+                strokeWidth="2"
             />
+            {/* ACTIVE RING */}
             {mode !== 'stopwatch' && (
                 <circle
                     cx="100"
                     cy="100"
-                    r={isWimHofBreathing ? "84" : "98"}
+                    r="98"
                     fill="none"
                     stroke={strokeColor}
-                    strokeWidth={isWimHofBreathing ? "3" : "4"} 
+                    strokeWidth="4" 
                     strokeLinecap="round"
-                    strokeDasharray={2 * Math.PI * (isWimHofBreathing ? 84 : 98)}
-                    strokeDashoffset={2 * Math.PI * (isWimHofBreathing ? 84 : 98) * (1 - timeProgress)}
-                    className="transition-all duration-100 ease-linear"
+                    strokeDasharray={2 * Math.PI * 98}
+                    // If Retention, keep full ring (offset 0), otherwise normal progress
+                    strokeDashoffset={isWimHofRetention ? 0 : 2 * Math.PI * 98 * (1 - timeProgress)}
+                    className={`transition-all ease-linear ${isWimHofRetention ? 'opacity-100' : 'duration-100'}`}
                     style={{ 
-                        filter: `drop-shadow(0 0 10px ${glowColor})`,
-                        opacity: isWimHofBreathing ? 0.6 : 1 
+                        filter: `drop-shadow(0 0 10px ${glowColor})`
                     }}
                 />
             )}
@@ -256,8 +243,11 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
 
         {/* 4. THE ORB (Container) */}
         <div 
-            className={`relative ${orbSize} rounded-full flex flex-col items-center justify-center transition-transform duration-[50ms] ease-linear z-10`}
-            style={{ transform: `scale(${scale})` }}
+            className={`relative ${orbSize} rounded-full flex flex-col items-center justify-center transition-transform ease-out z-10`}
+            style={{ 
+                transform: `scale(${scale})`,
+                transitionDuration: '1000ms' // Smooth breathing animation
+            }}
         >
             {/* Background Glass */}
             <div className={`absolute inset-0 rounded-full border border-white/10 bg-[#0a0a0b]/80 backdrop-blur-2xl shadow-2xl transition-all duration-500 ${isWimHofRetention ? 'shadow-orange-500/20 bg-[#1a0a05]/90' : ''}`}></div>
@@ -287,11 +277,25 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
                     <span className={`text-[18vmin] md:text-8xl font-display font-bold tabular-nums tracking-tighter ${phaseColorClass} drop-shadow-lg leading-none transition-colors duration-300`}>
                         {mainValue}
                     </span>
+                    
                     {/* Breath Counter Subtext for WHM Breathing */}
                     {isWimHofBreathing && (
-                        <span className="text-gray-500 text-xs font-mono mt-2">
-                            из {totalBreaths}
-                        </span>
+                        <div className="flex flex-col items-center mt-2">
+                            <span className="text-gray-500 text-xs font-mono">
+                                из {totalBreaths}
+                            </span>
+                            <span className="text-white/50 text-xs font-bold mt-1 bg-white/10 px-2 py-0.5 rounded">
+                                {phaseTimerText}
+                            </span>
+                        </div>
+                    )}
+                    
+                    {/* Explicit Phase Timer for Standard Modes */}
+                    {!isWimHof && mode !== 'stopwatch' && (
+                        <div className="mt-2 text-gray-400 text-xs font-bold uppercase tracking-widest bg-black/20 px-3 py-1 rounded-full border border-white/5">
+                            {phase === BreathingPhase.Inhale ? 'Вдох' : phase === BreathingPhase.Exhale ? 'Выдох' : phase === BreathingPhase.HoldIn ? 'Задержка' : phase === BreathingPhase.HoldOut ? 'Пауза' : ''}
+                            <span className="ml-2 text-white">{timeLeft.toFixed(1)}с</span>
+                        </div>
                     )}
                 </div>
 
@@ -314,14 +318,6 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
                         </div>
                     )}
                 </div>
-
-                {/* Legacy Nose Indicators */}
-                {isNoseTechnique && !isWimHof && (
-                    <>
-                        <div className={`absolute bottom-6 md:bottom-10 left-6 md:left-12 text-[8px] md:text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${closeLeft ? 'text-zen-accent opacity-100' : 'text-gray-600 opacity-30'}`}>Безымянный</div>
-                        <div className={`absolute bottom-6 md:bottom-10 right-6 md:left-auto md:right-12 text-[8px] md:text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${closeRight ? 'text-zen-accent opacity-100' : 'text-gray-600 opacity-30'}`}>Большой</div>
-                    </>
-                )}
             </div>
         </div>
     </div>
