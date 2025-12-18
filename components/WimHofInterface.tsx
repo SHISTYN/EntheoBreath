@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { BreathingPattern } from '../types';
 
 // --- TYPES & CONSTANTS ---
@@ -36,8 +36,9 @@ const HarmonicHexagon: React.FC<{
     const path = "M100 20 L170 60 L170 140 L100 180 L30 140 L30 60 Z";
 
     // Animation Variants
-    const tIn = { duration: speed.inhale, ease: [0.42, 0, 0.58, 1] }; // Ease-in-out
-    const tOut = { duration: speed.exhale, ease: [0.42, 0, 0.58, 1] };
+    // FIXED: Explicitly type the ease array as a tuple for Framer Motion compatibility
+    const tIn = { duration: speed.inhale, ease: [0.42, 0, 0.58, 1] as [number, number, number, number] };
+    const tOut = { duration: speed.exhale, ease: [0.42, 0, 0.58, 1] as [number, number, number, number] };
     
     // Staggered Layers
     const layerVariants = {
