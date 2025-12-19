@@ -4,13 +4,13 @@ import { DEFAULT_PATTERNS, CATEGORY_NAMES, CATEGORY_ICONS } from '../constants';
 import TechniqueCard from './library/TechniqueCard';
 import LibraryHeader from './library/LibraryHeader';
 
-// High Impact Techniques selected by Author
+// High Impact Techniques selected by Author (Ordered)
 const POWER_PACK_IDS = [
-    'wim-hof-session',     // The King
-    'anuloma-viloma-base', // Balance King
-    'buteyko',             // Health King
-    '4-7-8',               // Sleep King
-    'toltec-recapitulation'// Magic King
+    'wim-hof-session',     // 1. The King
+    'anuloma-viloma-base', // 2. Balance King
+    'buteyko',             // 3. Health King
+    'toltec-recapitulation', // 4. Magic King
+    '4-7-8',               // 5. Sleep King
 ];
 
 interface LibraryViewProps {
@@ -53,16 +53,23 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
             );
         }
 
-        // 3. Category Filter
+        // 3. Category Filter & Special Sort Logic
         if (selectedCategory === 'Favorites') {
             patterns = patterns.filter(p => favorites.includes(p.id));
         } else if (selectedCategory === 'AuthorChoice') {
+            // Filter
             patterns = patterns.filter(p => POWER_PACK_IDS.includes(p.id));
+            // Sort strictly by the POWER_PACK_IDS order
+            patterns.sort((a, b) => {
+                return POWER_PACK_IDS.indexOf(a.id) - POWER_PACK_IDS.indexOf(b.id);
+            });
+            // Return as a SINGLE group to avoid scattering them across original categories
+            return { 'AuthorChoice': patterns };
         } else if (selectedCategory !== 'All') {
             patterns = patterns.filter(p => p.category === selectedCategory);
         }
 
-        // 4. Group by Category
+        // 4. Group by Category (Default behavior)
         return patterns.reduce((acc, pattern) => {
             if (!acc[pattern.category]) acc[pattern.category] = [];
             acc[pattern.category].push(pattern);
@@ -89,32 +96,34 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
 
                 {/* UX EXPLANATION FOR AUTHOR CHOICE */}
                 {selectedCategory === 'AuthorChoice' && (
-                    <div className="max-w-3xl mx-auto mb-10 text-center animate-fade-in">
-                        <div className="inline-block p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 backdrop-blur-md">
-                            <p className="text-amber-700 dark:text-amber-400 font-medium italic text-sm md:text-base leading-relaxed">
-                                "Эти 5 практик составляют <strong className="text-amber-600 dark:text-amber-300">Золотой Стандарт</strong>. 
-                                Они дают самый быстрый и глубокий результат. Если у вас мало времени, делайте только их."
+                    <div className="max-w-3xl mx-auto mb-12 text-center animate-fade-in">
+                        <div className="inline-block p-6 rounded-3xl bg-gradient-to-br from-amber-500/10 to-orange-600/10 border border-amber-500/20 backdrop-blur-md shadow-[0_0_30px_rgba(245,158,11,0.1)]">
+                            <h3 className="text-xl font-display font-bold text-amber-500 mb-2">Золотой Стандарт</h3>
+                            <p className="text-amber-800 dark:text-amber-200 font-medium text-sm md:text-base leading-relaxed opacity-80">
+                                "Эти 5 практик дают 80% результата за 20% усилий. Если у вас мало времени — делайте только их."
                             </p>
                         </div>
                     </div>
                 )}
                 
-                {/* GRID SECTION - Denser Layout */}
+                {/* GRID SECTION */}
                 <div className="space-y-12">
                     {Object.entries(filteredGroupedPatterns).map(([category, patterns], catIdx) => (
                         <div key={category} className="animate-fade-in-up" style={{ animationDelay: `${catIdx * 100}ms` }}>
                             
-                            {/* Category Title - Tighter spacing */}
-                            <div className="flex items-center gap-4 mb-6 px-2">
-                                <div className="w-10 h-10 rounded-xl bg-cyan-100/50 dark:bg-white/5 flex items-center justify-center border border-cyan-200/50 dark:border-white/5 text-cyan-600 dark:text-zen-accent text-lg shadow-sm backdrop-blur-sm">
-                                    <i className={`fas fa-${CATEGORY_ICONS[category] || 'wind'}`}></i>
+                            {/* Category Title - Hide for AuthorChoice as we have a custom header above */}
+                            {category !== 'AuthorChoice' && (
+                                <div className="flex items-center gap-4 mb-6 px-2">
+                                    <div className="w-10 h-10 rounded-xl bg-cyan-100/50 dark:bg-white/5 flex items-center justify-center border border-cyan-200/50 dark:border-white/5 text-cyan-600 dark:text-zen-accent text-lg shadow-sm backdrop-blur-sm">
+                                        <i className={`fas fa-${CATEGORY_ICONS[category] || 'wind'}`}></i>
+                                    </div>
+                                    <h3 className="text-2xl font-display font-bold text-gray-900 dark:text-white tracking-tight">
+                                        {CATEGORY_NAMES[category] || category}
+                                    </h3>
                                 </div>
-                                <h3 className="text-2xl font-display font-bold text-gray-900 dark:text-white tracking-tight">
-                                    {CATEGORY_NAMES[category] || category}
-                                </h3>
-                            </div>
+                            )}
                             
-                            {/* Cards Grid - 5 cols on massive screens, gap-4 density */}
+                            {/* Cards Grid */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                                 {patterns.map((p) => (
                                     <TechniqueCard 

@@ -80,13 +80,13 @@ export const PHILOSOPHY_CONTENT = `
 // --- MAIN LIST AGGREGATION ---
 
 export const DEFAULT_PATTERNS: BreathingPattern[] = [
-  ...toltecTechniques,
-  ...energyTechniques,
-  ...relaxTechniques,
-  ...balanceTechniques,
-  ...focusTechniques,
-  ...healthTechniques,
-  ...qigongTechniques,
-  ...daoTechniques,
-  ...transcendenceTechniques
+  ...energyTechniques,      // 1. Энергия (Теперь первая)
+  ...relaxTechniques,       // 2. Спокойствие/Сон
+  ...balanceTechniques,     // 3. Баланс
+  ...focusTechniques,       // 4. Фокус
+  ...healthTechniques,      // 5. Здоровье
+  ...qigongTechniques,      // 6. Цигун
+  ...toltecTechniques,      // 7. Магия Тольтеков (Спустили вниз)
+  ...daoTechniques,         // 8. ДАО
+  ...transcendenceTechniques // 9. Трансценденция
 ];
