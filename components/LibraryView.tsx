@@ -108,7 +108,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
                 
                 {/* GRID SECTION */}
                 <div className="space-y-12">
-                    {Object.entries(filteredGroupedPatterns).map(([category, patterns], catIdx) => (
+                    {(Object.entries(filteredGroupedPatterns) as [string, BreathingPattern[]][]).map(([category, patterns], catIdx) => (
                         <div key={category} className="animate-fade-in-up" style={{ animationDelay: `${catIdx * 100}ms` }}>
                             
                             {/* Category Title - Hide for AuthorChoice as we have a custom header above */}

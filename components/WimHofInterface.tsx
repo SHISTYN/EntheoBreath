@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { BreathingPattern } from '../types';
+import WimHofGuide from './techniques/WimHofGuide'; // Import Guide
 
 // --- TYPES & CONSTANTS ---
 
 type WhmPhase = 'SETUP' | 'PREP' | 'BREATHING' | 'RETENTION' | 'RECOVERY_PREP' | 'RECOVERY' | 'ROUND_WAIT' | 'DONE';
 type SpeedKey = 'slow' | 'normal' | 'fast';
+type TabKey = 'practice' | 'guide'; // Reordered logic
 
 interface SpeedProfile {
     label: string;
@@ -21,7 +23,6 @@ const SPEEDS: Record<SpeedKey, SpeedProfile> = {
 };
 
 // --- SUB-COMPONENT: HARMONIC HEXAGON ---
-// Renders the breathing visual with 3 layered paths for the "organic" effect
 const HarmonicHexagon: React.FC<{
     state: 'inhale' | 'exhale' | 'hold' | 'static';
     speed: { inhale: number; exhale: number };
@@ -36,19 +37,17 @@ const HarmonicHexagon: React.FC<{
     const path = "M100 20 L170 60 L170 140 L100 180 L30 140 L30 60 Z";
 
     // Animation Variants
-    // FIXED: Explicitly type the ease array as a tuple for Framer Motion compatibility
     const tIn = { duration: speed.inhale, ease: [0.42, 0, 0.58, 1] as [number, number, number, number] };
     const tOut = { duration: speed.exhale, ease: [0.42, 0, 0.58, 1] as [number, number, number, number] };
     
-    // Staggered Layers - INCREASED AMPLITUDE for visibility
     const layerVariants = {
         inhale: (i: number) => ({
-            scale: 1 + (i * 0.18), // Was 0.12, increased for stronger breath effect
+            scale: 1 + (i * 0.18),
             opacity: 0.7 - (i * 0.15),
             transition: { ...tIn, delay: i * 0.06 } 
         }),
         exhale: (i: number) => ({
-            scale: 0.7 + (i * 0.04), // Was 0.75, decreased for tighter collapse
+            scale: 0.7 + (i * 0.04),
             opacity: 0.1 + (i * 0.1),
             transition: { ...tOut, delay: i * 0.04 }
         }),
@@ -56,7 +55,6 @@ const HarmonicHexagon: React.FC<{
         static: { scale: 1, opacity: 0.3 }
     };
 
-    // Text Sync
     const textVariants = {
         inhale: { 
             scale: 1.6, 
@@ -101,7 +99,6 @@ const HarmonicHexagon: React.FC<{
                 ))}
             </svg>
 
-            {/* Central Digits */}
             <div className="relative z-10 flex flex-col items-center justify-center pointer-events-none">
                 <motion.span 
                     variants={textVariants}
@@ -132,11 +129,13 @@ interface Props {
 }
 
 const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
-    // --- STATE ---
+    // --- TABS STATE ---
+    // UX DECISION: Default to 'practice' for immediate action
+    const [activeTab, setActiveTab] = useState<TabKey>('practice');
+
+    // --- BREATHING STATE ---
     const [phase, setPhase] = useState<WhmPhase>('SETUP');
-    
-    // Settings
-    const [roundsTarget, setRoundsTarget] = useState(3); // 0 or 11 = Infinity in UI logic
+    const [roundsTarget, setRoundsTarget] = useState(3);
     const [breathsTarget, setBreathsTarget] = useState(30);
     const [speedKey, setSpeedKey] = useState<SpeedKey>('normal');
     
@@ -145,16 +144,16 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
     const [currentBreath, setCurrentBreath] = useState(1);
     const [timerVal, setTimerVal] = useState(0);
     
-    // Refs for Timing
+    // Refs
     const reqRef = useRef<number | null>(null);
     const lastTimeRef = useRef<number>(0);
 
-    // --- SETUP PREVIEW LOOP (Runs only in SETUP) ---
+    // --- SETUP PREVIEW LOOP ---
     const [previewState, setPreviewState] = useState<'inhale'|'exhale'>('inhale');
     const [previewCount, setPreviewCount] = useState(1);
 
     useEffect(() => {
-        if (phase !== 'SETUP') return;
+        if (phase !== 'SETUP' || activeTab !== 'practice') return;
         
         let t1: any, t2: any;
         const s = SPEEDS[speedKey];
@@ -171,22 +170,20 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
         };
         loop();
         return () => { clearTimeout(t1); clearTimeout(t2); };
-    }, [speedKey, phase]);
+    }, [speedKey, phase, activeTab]);
 
-    // --- HELPER FOR RETENTION START ---
-    // Moved outside to be accessible by auto-transition logic
+    // --- RETENTION LOGIC ---
     const startRetention = useCallback(() => {
         setPhase('RETENTION');
         setTimerVal(0);
         setBreathAnimState('static');
     }, []);
 
-    // --- BREATHING LOGIC (The Core Loop) ---
-    // We use a separate state 'breathAnimState' to drive the Hexagon during the active phase
+    // --- BREATHING LOGIC ---
     const [breathAnimState, setBreathAnimState] = useState<'inhale'|'exhale'|'static'>('static');
 
     useEffect(() => {
-        if (phase !== 'BREATHING') return;
+        if (phase !== 'BREATHING' || activeTab !== 'practice') return;
 
         let isMounted = true;
         const s = SPEEDS[speedKey];
@@ -196,29 +193,23 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
         });
         
         const cycle = async () => {
-             // 1. INHALE
              setBreathAnimState('inhale');
              await delay(s.inhale * 1000);
              if (!isMounted || phase !== 'BREATHING') return;
 
-             // 2. EXHALE
              setBreathAnimState('exhale');
              await delay(s.exhale * 1000);
              if (!isMounted || phase !== 'BREATHING') return;
 
-             // 3. COUNT UPDATE & AUTO-TRANSITION CHECK
              setCurrentBreath(prev => {
                  const nextCount = prev + 1;
-                 // AUTO TRANSITION LOGIC
                  if (nextCount > breathsTarget) {
-                     // Trigger retention immediately after the last exhale
                      startRetention();
                      return prev; 
                  }
                  return nextCount;
              });
              
-             // If we just transitioned, this cycle loop naturally dies due to phase dependency change
              if (phase === 'BREATHING') {
                  cycle();
              }
@@ -226,10 +217,9 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
 
         cycle();
         return () => { isMounted = false; };
-    }, [phase, speedKey, breathsTarget, startRetention]);
+    }, [phase, speedKey, breathsTarget, startRetention, activeTab]);
 
-    // --- AUTO TRANSITION LOGIC ---
-    // Moved before tick to avoid usage-before-definition issues
+    // --- AUTO TRANSITION ---
     const handleAutoTransition = useCallback(() => {
         if (phase === 'PREP') {
             setPhase('BREATHING');
@@ -241,7 +231,6 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
             setPhase('ROUND_WAIT');
             setTimerVal(3);
         } else if (phase === 'ROUND_WAIT') {
-             // Check Rounds (10 is max in UI, >10 is Infinity)
             if (roundsTarget <= 10 && currentRound >= roundsTarget) {
                 setPhase('DONE');
             } else {
@@ -252,17 +241,15 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
         }
     }, [phase, roundsTarget, currentRound]);
 
-    // --- STOPWATCH & COUNTDOWN LOGIC (RAF) ---
+    // --- RAF LOOP ---
     const tick = useCallback((time: number) => {
         if (!lastTimeRef.current) lastTimeRef.current = time;
         const delta = (time - lastTimeRef.current) / 1000;
         lastTimeRef.current = time;
 
         if (phase === 'RETENTION') {
-            // Count UP
             setTimerVal(prev => prev + delta);
         } else if (['PREP', 'RECOVERY_PREP', 'RECOVERY', 'ROUND_WAIT'].includes(phase)) {
-            // Count DOWN
             setTimerVal(prev => {
                 const next = prev - delta;
                 if (next <= 0) {
@@ -275,17 +262,15 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
         reqRef.current = requestAnimationFrame(tick);
     }, [phase, handleAutoTransition]); 
 
-    // Start/Stop RAF
     useEffect(() => {
-        if (phase === 'SETUP' || phase === 'BREATHING' || phase === 'DONE') {
+        if (activeTab !== 'practice' || phase === 'SETUP' || phase === 'BREATHING' || phase === 'DONE') {
              if (reqRef.current) cancelAnimationFrame(reqRef.current);
              lastTimeRef.current = 0;
              return;
         }
         reqRef.current = requestAnimationFrame(tick);
         return () => { if (reqRef.current) cancelAnimationFrame(reqRef.current); };
-    }, [phase, tick]);
-
+    }, [phase, tick, activeTab]);
 
     // --- INTERACTIONS ---
     const startSession = () => {
@@ -295,10 +280,8 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
     };
 
     const handleDoubleTap = () => {
-        if (phase === 'BREATHING') {
-            // Manual early exit to retention
-            startRetention();
-        } else if (phase === 'RETENTION') {
+        if (phase === 'BREATHING') startRetention();
+        else if (phase === 'RETENTION') {
             setPhase('RECOVERY_PREP');
             setTimerVal(3);
         }
@@ -310,257 +293,197 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
         return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
     };
 
-    // --- RENDER HELPERS ---
-    
-    // 1. SETUP UI
-    if (phase === 'SETUP') {
-        const isMaxRounds = roundsTarget > 10;
-        
-        return (
-            <div className="w-full h-full flex flex-col bg-[#0B0E11] text-white p-4 md:p-8 animate-fade-in font-sans">
-                
-                {/* PREVIEW BLOCK (TOP) */}
-                <div className="flex-1 flex flex-col items-center justify-center relative min-h-[250px] mb-8">
-                     <div className="absolute top-0 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                         Предпросмотр темпа
-                     </div>
-                     <HarmonicHexagon 
-                        state={previewState}
-                        speed={SPEEDS[speedKey]}
-                        label={previewCount}
-                        scale={0.9}
-                        color="#48CFE1"
-                     />
-                     
-                     {/* SPEED CONTROLS */}
-                     <div className="flex gap-2 mt-8 bg-white/5 p-1 rounded-xl border border-white/5">
-                        {(['slow', 'normal', 'fast'] as SpeedKey[]).map(k => (
-                            <button
-                                key={k}
-                                onClick={() => setSpeedKey(k)}
-                                className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all ${
-                                    speedKey === k 
-                                    ? 'bg-[#48CFE1] text-black shadow-[0_0_15px_rgba(72,207,225,0.4)]' 
-                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
-                                }`}
+    // --- RENDER ---
+    return (
+        <div className="w-full h-full flex flex-col bg-[#0B0E11] text-white relative overflow-hidden font-sans">
+            
+            {/* 1. UNIFIED HEADER */}
+            <div className="w-full p-4 md:p-6 flex flex-col gap-4 z-20 bg-gradient-to-b from-[#0B0E11] to-[#0B0E11]/0 shrink-0">
+                <div className="flex justify-between items-center">
+                    
+                    {/* Left: Round Info */}
+                    <div className="flex flex-col w-12">
+                         <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Раунд</span>
+                         <span className="text-xl font-display font-bold text-white">
+                            {currentRound} <span className="text-gray-600 text-sm">/ {roundsTarget > 10 ? '∞' : roundsTarget}</span>
+                         </span>
+                    </div>
+
+                    {/* Center: CONSISTENT TABS (Matches Sidebar Style) */}
+                    <div className="bg-white/5 p-1 rounded-xl border border-white/5 flex relative w-full max-w-[260px]">
+                        {/* Tab Background Logic with AnimatePresence/layoutId */}
+                        {['practice', 'guide'].map((tab) => (
+                            <button 
+                                key={tab}
+                                onClick={() => setActiveTab(tab as TabKey)}
+                                className={`flex-1 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest rounded-lg relative z-10 transition-colors duration-300 ${activeTab === tab ? 'text-white' : 'text-gray-500 hover:text-gray-300'}`}
                             >
-                                {SPEEDS[k].label}
+                                {activeTab === tab && (
+                                    <motion.div 
+                                        layoutId="activeWhmTab"
+                                        className="absolute inset-0 bg-white/10 rounded-lg shadow-sm"
+                                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                    />
+                                )}
+                                {tab === 'guide' ? '📹 Руководство' : '🧘 Практика'}
                             </button>
                         ))}
-                     </div>
-                </div>
-
-                {/* SETTINGS BLOCK (BOTTOM) */}
-                <div className="w-full max-w-md mx-auto space-y-8">
-                    
-                    {/* A. ROUNDS STEPPER */}
-                    <div className="flex items-center justify-between">
-                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Раунды</label>
-                        <div className="flex items-center gap-4">
-                            <button 
-                                onClick={() => setRoundsTarget(r => r > 1 ? r - 1 : 1)}
-                                className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white flex items-center justify-center transition-all active:scale-95"
-                            >
-                                <i className="fas fa-minus text-xs"></i>
-                            </button>
-                            
-                            <div className="w-12 text-center font-display font-bold text-xl text-[#48CFE1]">
-                                {isMaxRounds ? '∞' : roundsTarget}
-                            </div>
-                            
-                            <button 
-                                onClick={() => setRoundsTarget(r => r <= 10 ? r + 1 : 11)}
-                                className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white flex items-center justify-center transition-all active:scale-95"
-                            >
-                                <i className="fas fa-plus text-xs"></i>
-                            </button>
-                        </div>
                     </div>
-
-                    {/* B. BREATHS SLIDER */}
-                    <div>
-                        <div className="flex justify-between mb-4">
-                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Вдохи</label>
-                            <span className="text-sm font-bold text-[#48CFE1]">{breathsTarget}</span>
-                        </div>
-                        
-                        <div className="relative h-12 w-full flex items-center">
-                            {/* Track Background */}
-                            <div className="absolute left-0 right-0 h-2 bg-white/10 rounded-full overflow-hidden">
-                                {/* Fill */}
-                                <div 
-                                    className="h-full bg-[#48CFE1] transition-all duration-150" 
-                                    style={{ width: `${((breathsTarget - 5) / 55) * 100}%` }}
-                                ></div>
-                            </div>
-
-                            {/* Center Marker (30) */}
-                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-0.5 h-4 bg-white/30 rounded-full pointer-events-none"></div>
-
-                            {/* The Input */}
-                            <input 
-                                type="range" min="5" max="60" step="5" 
-                                value={breathsTarget}
-                                onChange={(e) => setBreathsTarget(Number(e.target.value))}
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-                            />
-
-                            {/* Custom Thumb Visual (Follows input) */}
-                            <div 
-                                className="absolute h-6 w-6 bg-white rounded-full shadow-[0_0_15px_rgba(255,255,255,0.5)] pointer-events-none transition-all duration-150 border-2 border-[#0B0E11] z-10"
-                                style={{ 
-                                    left: `${((breathsTarget - 5) / 55) * 100}%`, 
-                                    transform: 'translateX(-50%)' 
-                                }}
-                            ></div>
-                        </div>
-                        <div className="flex justify-between px-1 mt-1 text-[9px] text-gray-600 font-bold font-mono">
-                            <span>5</span>
-                            <span className="text-gray-500">30</span>
-                            <span>60</span>
-                        </div>
-                    </div>
-
-                    {/* START BUTTON */}
-                    <button 
-                        onClick={startSession}
-                        className="w-full py-4 bg-gradient-to-r from-[#48CFE1] to-cyan-600 text-[#0B0E11] font-display font-bold text-lg uppercase tracking-widest rounded-2xl shadow-[0_0_20px_rgba(72,207,225,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all"
-                    >
-                        Начать практику
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    // 2. ACTIVE PHASES UI
-    // Determine props for Hexagon based on phase
-    let visState: 'inhale' | 'exhale' | 'hold' | 'static' = 'static';
-    let visLabel: string | number = "";
-    let visSub = "";
-    let visColor = "#48CFE1"; // Default Cyan
-    let hintText = "";
-    let isClickable = false;
-
-    if (phase === 'PREP') {
-        visLabel = Math.ceil(timerVal);
-        visSub = "ПРИГОТОВЬТЕСЬ";
-    } 
-    else if (phase === 'BREATHING') {
-        visState = breathAnimState;
-        visLabel = currentBreath;
-        visSub = visState === 'inhale' ? "ВДОХ" : "ВЫДОХ";
-        // Update hint to reflect both options
-        hintText = "Двойной тап: завершить раньше";
-        isClickable = true;
-    } 
-    else if (phase === 'RETENTION') {
-        visState = 'static';
-        visLabel = formatStopwatch(timerVal);
-        visSub = "ЗАДЕРЖКА";
-        visColor = "#F59E0B"; // Orange
-        hintText = "Тап для вдоха";
-        isClickable = true;
-    } 
-    else if (phase === 'RECOVERY_PREP') {
-        visState = 'inhale';
-        visLabel = Math.ceil(timerVal);
-        visSub = "ГЛУБОКИЙ ВДОХ";
-        visColor = "#A855F7"; // Purple
-    } 
-    else if (phase === 'RECOVERY') {
-        visState = 'hold';
-        visLabel = Math.ceil(timerVal);
-        visSub = "ДЕРЖИТЕ";
-        visColor = "#A855F7";
-    } 
-    else if (phase === 'ROUND_WAIT') {
-        visLabel = Math.ceil(timerVal);
-        visSub = "ОТДЫХ";
-    } 
-    else if (phase === 'DONE') {
-        visLabel = "✓";
-        visSub = "ФИНИШ";
-    }
-
-    return (
-        <div 
-            className="w-full h-full flex flex-col bg-[#0B0E11] text-white relative overflow-hidden select-none"
-            onDoubleClick={isClickable ? handleDoubleTap : undefined}
-            onClick={phase === 'RETENTION' ? handleDoubleTap : undefined} // Also single click for retention finish
-        >
-            {/* TOP BAR */}
-            <div className="absolute top-0 w-full p-6 flex justify-between items-center z-20">
-                <div className="flex flex-col">
-                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Раунд</span>
-                    <span className="text-xl font-display font-bold text-white">
-                        {currentRound} <span className="text-gray-600 text-sm">/ {roundsTarget > 10 ? '∞' : roundsTarget}</span>
-                    </span>
-                </div>
-                <button 
-                    onClick={onExit}
-                    className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10"
-                >
-                    <i className="fas fa-times text-xs"></i>
-                </button>
-            </div>
-
-            {/* MAIN VISUAL AREA */}
-            <div className="flex-1 flex flex-col items-center justify-center relative w-full">
-                
-                {/* Phase Title */}
-                <h2 className="absolute top-[15%] w-full text-center text-2xl md:text-3xl font-display font-bold text-white px-4 animate-fade-in">
-                    {phase === 'RETENTION' ? "ВЫДОХНИТЕ И ЗАДЕРЖИТЕ" : 
-                     phase === 'RECOVERY_PREP' ? "ПРИГОТОВЬТЕСЬ..." :
-                     phase === 'RECOVERY' ? "ДЕРЖИТЕ ДЫХАНИЕ" :
-                     phase === 'BREATHING' ? "РИТМИЧНОЕ ДЫХАНИЕ" : 
-                     phase === 'ROUND_WAIT' ? "ОТЛИЧНО!" : ""}
-                </h2>
-
-                {/* THE HEXAGON - WRAPPED IN MOTION DIV FOR PUMPING EFFECT */}
-                <motion.div 
-                    className="mt-8 relative z-10"
-                    animate={
-                        phase === 'BREATHING' 
-                        ? { scale: breathAnimState === 'inhale' ? 1.2 : 0.9 }
-                        : { scale: 1 }
-                    }
-                    transition={{
-                        duration: phase === 'BREATHING' 
-                            ? (breathAnimState === 'inhale' ? SPEEDS[speedKey].inhale : SPEEDS[speedKey].exhale)
-                            : 0.5,
-                        ease: "easeInOut"
-                    }}
-                >
-                    <HarmonicHexagon 
-                        state={visState}
-                        speed={SPEEDS[speedKey]}
-                        label={visLabel}
-                        subLabel={visSub}
-                        color={visColor}
-                        showLayers={phase !== 'RETENTION' && phase !== 'ROUND_WAIT' && phase !== 'DONE'}
-                    />
-                </motion.div>
-
-                {/* BOTTOM HINT */}
-                <div className="absolute bottom-[10%] w-full flex justify-center">
-                    {hintText && (
-                        <div className="px-5 py-2 rounded-full bg-white/5 border border-white/5 backdrop-blur-md animate-pulse">
-                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                {hintText}
-                            </span>
-                        </div>
-                    )}
                     
-                    {phase === 'DONE' && (
+                    {/* Right: Close Button */}
+                    <div className="w-12 flex justify-end">
                         <button 
                             onClick={onExit}
-                            className="px-8 py-3 bg-white text-black font-bold rounded-xl shadow-glow-cyan hover:scale-105 transition-transform"
+                            className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
                         >
-                            В меню
+                            <i className="fas fa-times"></i>
                         </button>
-                    )}
+                    </div>
                 </div>
+            </div>
+
+            {/* 3. CONTENT AREA */}
+            <div className="flex-1 relative w-full overflow-hidden">
+                
+                {/* TAB: GUIDE */}
+                {activeTab === 'guide' && (
+                    <div className="absolute inset-0 animate-fade-in">
+                        <WimHofGuide onStartPractice={() => setActiveTab('practice')} />
+                    </div>
+                )}
+
+                {/* TAB: PRACTICE */}
+                {activeTab === 'practice' && (
+                    <div 
+                        className="absolute inset-0 flex flex-col items-center animate-fade-in"
+                        onDoubleClick={phase === 'BREATHING' || phase === 'RETENTION' ? handleDoubleTap : undefined}
+                        onClick={phase === 'RETENTION' ? handleDoubleTap : undefined}
+                    >
+                        {phase === 'SETUP' ? (
+                            <div className="w-full h-full flex flex-col items-center justify-center p-4">
+                                {/* PREVIEW HEXAGON */}
+                                <div className="flex-1 flex flex-col items-center justify-center w-full min-h-[250px] relative">
+                                    <div className="absolute top-0 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">
+                                        Предпросмотр темпа
+                                    </div>
+                                    <HarmonicHexagon 
+                                        state={previewState}
+                                        speed={SPEEDS[speedKey]}
+                                        label={previewCount}
+                                        scale={0.9}
+                                        color="#48CFE1"
+                                    />
+                                    {/* SPEED */}
+                                    <div className="flex gap-2 mt-8 bg-white/5 p-1 rounded-xl border border-white/5 relative z-20">
+                                        {(['slow', 'normal', 'fast'] as SpeedKey[]).map(k => (
+                                            <button
+                                                key={k}
+                                                onClick={() => setSpeedKey(k)}
+                                                className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all ${
+                                                    speedKey === k 
+                                                    ? 'bg-[#48CFE1] text-black shadow-[0_0_15px_rgba(72,207,225,0.4)]' 
+                                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                                }`}
+                                            >
+                                                {SPEEDS[k].label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* CONTROLS */}
+                                <div className="w-full max-w-md space-y-6 pb-8">
+                                    <div className="flex items-center justify-between px-2">
+                                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Раунды</label>
+                                        <div className="flex items-center gap-4">
+                                            <button onClick={() => setRoundsTarget(r => Math.max(1, r - 1))} className="w-10 h-10 rounded-full bg-white/5 text-white flex items-center justify-center hover:bg-white/10"><i className="fas fa-minus text-xs"></i></button>
+                                            <span className="w-8 text-center font-bold text-xl text-[#48CFE1]">{roundsTarget > 10 ? '∞' : roundsTarget}</span>
+                                            <button onClick={() => setRoundsTarget(r => r <= 10 ? r + 1 : 11)} className="w-10 h-10 rounded-full bg-white/5 text-white flex items-center justify-center hover:bg-white/10"><i className="fas fa-plus text-xs"></i></button>
+                                        </div>
+                                    </div>
+
+                                    <div className="px-2">
+                                        <div className="flex justify-between mb-2">
+                                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Вдохи</label>
+                                            <span className="text-sm font-bold text-[#48CFE1]">{breathsTarget}</span>
+                                        </div>
+                                        <input 
+                                            type="range" min="5" max="60" step="5" 
+                                            value={breathsTarget} 
+                                            onChange={(e) => setBreathsTarget(Number(e.target.value))}
+                                            className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#48CFE1]"
+                                        />
+                                    </div>
+
+                                    <button onClick={startSession} className="w-full py-4 bg-gradient-to-r from-[#48CFE1] to-cyan-600 text-[#0B0E11] font-display font-bold text-lg uppercase tracking-widest rounded-2xl shadow-glow-cyan hover:scale-[1.02] transition-all">
+                                        Начать
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            // ACTIVE SESSION UI
+                            <div className="w-full h-full flex flex-col items-center justify-center relative">
+                                <h2 className="absolute top-[10%] w-full text-center text-2xl md:text-3xl font-display font-bold text-white px-4 animate-fade-in">
+                                    {phase === 'RETENTION' ? "ВЫДОХНИТЕ И ЗАДЕРЖИТЕ" : 
+                                     phase === 'RECOVERY_PREP' ? "ПРИГОТОВЬТЕСЬ..." :
+                                     phase === 'RECOVERY' ? "ДЕРЖИТЕ ДЫХАНИЕ" :
+                                     phase === 'BREATHING' ? "РИТМИЧНОЕ ДЫХАНИЕ" : 
+                                     phase === 'ROUND_WAIT' ? "ОТЛИЧНО!" : 
+                                     phase === 'PREP' ? "ПРИГОТОВЬТЕСЬ" : ""}
+                                </h2>
+
+                                <motion.div 
+                                    className="relative z-10"
+                                    animate={phase === 'BREATHING' ? { scale: breathAnimState === 'inhale' ? 1.2 : 0.9 } : { scale: 1 }}
+                                    transition={{ duration: phase === 'BREATHING' ? (breathAnimState === 'inhale' ? SPEEDS[speedKey].inhale : SPEEDS[speedKey].exhale) : 0.5 }}
+                                >
+                                    <HarmonicHexagon 
+                                        state={
+                                            phase === 'BREATHING' ? breathAnimState :
+                                            phase === 'RETENTION' ? 'static' :
+                                            phase === 'RECOVERY_PREP' ? 'inhale' :
+                                            phase === 'RECOVERY' ? 'hold' : 'static'
+                                        }
+                                        speed={SPEEDS[speedKey]}
+                                        label={
+                                            phase === 'BREATHING' ? currentBreath :
+                                            phase === 'RETENTION' ? formatStopwatch(timerVal) :
+                                            phase === 'DONE' ? "✓" : Math.ceil(timerVal)
+                                        }
+                                        subLabel={
+                                            phase === 'BREATHING' ? (breathAnimState === 'inhale' ? "ВДОХ" : "ВЫДОХ") :
+                                            phase === 'RETENTION' ? "ЗАДЕРЖКА" :
+                                            phase === 'RECOVERY' ? "ДЕРЖИТЕ" :
+                                            phase === 'DONE' ? "ФИНИШ" : ""
+                                        }
+                                        color={
+                                            phase === 'RETENTION' ? "#F59E0B" : 
+                                            phase === 'RECOVERY' ? "#A855F7" : "#48CFE1"
+                                        }
+                                        showLayers={!['RETENTION', 'ROUND_WAIT', 'DONE'].includes(phase)}
+                                    />
+                                </motion.div>
+                                
+                                {phase === 'BREATHING' && (
+                                    <div className="absolute bottom-10 px-5 py-2 rounded-full bg-white/5 border border-white/5 backdrop-blur-md animate-pulse">
+                                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Двойной тап: завершить</span>
+                                    </div>
+                                )}
+                                {phase === 'RETENTION' && (
+                                    <div className="absolute bottom-10 px-5 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 backdrop-blur-md animate-pulse">
+                                        <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest">Тапните для вдоха</span>
+                                    </div>
+                                )}
+                                {phase === 'DONE' && (
+                                     <div className="absolute bottom-10">
+                                         <button onClick={onExit} className="px-8 py-3 bg-white text-black font-bold rounded-xl shadow-glow-cyan">В меню</button>
+                                     </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                )}
+
             </div>
         </div>
     );

@@ -12,7 +12,7 @@ import { useUserProgress } from './hooks/useUserProgress'; // Import Hook
 // Heavy components are loaded only when needed to free up the main thread
 const Controls = lazy(() => import('./components/Controls'));
 const TimerVisual = lazy(() => import('./components/TimerVisual'));
-const AnulomaVilomaInterface = lazy(() => import('./components/AnulomaVilomaInterface')); // NEW IMPORT
+const AnulomaVilomaInterface = lazy(() => import('./components/AnulomaVilomaInterface')); 
 const WimHofInterface = lazy(() => import('./components/WimHofInterface'));
 const AnalysisModal = lazy(() => import('./components/AnalysisModal'));
 const LibraryView = lazy(() => import('./components/LibraryView'));
@@ -22,6 +22,8 @@ const MobileFaq = lazy(() => import('./components/MobileFaq'));
 // --- TYPES ---
 type ThemeMode = 'dark' | 'light';
 type ExecutionMode = 'timer' | 'stopwatch';
+// Reverted ViewState to simple logic
+type ViewState = 'library' | 'timer';
 
 // Minimal Loader for Suspense
 const LoadingFallback = () => (
@@ -37,7 +39,7 @@ const App: React.FC = () => {
   // --- State ---
   const [activePattern, setActivePattern] = useState<BreathingPattern>(DEFAULT_PATTERNS[0]);
   const [rounds, setRounds] = useState<number>(0); 
-  const [view, setView] = useState<'timer' | 'library'>('library');
+  const [view, setView] = useState<ViewState>('library');
   const [infoTab, setInfoTab] = useState<'about' | 'guide' | 'safety'>('about'); 
   const [isLoadingApp, setIsLoadingApp] = useState(true);
   const [executionMode, setExecutionMode] = useState<ExecutionMode>('timer');
