@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BreathingPattern } from '../types';
 import { DEFAULT_PATTERNS, CATEGORY_NAMES, CATEGORY_ICONS } from '../constants';
 import SpotlightCard from './SpotlightCard';
+import IconRenderer from './IconRenderer';
 
 interface LibraryViewProps {
     selectPattern: (p: BreathingPattern) => void;
@@ -100,7 +101,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern }) => {
                                     <SpotlightCard 
                                         key={p.id} 
                                         onClick={() => selectPattern(p)}
-                                        className="bg-white/80 dark:bg-[#0f0f10]/60 backdrop-blur-xl rounded-[24px] p-6 cursor-pointer shadow-sm hover:shadow-2xl dark:shadow-black/50 border border-gray-200 dark:border-white/5 flex flex-col h-full min-h-[280px]"
+                                        className="bg-white/80 dark:bg-[#0f0f10]/60 backdrop-blur-xl rounded-[24px] p-6 cursor-pointer shadow-sm hover:shadow-2xl dark:shadow-black/50 border border-gray-200 dark:border-white/5 flex flex-col h-full min-h-[300px]"
                                     >
                                         <div className="flex justify-between items-start mb-4">
                                             <h3 className="text-lg font-display font-bold text-gray-900 dark:text-white group-hover:text-zen-accent dark:group-hover:text-zen-accent transition-colors leading-tight line-clamp-2">{p.name}</h3>
@@ -112,13 +113,14 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern }) => {
                                                 {p.difficulty}
                                             </span>
                                         </div>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 line-clamp-4 leading-relaxed font-light">{p.description}</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 line-clamp-3 leading-relaxed font-light">{p.description}</p>
                                         
-                                        <div className="flex flex-wrap gap-2 mb-4 mt-auto">
-                                            {p.benefits && p.benefits.slice(0, 2).map((b, i) => (
-                                                <span key={i} className="text-[10px] text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/5 px-2.5 py-1 rounded-md border border-gray-100 dark:border-white/5 truncate max-w-full">
-                                                    {b}
-                                                </span>
+                                        <div className="grid grid-cols-2 gap-2 mb-4 mt-auto">
+                                            {p.benefits && p.benefits.slice(0, 4).map((b, i) => (
+                                                <div key={i} className="flex items-center gap-1.5 text-[9px] text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-white/5 px-2 py-1.5 rounded-lg border border-gray-100 dark:border-white/5 overflow-hidden">
+                                                    <IconRenderer iconName={b.icon} size={10} className="text-cyan-600 dark:text-zen-accent shrink-0" />
+                                                    <span className="truncate">{b.label}</span>
+                                                </div>
                                             ))}
                                         </div>
 

@@ -190,18 +190,20 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
 
         let isMounted = true;
         const s = SPEEDS[speedKey];
+
+        const delay = (ms: number) => new Promise<void>(resolve => {
+            setTimeout(() => resolve(undefined), ms);
+        });
         
         const cycle = async () => {
              // 1. INHALE
              setBreathAnimState('inhale');
-             // Fix: Pass undefined to resolve Promise<void> which expects 1 argument in strict mode
-             await new Promise<void>(r => setTimeout(() => r(undefined), s.inhale * 1000));
+             await delay(s.inhale * 1000);
              if (!isMounted || phase !== 'BREATHING') return;
 
              // 2. EXHALE
              setBreathAnimState('exhale');
-             // Fix: Pass undefined to resolve Promise<void> which expects 1 argument in strict mode
-             await new Promise<void>(r => setTimeout(() => r(undefined), s.exhale * 1000));
+             await delay(s.exhale * 1000);
              if (!isMounted || phase !== 'BREATHING') return;
 
              // 3. COUNT UPDATE & AUTO-TRANSITION CHECK

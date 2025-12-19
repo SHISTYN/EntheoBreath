@@ -2,6 +2,7 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { BreathingPattern } from '../types';
 import { CATEGORY_ICONS, CATEGORY_NAMES } from '../constants';
+import IconRenderer from './IconRenderer';
 
 interface TimerSidebarProps {
     activePattern: BreathingPattern;
@@ -73,14 +74,16 @@ const TimerSidebar: React.FC<TimerSidebarProps> = ({
                             {activePattern.benefits && activePattern.benefits.length > 0 && (
                                 <div>
                                     <h4 className="text-[10px] font-bold text-premium-purple uppercase tracking-[0.2em] mb-3 opacity-80">Ключевые эффекты</h4>
-                                    <ul className="space-y-3">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         {activePattern.benefits.map((benefit, i) => (
-                                            <li key={i} className="flex items-start gap-3 text-gray-700 dark:text-gray-300 font-light">
-                                                <div className="mt-2 w-1.5 h-1.5 rounded-full bg-premium-purple flex-shrink-0 shadow-glow-purple"></div>
-                                                <span className="text-base md:text-lg">{benefit}</span>
-                                            </li>
+                                            <div key={i} className="flex items-center gap-3 p-3 bg-white/50 dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-xl">
+                                                <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/10 flex items-center justify-center text-premium-purple dark:text-purple-400 shrink-0">
+                                                    <IconRenderer iconName={benefit.icon} size={16} />
+                                                </div>
+                                                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{benefit.label}</span>
+                                            </div>
                                         ))}
-                                    </ul>
+                                    </div>
                                 </div>
                             )}
                             

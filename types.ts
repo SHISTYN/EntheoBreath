@@ -9,52 +9,55 @@ export enum BreathingPhase {
 }
 
 export interface BreathPreset {
-  name: string; // e.g., "Уровень 1", "Новичок", "Мастер"
+  name: string;
   inhale: number;
   holdIn: number;
   exhale: number;
   holdOut: number;
-  breathCount?: number; // Override default breath count
-  retentionProfile?: number[]; // Custom retention times per round
+  breathCount?: number;
+  retentionProfile?: number[];
 }
 
 export interface MusicLink {
   label: string;
   url: string;
-  icon: string; // FontAwesome icon name (e.g., 'telegram', 'cloud')
-  color?: string; // Optional specific color class
+  icon: string;
+  color?: string;
+}
+
+export interface Benefit {
+  label: string;
+  icon: string; // Lucide icon name
+  color?: string; // Tailwind color class (optional override)
 }
 
 export interface BreathingPattern {
   name: string;
-  description: string; // Short summary text
-  instruction: string; // Detailed step-by-step markdown
-  benefits: string[]; // List of specific benefits
+  description: string;
+  instruction: string;
+  benefits: Benefit[]; // Updated structure
   
-  // New Safety Fields
-  safetyWarning?: string; // CRITICAL warnings (Red alert)
-  contraindications?: string[]; // Who should NOT do this (hypertension, pregnancy, etc.)
-  conditions?: string[]; // When/How: "Empty stomach", "Lying down", "Safe for driving?"
+  safetyWarning?: string;
+  contraindications?: string[];
+  conditions?: string[];
   
   id: string;
-  // Added 'manual' for Castaneda/Tensegrity/Qigong techniques
   mode: 'loop' | 'wim-hof' | 'stopwatch' | 'manual'; 
   inhale: number;
   holdIn: number;
   exhale: number;
   holdOut: number;
-  breathCount?: number; // Target breaths for Wim Hof mode (e.g., 30)
-  retentionProfile?: number[]; // Array of seconds for retention per round [30, 60, 90...]
+  breathCount?: number;
+  retentionProfile?: number[];
   
-  // Optional override for the pattern display text (e.g., "0-0-0-0")
   displayLabel?: string; 
 
-  audioUrl?: string; // Legacy Link (Single)
-  musicLinks?: MusicLink[]; // NEW: Multiple links support
+  audioUrl?: string;
+  musicLinks?: MusicLink[];
   
   category: 'Calm' | 'Energy' | 'Balance' | 'Sleep' | 'Focus' | 'Health' | 'Transcendence' | 'Toltec' | 'Qigong' | 'Tao';
   difficulty: 'Новичок' | 'Средний' | 'Профи';
-  presets?: BreathPreset[]; // Optional list of presets
+  presets?: BreathPreset[];
 }
 
 export interface BreathState {
@@ -62,10 +65,10 @@ export interface BreathState {
   secondsRemaining: number;
   totalSecondsElapsed: number;
   currentRound: number;
-  currentBreath: number; // For counting breaths in Wim Hof mode
+  currentBreath: number;
   isActive: boolean;
   isPaused: boolean;
-  sessionResults: number[]; // Stores retention times for WHM
+  sessionResults: number[];
 }
 
 export interface GeminiAnalysis {
