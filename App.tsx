@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback, Suspense, lazy } from 'react';
 import { BreathState, BreathingPattern, BreathingPhase } from './types';
-import { DEFAULT_PATTERNS, CATEGORY_NAMES as categoryNames, CATEGORY_ICONS as categoryIcons, PHILOSOPHY_CONTENT } from './constants';
+import { DEFAULT_PATTERNS } from './constants';
 import { getBreathingAnalysis } from './services/geminiService';
 import AppBackground from './components/AppBackground';
 import SplashScreen from './components/SplashScreen';
-import Navbar from './components/Navbar';
+import { Header } from './components/layout/Header';
 import { useAudioSystem } from './hooks/useAudioSystem';
-import { useUserProgress } from './hooks/useUserProgress'; // Import Hook
+import { useUserProgress } from './hooks/useUserProgress';
 
 // --- LAZY IMPORTS (Code Splitting) ---
-// Heavy components are loaded only when needed to free up the main thread
 const Controls = lazy(() => import('./components/Controls'));
 const TimerVisual = lazy(() => import('./components/TimerVisual'));
 const AnulomaVilomaInterface = lazy(() => import('./components/AnulomaVilomaInterface')); 
@@ -22,7 +21,6 @@ const MobileFaq = lazy(() => import('./components/MobileFaq'));
 // --- TYPES ---
 type ThemeMode = 'dark' | 'light';
 type ExecutionMode = 'timer' | 'stopwatch';
-// Reverted ViewState to simple logic
 type ViewState = 'library' | 'timer';
 
 // Minimal Loader for Suspense
@@ -69,7 +67,6 @@ const App: React.FC = () => {
   const [isAnalyzing, setAnalyzing] = useState(false);
   
   // Modal State
-  const [showPhilosophy, setShowPhilosophy] = useState(false);
   const [showMobileFaq, setShowMobileFaq] = useState(false);
   const [showResults, setShowResults] = useState(false); 
 
@@ -369,6 +366,9 @@ const App: React.FC = () => {
       setActivePattern(p);
       setView('timer');
       
+      // SCROLL TO TOP FIX
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+
       // LOGIC: If Manual (Text Heavy), auto-select 'guide' tab and prepare UI
       if (p.mode === 'manual') {
           setInfoTab('guide');
@@ -397,7 +397,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans selection:bg-purple-500/30 overflow-x-hidden relative text-gray-900 dark:text-gray-100 transition-colors duration-500 bg-slate-50 dark:bg-[#050505]">
+    <div className="min-h-screen flex flex-col font-sans selection:bg-purple-500/30 overflow-x-hidden relative text-zinc-900 dark:text-gray-100 transition-colors duration-500 bg-slate-50 dark:bg-[#050505]">
       
       {/* LOADING SCREEN (SPLASH) */}
       <SplashScreen isLoading={isLoadingApp} />
@@ -441,24 +441,17 @@ const App: React.FC = () => {
            content={analysisContent}
            isLoading={isAnalyzing}
         />
-        <AnalysisModal 
-           isOpen={showPhilosophy} 
-           onClose={() => setShowPhilosophy(false)} 
-           title="Философия Практики" 
-           content={PHILOSOPHY_CONTENT}
-           isLoading={false}
-        />
       </Suspense>
 
-      {/* --- NAVBAR --- */}
-      <Navbar 
+      {/* --- HEADER (Replaces Navbar) --- */}
+      <Header 
         view={view}
         setView={setView}
         theme={theme}
         toggleTheme={toggleTheme}
         deferredPrompt={deferredPrompt}
         handleInstallClick={handleInstallClick}
-        setShowPhilosophy={setShowPhilosophy}
+        setShowPhilosophy={() => {}} // No-op as handled internally
         soundMode={soundMode}
         changeSoundMode={changeSoundMode}
         handleShare={handleShare}
@@ -466,7 +459,7 @@ const App: React.FC = () => {
       />
 
       {/* Main Content */}
-      <main className="w-full mx-auto flex-grow flex flex-col relative z-10">
+      <main className="w-full mx-auto flex-grow flex flex-col relative z-10 pt-28 md:pt-32">
         
         {view === 'library' && (
             <Suspense fallback={<LoadingFallback />}>
@@ -479,7 +472,7 @@ const App: React.FC = () => {
         )}
 
         {view === 'timer' && (
-            <div className="flex-grow flex flex-col lg:flex-row min-h-[100dvh] lg:h-screen lg:overflow-hidden relative">
+            <div className="flex-grow flex flex-col lg:flex-row min-h-[100dvh] lg:h-[calc(100vh-8rem)] lg:overflow-hidden relative">
                 
                 {manualStopwatchOpen && (
                     <div className="absolute inset-0 z-50 bg-[#050505] flex flex-col animate-fade-in">
@@ -519,21 +512,24 @@ const App: React.FC = () => {
                     </div>
                 )}
 
-                {/* Left Panel */}
-                <Suspense fallback={<div className="w-full lg:w-[480px] bg-white/5 animate-pulse"></div>}>
-                    <TimerSidebar 
-                        activePattern={activePattern}
-                        setView={setView}
-                        infoTab={infoTab}
-                        setInfoTab={setInfoTab}
-                        handleDeepAnalysis={handleDeepAnalysis}
-                        isAnalyzing={isAnalyzing}
-                    />
-                </Suspense>
+                {/* Left Panel (Sidebar) - REORDERED: Order-2 on mobile, Order-1 on Desktop */}
+                <div className="contents lg:block order-2 lg:order-1">
+                    <Suspense fallback={<div className="w-full lg:w-[480px] bg-white/5 animate-pulse"></div>}>
+                        <TimerSidebar 
+                            activePattern={activePattern}
+                            setView={setView}
+                            infoTab={infoTab}
+                            setInfoTab={setInfoTab}
+                            handleDeepAnalysis={handleDeepAnalysis}
+                            isAnalyzing={isAnalyzing}
+                        />
+                    </Suspense>
+                </div>
 
-                {/* RIGHT PANEL - Conditional Rendering */}
+                {/* RIGHT PANEL - REORDERED: Order-1 on mobile, Order-2 on Desktop */}
                 {activePattern.mode === 'wim-hof' ? (
-                   <div className="flex-1 flex flex-col h-[100dvh] lg:h-full relative overflow-hidden order-2 bg-[#0B0E11] z-30">
+                   // MOBILE LAYOUT FIX: Changed overflow-hidden to overflow-y-auto on mobile to allow scrolling through long setup content
+                   <div className="flex-1 flex flex-col h-[100dvh] lg:h-full relative overflow-y-auto lg:overflow-hidden bg-[#0B0E11] z-30 order-1 lg:order-2">
                        <Suspense fallback={<LoadingFallback />}>
                            <WimHofInterface 
                                pattern={activePattern} 
@@ -542,7 +538,7 @@ const App: React.FC = () => {
                        </Suspense>
                    </div>
                 ) : activePattern.mode !== 'manual' && (
-                    <div className="flex-1 flex flex-col min-h-[100dvh] lg:min-h-0 lg:h-full relative overflow-x-hidden lg:overflow-hidden order-2">
+                    <div className="flex-1 flex flex-col min-h-[100dvh] lg:min-h-0 lg:h-full relative overflow-y-auto lg:overflow-hidden order-1 lg:order-2 custom-scrollbar">
                     
                         <div 
                             className={`absolute inset-0 transition-opacity duration-1000 z-0 pointer-events-none ${timerState.isActive ? 'opacity-30' : 'opacity-0'}`}
@@ -551,10 +547,10 @@ const App: React.FC = () => {
                             }}
                         ></div>
 
-                        <div className="flex flex-col h-full justify-between z-10 py-6">
+                        <div className="flex flex-col min-h-full lg:h-full justify-between z-10 py-6">
                             
                             <div className="flex flex-col items-center gap-6 flex-shrink-0">
-                                <div className="flex items-center justify-center p-1.5 bg-gray-200 dark:bg-white/5 rounded-full backdrop-blur-md border border-white/10 scale-90 lg:scale-100">
+                                <div className="flex items-center justify-center p-1.5 bg-gray-200 dark:bg-white/5 rounded-full backdrop-blur-md border border-zinc-200 dark:border-white/10 scale-90 lg:scale-100">
                                     <button 
                                         onClick={() => handleModeSwitch('timer')}
                                         className={`px-6 lg:px-8 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${executionMode === 'timer' ? 'bg-white dark:bg-black text-black dark:text-white shadow-lg' : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-300'}`}
@@ -598,6 +594,8 @@ const App: React.FC = () => {
                                                 timerState.currentPhase === BreathingPhase.HoldOut ? activePattern.holdOut : 3
                                             }
                                             currentRound={timerState.currentRound}
+                                            onPatternUpdate={(updates) => setActivePattern(prev => ({...prev, ...updates}))}
+                                            activePattern={activePattern}
                                         />
                                     ) : (
                                         <TimerVisual 
@@ -636,7 +634,7 @@ const App: React.FC = () => {
                                         className={`w-20 h-20 rounded-full flex items-center justify-center text-3xl transition-all active:scale-95 ${
                                             timerState.isActive && !timerState.isPaused
                                             ? 'bg-white dark:bg-[#121212] text-rose-500 border border-rose-200 dark:border-rose-500/20 shadow-[0_0_60px_rgba(244,63,94,0.4)] hover:shadow-rose-500/50 hover:scale-105'
-                                            : 'bg-black dark:bg-white text-white dark:text-black hover:opacity-90 shadow-[0_0_60px_rgba(0,0,0,0.1)] dark:shadow-[0_0_60px_rgba(255,255,255,0.2)] hover:scale-105'
+                                            : 'bg-zinc-900 dark:bg-white text-white dark:text-black hover:opacity-90 shadow-[0_0_60px_rgba(0,0,0,0.1)] dark:shadow-[0_0_60px_rgba(255,255,255,0.2)] hover:scale-105'
                                         }`}
                                     >
                                         <i className={`fas fa-${timerState.isActive && !timerState.isPaused ? 'pause' : 'play ml-1'}`}></i>

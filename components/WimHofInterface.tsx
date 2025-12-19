@@ -103,7 +103,7 @@ const HarmonicHexagon: React.FC<{
                 <motion.span 
                     variants={textVariants}
                     animate={state}
-                    className="font-display font-bold text-white tabular-nums leading-none text-7xl md:text-8xl"
+                    className="font-display font-bold text-zinc-900 dark:text-white tabular-nums leading-none text-7xl md:text-8xl bg-gradient-to-b from-white via-white to-gray-400 bg-[length:100%_200%] animate-shimmer-slow bg-clip-text text-transparent"
                 >
                     {label}
                 </motion.span>
@@ -111,7 +111,7 @@ const HarmonicHexagon: React.FC<{
                 {subLabel && (
                     <motion.span 
                         animate={{ opacity: state === 'inhale' || state === 'hold' ? 1 : 0.6 }}
-                        className="mt-4 text-[10px] font-bold uppercase tracking-[0.3em] text-white/70 bg-black/40 px-3 py-1 rounded-full backdrop-blur-md border border-white/5"
+                        className="mt-4 text-[10px] font-bold uppercase tracking-[0.3em] text-white/90 bg-zinc-900/80 dark:bg-black/40 px-3 py-1 rounded-full backdrop-blur-md border border-white/10 shadow-lg"
                     >
                         {subLabel}
                     </motion.span>
@@ -295,33 +295,32 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
 
     // --- RENDER ---
     return (
-        <div className="w-full h-full flex flex-col bg-[#0B0E11] text-white relative overflow-hidden font-sans">
+        <div className="w-full h-[100dvh] lg:h-full flex flex-col bg-white dark:bg-[#0B0E11] text-zinc-900 dark:text-white relative overflow-hidden font-sans">
             
-            {/* 1. UNIFIED HEADER */}
-            <div className="w-full p-4 md:p-6 flex flex-col gap-4 z-20 bg-gradient-to-b from-[#0B0E11] to-[#0B0E11]/0 shrink-0">
+            {/* 1. UNIFIED HEADER (Sticky Top) */}
+            <div className="w-full p-4 md:p-6 flex flex-col gap-4 z-20 bg-gradient-to-b from-white to-white/0 dark:from-[#0B0E11] dark:to-[#0B0E11]/0 shrink-0 sticky top-0">
                 <div className="flex justify-between items-center">
                     
                     {/* Left: Round Info */}
                     <div className="flex flex-col w-12">
-                         <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Раунд</span>
-                         <span className="text-xl font-display font-bold text-white">
-                            {currentRound} <span className="text-gray-600 text-sm">/ {roundsTarget > 10 ? '∞' : roundsTarget}</span>
+                         <span className="text-[10px] text-zinc-500 dark:text-gray-500 font-bold uppercase tracking-widest">Раунд</span>
+                         <span className="text-xl font-display font-bold text-zinc-900 dark:text-white">
+                            {currentRound} <span className="text-zinc-400 dark:text-gray-600 text-sm">/ {roundsTarget > 10 ? '∞' : roundsTarget}</span>
                          </span>
                     </div>
 
-                    {/* Center: CONSISTENT TABS (Matches Sidebar Style) */}
-                    <div className="bg-white/5 p-1 rounded-xl border border-white/5 flex relative w-full max-w-[260px]">
-                        {/* Tab Background Logic with AnimatePresence/layoutId */}
+                    {/* Center: CONSISTENT TABS */}
+                    <div className="bg-zinc-100 dark:bg-white/5 p-1 rounded-xl border border-zinc-200 dark:border-white/5 flex relative w-full max-w-[260px]">
                         {['practice', 'guide'].map((tab) => (
                             <button 
                                 key={tab}
                                 onClick={() => setActiveTab(tab as TabKey)}
-                                className={`flex-1 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest rounded-lg relative z-10 transition-colors duration-300 ${activeTab === tab ? 'text-white' : 'text-gray-500 hover:text-gray-300'}`}
+                                className={`flex-1 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest rounded-lg relative z-10 transition-colors duration-300 ${activeTab === tab ? 'text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-gray-300'}`}
                             >
                                 {activeTab === tab && (
                                     <motion.div 
                                         layoutId="activeWhmTab"
-                                        className="absolute inset-0 bg-white/10 rounded-lg shadow-sm"
+                                        className="absolute inset-0 bg-white dark:bg-white/10 rounded-lg shadow-sm"
                                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                     />
                                 )}
@@ -334,7 +333,7 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
                     <div className="w-12 flex justify-end">
                         <button 
                             onClick={onExit}
-                            className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                            className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-white/5 flex items-center justify-center text-zinc-500 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors"
                         >
                             <i className="fas fa-times"></i>
                         </button>
@@ -343,11 +342,11 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
             </div>
 
             {/* 3. CONTENT AREA */}
-            <div className="flex-1 relative w-full overflow-hidden">
+            <div className="flex-1 relative w-full flex flex-col min-h-0 overflow-hidden">
                 
                 {/* TAB: GUIDE */}
                 {activeTab === 'guide' && (
-                    <div className="absolute inset-0 animate-fade-in">
+                    <div className="absolute inset-0 animate-fade-in overflow-y-auto custom-scrollbar">
                         <WimHofGuide onStartPractice={() => setActiveTab('practice')} />
                     </div>
                 )}
@@ -355,15 +354,17 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
                 {/* TAB: PRACTICE */}
                 {activeTab === 'practice' && (
                     <div 
-                        className="absolute inset-0 flex flex-col items-center animate-fade-in"
+                        className="flex-grow flex flex-col items-center animate-fade-in w-full h-full"
                         onDoubleClick={phase === 'BREATHING' || phase === 'RETENTION' ? handleDoubleTap : undefined}
                         onClick={phase === 'RETENTION' ? handleDoubleTap : undefined}
                     >
                         {phase === 'SETUP' ? (
-                            <div className="w-full h-full flex flex-col items-center justify-center p-4">
-                                {/* PREVIEW HEXAGON */}
-                                <div className="flex-1 flex flex-col items-center justify-center w-full min-h-[250px] relative">
-                                    <div className="absolute top-0 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">
+                            // FLEX COLUMN LAYOUT: Ensures Controls are always at bottom but not covering content
+                            <div className="w-full h-full flex flex-col">
+                                
+                                {/* A. VISUALIZATION (Flexible Space) */}
+                                <div className="flex-grow flex flex-col items-center justify-center relative px-4 overflow-y-auto min-h-[300px]">
+                                    <div className="text-[10px] font-bold text-zinc-400 dark:text-gray-500 uppercase tracking-widest mb-4">
                                         Предпросмотр темпа
                                     </div>
                                     <HarmonicHexagon 
@@ -373,8 +374,8 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
                                         scale={0.9}
                                         color="#48CFE1"
                                     />
-                                    {/* SPEED */}
-                                    <div className="flex gap-2 mt-8 bg-white/5 p-1 rounded-xl border border-white/5 relative z-20">
+                                    {/* SPEED SELECTOR */}
+                                    <div className="flex gap-2 mt-8 bg-zinc-100 dark:bg-white/5 p-1 rounded-xl border border-zinc-200 dark:border-white/5 relative z-20">
                                         {(['slow', 'normal', 'fast'] as SpeedKey[]).map(k => (
                                             <button
                                                 key={k}
@@ -382,7 +383,7 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
                                                 className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all ${
                                                     speedKey === k 
                                                     ? 'bg-[#48CFE1] text-black shadow-[0_0_15px_rgba(72,207,225,0.4)]' 
-                                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                                    : 'text-zinc-500 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-white/5'
                                                 }`}
                                             >
                                                 {SPEEDS[k].label}
@@ -391,39 +392,47 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
                                     </div>
                                 </div>
 
-                                {/* CONTROLS */}
-                                <div className="w-full max-w-md space-y-6 pb-8">
-                                    <div className="flex items-center justify-between px-2">
-                                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Раунды</label>
-                                        <div className="flex items-center gap-4">
-                                            <button onClick={() => setRoundsTarget(r => Math.max(1, r - 1))} className="w-10 h-10 rounded-full bg-white/5 text-white flex items-center justify-center hover:bg-white/10"><i className="fas fa-minus text-xs"></i></button>
-                                            <span className="w-8 text-center font-bold text-xl text-[#48CFE1]">{roundsTarget > 10 ? '∞' : roundsTarget}</span>
-                                            <button onClick={() => setRoundsTarget(r => r <= 10 ? r + 1 : 11)} className="w-10 h-10 rounded-full bg-white/5 text-white flex items-center justify-center hover:bg-white/10"><i className="fas fa-plus text-xs"></i></button>
+                                {/* B. CONTROLS FOOTER (Static at bottom of flex container) */}
+                                <div className="flex-shrink-0 w-full bg-white dark:bg-[#0B0E11] border-t border-zinc-200 dark:border-white/10 p-6 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] dark:shadow-none">
+                                    <div className="max-w-md mx-auto w-full">
+                                        {/* Inputs Row */}
+                                        <div className="flex items-center gap-4 mb-6">
+                                            {/* Rounds */}
+                                            <div className="flex-1 flex flex-col gap-2">
+                                                <label className="text-[10px] font-bold text-zinc-400 dark:text-gray-400 uppercase tracking-widest">Раунды</label>
+                                                <div className="flex items-center justify-between bg-zinc-100 dark:bg-white/5 rounded-xl p-1 border border-zinc-200 dark:border-white/5">
+                                                    <button onClick={() => setRoundsTarget(r => Math.max(1, r - 1))} className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-white dark:hover:bg-white/10 text-zinc-500 dark:text-gray-400"><i className="fas fa-minus text-xs"></i></button>
+                                                    <span className="font-display font-bold text-zinc-900 dark:text-white text-lg">{roundsTarget > 10 ? '∞' : roundsTarget}</span>
+                                                    <button onClick={() => setRoundsTarget(r => r <= 10 ? r + 1 : 11)} className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-white dark:hover:bg-white/10 text-zinc-500 dark:text-gray-400"><i className="fas fa-plus text-xs"></i></button>
+                                                </div>
+                                            </div>
+                                            
+                                            {/* Breaths */}
+                                            <div className="flex-1 flex flex-col gap-2">
+                                                 <div className="flex justify-between items-center">
+                                                    <label className="text-[10px] font-bold text-zinc-400 dark:text-gray-400 uppercase tracking-widest">Вдохи</label>
+                                                    <span className="text-[10px] font-bold text-[#48CFE1]">{breathsTarget}</span>
+                                                 </div>
+                                                 <input 
+                                                    type="range" min="5" max="60" step="5" 
+                                                    value={breathsTarget} 
+                                                    onChange={(e) => setBreathsTarget(Number(e.target.value))}
+                                                    className="w-full h-2 bg-zinc-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#48CFE1] mt-3"
+                                                />
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div className="px-2">
-                                        <div className="flex justify-between mb-2">
-                                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Вдохи</label>
-                                            <span className="text-sm font-bold text-[#48CFE1]">{breathsTarget}</span>
-                                        </div>
-                                        <input 
-                                            type="range" min="5" max="60" step="5" 
-                                            value={breathsTarget} 
-                                            onChange={(e) => setBreathsTarget(Number(e.target.value))}
-                                            className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#48CFE1]"
-                                        />
+                                        {/* Start Button */}
+                                        <button onClick={startSession} className="w-full py-4 bg-gradient-to-r from-[#48CFE1] to-cyan-600 text-black dark:text-[#0B0E11] font-display font-bold text-lg uppercase tracking-widest rounded-2xl shadow-glow-cyan hover:scale-[1.02] active:scale-95 transition-all">
+                                            Начать
+                                        </button>
                                     </div>
-
-                                    <button onClick={startSession} className="w-full py-4 bg-gradient-to-r from-[#48CFE1] to-cyan-600 text-[#0B0E11] font-display font-bold text-lg uppercase tracking-widest rounded-2xl shadow-glow-cyan hover:scale-[1.02] transition-all">
-                                        Начать
-                                    </button>
                                 </div>
                             </div>
                         ) : (
                             // ACTIVE SESSION UI
                             <div className="w-full h-full flex flex-col items-center justify-center relative">
-                                <h2 className="absolute top-[10%] w-full text-center text-2xl md:text-3xl font-display font-bold text-white px-4 animate-fade-in">
+                                <h2 className="absolute top-[10%] w-full text-center text-2xl md:text-3xl font-display font-bold text-zinc-900 dark:text-white px-4 animate-fade-in">
                                     {phase === 'RETENTION' ? "ВЫДОХНИТЕ И ЗАДЕРЖИТЕ" : 
                                      phase === 'RECOVERY_PREP' ? "ПРИГОТОВЬТЕСЬ..." :
                                      phase === 'RECOVERY' ? "ДЕРЖИТЕ ДЫХАНИЕ" :
@@ -465,18 +474,18 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
                                 </motion.div>
                                 
                                 {phase === 'BREATHING' && (
-                                    <div className="absolute bottom-10 px-5 py-2 rounded-full bg-white/5 border border-white/5 backdrop-blur-md animate-pulse">
-                                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Двойной тап: завершить</span>
+                                    <div className="absolute bottom-10 px-5 py-2 rounded-full bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/5 backdrop-blur-md animate-pulse">
+                                        <span className="text-[10px] font-bold text-zinc-500 dark:text-gray-400 uppercase tracking-widest">Двойной тап: завершить</span>
                                     </div>
                                 )}
                                 {phase === 'RETENTION' && (
-                                    <div className="absolute bottom-10 px-5 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 backdrop-blur-md animate-pulse">
-                                        <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest">Тапните для вдоха</span>
+                                    <div className="absolute bottom-10 px-5 py-2 rounded-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 backdrop-blur-md animate-pulse">
+                                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest">Тапните для вдоха</span>
                                     </div>
                                 )}
                                 {phase === 'DONE' && (
                                      <div className="absolute bottom-10">
-                                         <button onClick={onExit} className="px-8 py-3 bg-white text-black font-bold rounded-xl shadow-glow-cyan">В меню</button>
+                                         <button onClick={onExit} className="px-8 py-3 bg-zinc-900 dark:bg-white text-white dark:text-black font-bold rounded-xl shadow-glow-cyan">В меню</button>
                                      </div>
                                 )}
                             </div>
