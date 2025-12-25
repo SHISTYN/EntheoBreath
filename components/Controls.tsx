@@ -38,10 +38,10 @@ const MinimalInput: React.FC<{
     };
 
     return (
-        <div className="flex flex-col items-center justify-center group p-1 w-full">
+        <div className="flex flex-col items-center justify-center group p-1 w-full h-full">
             {/* Label */}
             <div className="flex flex-col items-center mb-1.5 opacity-80 transition-opacity group-hover:opacity-100">
-                <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: color }}>
+                <span className="text-[10px] font-bold uppercase tracking-wider whitespace-nowrap" style={{ color: color }}>
                     {label}
                 </span>
                 {subLabel && <span className="text-[8px] text-gray-500 mt-0.5">{subLabel}</span>}
@@ -53,7 +53,7 @@ const MinimalInput: React.FC<{
                 <MotionButton 
                     whileTap={{ scale: 0.8 }}
                     onClick={() => onChange(Math.max(0, Number((value - step).toFixed(1))))}
-                    className="w-12 h-10 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                    className="w-10 h-10 md:w-12 md:h-10 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
                 >
                     <i className="fas fa-minus text-xs"></i>
                 </MotionButton>
@@ -76,7 +76,7 @@ const MinimalInput: React.FC<{
                 <MotionButton 
                     whileTap={{ scale: 0.8 }}
                     onClick={() => onChange(Number((value + step).toFixed(1)))}
-                    className="w-12 h-10 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                    className="w-10 h-10 md:w-12 md:h-10 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
                 >
                     <i className="fas fa-plus text-xs"></i>
                 </MotionButton>
@@ -123,6 +123,25 @@ const Controls: React.FC<ControlsProps> = ({ pattern, onChange, rounds, onRounds
           retentionProfile: p.retentionProfile ?? pattern.retentionProfile
       });
   };
+
+  // Determine layout class based on number of active fields
+  const activeFieldsCount = [
+      true, // Inhale always visible
+      pattern.holdIn > 0,
+      true, // Exhale always visible
+      pattern.holdOut > 0
+  ].filter(Boolean).length;
+
+  // If 3 or fewer items, use a single row (flex-nowrap). If more, grid or wrap.
+  const layoutClass = pattern.mode === 'wim-hof' 
+      ? 'grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4' 
+      : activeFieldsCount <= 3 
+          ? 'flex flex-row flex-nowrap items-stretch justify-between gap-3 w-full' 
+          : 'flex flex-wrap items-center justify-center gap-3 md:gap-4';
+
+  const itemClass = activeFieldsCount <= 3 
+      ? 'flex-1 min-w-0' // stretch in row
+      : 'w-[48%] md:flex-1 min-w-[120px]'; // standard wrap behavior
 
   if (readOnly) return null;
 
@@ -175,8 +194,12 @@ const Controls: React.FC<ControlsProps> = ({ pattern, onChange, rounds, onRounds
              <div className="text-center text-xs text-gray-500 py-2">Режим секундомера</div> 
          ) : (
              <div className="flex flex-col gap-6">
-                 {/* Main Inputs Grid - 2 Cols Mobile, 4 Cols Desktop */}
-                 <div className={`grid grid-cols-2 ${pattern.mode === 'wim-hof' ? 'md:grid-cols-3 lg:grid-cols-3' : 'md:grid-cols-4'} gap-3 md:gap-4`}>
+                 {/* 
+                     ADAPTIVE LAYOUT:
+                     - Wim Hof: Fixed 3 columns
+                     - Standard: Flexible Flexbox based on activeFieldsCount
+                 */}
+                 <div className={layoutClass}>
                      {pattern.mode === 'wim-hof' ? (
                          <>
                             <MinimalInput label="Вдохи" value={pattern.breathCount || 30} step={5} color="#22d3ee" onChange={(v) => onChange({ ...pattern, breathCount: v })} />
@@ -194,10 +217,29 @@ const Controls: React.FC<ControlsProps> = ({ pattern, onChange, rounds, onRounds
                          </>
                      ) : (
                          <>
-                            <MinimalInput label="Вдох" value={pattern.inhale} step={0.5} color="#22d3ee" onChange={(v) => onChange({ ...pattern, inhale: v })} />
-                            <MinimalInput label="Задержка" value={pattern.holdIn} step={0.5} color="#F59E0B" onChange={(v) => onChange({ ...pattern, holdIn: v })} />
-                            <MinimalInput label="Выдох" value={pattern.exhale} step={0.5} color="#7C3AED" onChange={(v) => onChange({ ...pattern, exhale: v })} />
-                            <MinimalInput label="Пауза" value={pattern.holdOut} step={0.5} color="#fb7185" onChange={(v) => onChange({ ...pattern, holdOut: v })} />
+                            {/* INHALE (Always visible) */}
+                            <div className={itemClass}>
+                                <MinimalInput label="Вдох" value={pattern.inhale} step={0.5} color="#22d3ee" onChange={(v) => onChange({ ...pattern, inhale: v })} />
+                            </div>
+
+                            {/* HOLD IN (Conditional) */}
+                            {pattern.holdIn > 0 && (
+                                <div className={itemClass}>
+                                    <MinimalInput label="Задержка" value={pattern.holdIn} step={0.5} color="#F59E0B" onChange={(v) => onChange({ ...pattern, holdIn: v })} />
+                                </div>
+                            )}
+
+                            {/* EXHALE (Always visible) */}
+                            <div className={itemClass}>
+                                <MinimalInput label="Выдох" value={pattern.exhale} step={0.5} color="#7C3AED" onChange={(v) => onChange({ ...pattern, exhale: v })} />
+                            </div>
+
+                            {/* HOLD OUT (Conditional) */}
+                            {pattern.holdOut > 0 && (
+                                <div className={itemClass}>
+                                    <MinimalInput label="Пауза" value={pattern.holdOut} step={0.5} color="#fb7185" onChange={(v) => onChange({ ...pattern, holdOut: v })} />
+                                </div>
+                            )}
                          </>
                      )}
                  </div>

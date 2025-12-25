@@ -152,7 +152,7 @@ const LibraryHeader: React.FC<LibraryHeaderProps> = ({
             {/* Sticky container wrapping Tags and Categories */}
             <div className="sticky top-0 z-40 w-full py-4 bg-slate-50/90 dark:bg-[#050505]/90 backdrop-blur-xl border-b border-gray-200/50 dark:border-white/5 transition-all duration-500">
                 <LayoutGroup>
-                    {/* 4. QUICK ACTIONS (Liquid Chips) */}
+                    {/* 5. QUICK ACTIONS (Liquid Chips) */}
                     <div className="w-full flex flex-wrap justify-center gap-2 mb-4 px-2 max-w-[1600px] mx-auto">
                         {QUICK_ACTIONS.map((action) => {
                             const isActive = selectedTag === action.tag;
@@ -185,28 +185,11 @@ const LibraryHeader: React.FC<LibraryHeaderProps> = ({
                         })}
                     </div>
 
-                    {/* 5. HYBRID CATEGORY NAVIGATION */}
-                    <div className="w-full relative group max-w-[1600px] mx-auto">
-                        
-                        {/* Gradient Masks (Fade edges) - HIDDEN ON DESKTOP (md:hidden) because we wrap there */}
-                        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-slate-50 dark:from-[#050505] to-transparent z-20 pointer-events-none md:hidden"></div>
-                        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-slate-50 dark:from-[#050505] to-transparent z-20 pointer-events-none md:hidden"></div>
-
-                        {/* 
-                            ADAPTIVE CONTAINER:
-                            - Mobile: overflow-x-auto, no-scrollbar, flex-nowrap (Scrollable Strip)
-                            - Desktop (md): flex-wrap, justify-center, overflow-visible (Cloud Layout)
-                        */}
+                    {/* 6. WRAPPED CATEGORY NAVIGATION */}
+                    <div className="w-full relative group max-w-[1600px] mx-auto px-4">
                         <div 
                             ref={scrollContainerRef}
-                            className="
-                                flex gap-2 py-1 px-4 
-                                overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar flex-nowrap
-                                md:flex-wrap md:justify-center md:overflow-visible md:px-0 md:snap-none
-                            "
-                            style={{ 
-                                WebkitOverflowScrolling: 'touch' 
-                            }}
+                            className="flex flex-wrap justify-center gap-2 py-1"
                         >
                             {allCategories.map(cat => {
                                 const isAuthorChoice = cat === 'AuthorChoice';
@@ -220,7 +203,7 @@ const LibraryHeader: React.FC<LibraryHeaderProps> = ({
                                         onClick={() => onCategoryChange(cat)}
                                         whileTap={{ scale: 0.9 }}
                                         className={`
-                                            relative px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap snap-center shrink-0
+                                            relative px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap shrink-0
                                             ${isSelected ? 'text-white dark:text-black shadow-lg' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300'}
                                         `}
                                     >

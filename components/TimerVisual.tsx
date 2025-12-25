@@ -12,6 +12,7 @@ interface TimerVisualProps {
   totalBreaths?: number;
   mode?: 'loop' | 'wim-hof' | 'stopwatch' | 'manual';
   theme?: 'dark' | 'light';
+  isActive?: boolean;
 }
 
 const TimerVisual: React.FC<TimerVisualProps> = ({ 
@@ -19,95 +20,80 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
     timeLeft, 
     totalTimeForPhase, 
     label, 
-    patternId, 
     currentRound = 1,
     currentBreath = 0,
-    totalBreaths = 30,
     mode = 'loop',
-    theme = 'dark'
+    theme = 'dark',
+    isActive = false
 }) => {
   
-  // --- Mode Detection ---
   const isWimHof = mode === 'wim-hof';
+  const isStopwatch = mode === 'stopwatch';
+  
   const isWimHofBreathing = isWimHof && (phase === BreathingPhase.Inhale || phase === BreathingPhase.Exhale);
   const isWimHofRetention = isWimHof && phase === BreathingPhase.HoldOut;
   const isWimHofRecovery = isWimHof && phase === BreathingPhase.HoldIn;
 
-  // --- Progress Calculations ---
-  // 1. Time Progress (Standard)
   const timeProgress = totalTimeForPhase > 0 ? (totalTimeForPhase - timeLeft) / totalTimeForPhase : 0;
   
-  // --- Color Logic ---
-  let phaseColorClass = '';
   let glowColor = '';
   let strokeColor = '';
 
   if (isWimHof) {
       if (isWimHofBreathing) {
-          phaseColorClass = 'text-cyan-400';
           glowColor = '#22d3ee'; 
           strokeColor = '#22d3ee';
       } else if (isWimHofRetention) {
-          phaseColorClass = 'text-orange-500';
           glowColor = '#f97316'; 
           strokeColor = '#f97316';
       } else if (isWimHofRecovery) {
-          phaseColorClass = 'text-purple-400';
           glowColor = '#a855f7'; 
           strokeColor = '#a855f7';
       } else {
-          phaseColorClass = 'text-white';
           glowColor = '#9ca3af';
           strokeColor = '#ffffff';
       }
+  } else if (isStopwatch) {
+      glowColor = isActive ? '#ffffff' : '#52525b';
+      strokeColor = isActive ? '#ffffff' : '#52525b';
   } else {
       switch (phase) {
           case BreathingPhase.Inhale:
-              phaseColorClass = 'text-zen-accent'; 
-              glowColor = '#22d3ee';
+              glowColor = '#22d3ee'; // Cyan
               strokeColor = '#22d3ee';
               break;
           case BreathingPhase.Exhale:
-              phaseColorClass = 'text-premium-purple'; 
-              glowColor = '#7C3AED';
-              strokeColor = '#7C3AED';
+              glowColor = '#818cf8'; // Indigo/Purple mix
+              strokeColor = '#818cf8';
               break;
           case BreathingPhase.HoldIn:
-              phaseColorClass = 'text-premium-gold'; 
-              glowColor = '#F59E0B';
-              strokeColor = '#F59E0B';
+              glowColor = '#fbbf24'; // Amber
+              strokeColor = '#fbbf24';
               break;
           case BreathingPhase.HoldOut:
-              phaseColorClass = 'text-rose-400';
-              glowColor = '#fb7185';
+              glowColor = '#fb7185'; // Rose
               strokeColor = '#fb7185';
               break;
           default:
-              phaseColorClass = 'text-white';
               glowColor = '#9ca3af';
               strokeColor = '#9ca3af';
       }
   }
 
-  // --- Display Value Logic ---
+  // Value Logic
   let mainValue = "";
   let subText = label;
-  let bottomText = "";
-  let phaseTimerText = ""; 
 
-  if (mode === 'stopwatch') {
+  if (isStopwatch) {
       const totalSeconds = timeLeft;
       const minutes = Math.floor(totalSeconds / 60);
       const seconds = Math.floor(totalSeconds % 60);
-      const ms = Math.floor((totalSeconds % 1) * 10);
-      mainValue = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${ms}`;
-      subText = "Секундомер";
+      mainValue = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      subText = isActive ? "СЕКУНДОМЕР" : "ПАУЗА";
   } else if (isWimHof) {
       if (isWimHofBreathing) {
           mainValue = `${currentBreath}`;
           subText = phase === BreathingPhase.Inhale ? "ВДОХ" : "ВЫДОХ";
-          bottomText = `РАУНД ${currentRound} • ЦЕЛЬ: ${totalBreaths}`;
-          phaseTimerText = `${timeLeft.toFixed(1)}с`;
       } else if (isWimHofRetention) {
           const m = Math.floor(timeLeft / 60);
           const s = Math.floor(timeLeft % 60);
@@ -117,111 +103,123 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
               mainValue = timeLeft.toFixed(1);
           }
           subText = "ЗАДЕРЖКА";
-          bottomText = `РАУНД ${currentRound} • РАССЛАБЛЕНИЕ`;
       } else if (isWimHofRecovery) {
-          mainValue = Math.ceil(timeLeft).toString(); // Round up
+          mainValue = Math.ceil(timeLeft).toString();
           subText = "ВОССТАНОВЛЕНИЕ";
-          bottomText = "ВДОХ И ДЕРЖАТЬ";
       } else {
            mainValue = Math.ceil(timeLeft).toString();
            subText = label;
       }
   } else {
-      // Standard Modes: Countdown
       mainValue = Math.ceil(timeLeft).toString();
-      phaseTimerText = ""; 
   }
 
-  // --- Visual Scaling (Breathing Animation) ---
-  let scale = 1;
-  if (mode !== 'stopwatch') {
-      if (phase === BreathingPhase.Inhale) scale = 1.1; // Gentle expansion
-      else if (phase === BreathingPhase.Exhale) scale = 0.9;
-  }
+  // Breathing Animation for container
+  const breatheScale = !isStopwatch && isActive 
+    ? (phase === BreathingPhase.Inhale ? 1.05 : phase === BreathingPhase.Exhale ? 0.95 : 1)
+    : 1;
 
-  // UPDATED SIZES: Use max-height/width to fit within flex container
-  // 40vh ensures it never takes more than 40% of viewport height
-  const containerSize = "w-[60vmin] h-[60vmin] max-w-[280px] max-h-[280px] md:w-[320px] md:h-[320px]";
-  
+  // Responsive Container
+  const containerSize = "w-[260px] h-[260px] md:w-[300px] md:h-[300px]";
+  const radius = 120; // Internal SVG radius
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = isStopwatch 
+    ? (circumference * 0.25) // Static ring for stopwatch
+    : circumference * (1 - timeProgress);
+
   return (
-    <div className={`relative ${containerSize} flex items-center justify-center flex-shrink-0 mx-auto`}>
-        
-        {/* 1. Ambient Glow */}
+    <div className={`relative ${containerSize} flex items-center justify-center flex-shrink-0 mx-auto transition-transform duration-[2000ms] ease-in-out`}
+         style={{ transform: `scale(${breatheScale})` }}
+    >
+        {/* 1. OUTER GLOW (Ambient Light) */}
         <div 
-            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] rounded-full blur-[60px] pointer-events-none transition-all ease-out ${isWimHofRetention ? 'opacity-50 animate-pulse' : 'opacity-20'}`}
+            className="absolute inset-0 rounded-full blur-[50px] transition-opacity duration-700"
             style={{ 
-                backgroundColor: glowColor,
-                transform: `translate(-50%, -50%) scale(${scale})`,
-                transitionDuration: '1s'
+                background: `radial-gradient(circle, ${glowColor}40 0%, transparent 70%)`,
+                opacity: isActive ? 0.6 : 0.2
             }}
         />
 
-        {/* 2. PROGRESS RINGS (SVG LAYER) */}
+        {/* 2. GLASS ORB BACKGROUND (Apple Liquid Style) */}
+        <div className="absolute inset-2 rounded-full bg-gradient-to-br from-white/10 to-transparent dark:from-white/5 dark:to-black/20 backdrop-blur-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),0_10px_30px_rgba(0,0,0,0.2)] border border-white/10 ring-1 ring-black/5"></div>
+
+        {/* 3. SVG PROGRESS RING */}
         <svg 
-            className={`absolute inset-0 w-full h-full rotate-[-90deg] pointer-events-none overflow-visible z-0`}
-            viewBox="0 0 200 200"
+            className="absolute inset-0 w-full h-full -rotate-90 drop-shadow-lg"
+            viewBox="0 0 300 300"
         >
+            {/* Track */}
             <circle
-                cx="100"
-                cy="100"
-                r="90"
+                cx="150"
+                cy="150"
+                r={radius}
                 fill="none"
-                stroke={theme === 'light' ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.05)"}
-                strokeWidth="2"
+                stroke={theme === 'light' ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.06)"}
+                strokeWidth="12"
+                strokeLinecap="round"
             />
-            {mode !== 'stopwatch' && (
-                <circle
-                    cx="100"
-                    cy="100"
-                    r="90"
-                    fill="none"
-                    stroke={strokeColor}
-                    strokeWidth="4" 
-                    strokeLinecap="round"
-                    strokeDasharray={2 * Math.PI * 90}
-                    strokeDashoffset={2 * Math.PI * 90 * (1 - timeProgress)}
-                    className="transition-all duration-100 ease-linear"
-                    style={{ 
-                        filter: `drop-shadow(0 0 10px ${glowColor})`
-                    }}
-                />
-            )}
+            {/* Progress - Liquid Neon */}
+            <circle
+                cx="150"
+                cy="150"
+                r={radius}
+                fill="none"
+                stroke={strokeColor}
+                strokeWidth="12"
+                strokeLinecap="round"
+                strokeDasharray={circumference}
+                strokeDashoffset={strokeDashoffset}
+                className="transition-all duration-300 ease-linear"
+                style={{ 
+                    filter: `drop-shadow(0 0 6px ${glowColor})`
+                }}
+            />
         </svg>
 
-        {/* 3. THE ORB (Container) */}
-        <div 
-            className={`relative w-[85%] h-[85%] rounded-full flex flex-col items-center justify-center transition-transform ease-out z-10`}
-            style={{ 
-                transform: `scale(${scale})`,
-                transitionDuration: '1000ms'
-            }}
-        >
-            {/* Background Glass */}
-            <div className={`absolute inset-0 rounded-full border border-white/10 bg-[#0a0a0b]/80 backdrop-blur-2xl shadow-2xl transition-all duration-500 ${isWimHofRetention ? 'shadow-orange-500/20 bg-[#1a0a05]/90' : ''}`}></div>
-
-            {/* --- CONTENT LAYER --- */}
-            <div className="relative z-10 flex flex-col items-center justify-center h-full w-full">
+        {/* 4. CONTENT (Inside the Glass) */}
+        <div className="relative z-10 flex flex-col items-center justify-center">
+            
+            {/* Main Number - Super Clean Typography */}
+            <div className="relative">
+                <span 
+                    className="font-display font-bold text-7xl md:text-8xl tabular-nums tracking-tighter leading-none text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 drop-shadow-sm"
+                    style={{ 
+                        fontVariantNumeric: 'tabular-nums',
+                        textShadow: `0 4px 20px ${glowColor}40`
+                    }}
+                >
+                    {mainValue}
+                </span>
                 
-                {/* Main Value */}
-                <div className="flex flex-col items-center justify-center">
-                    <span className={`text-6xl md:text-7xl font-display font-bold font-mono tabular-nums tracking-tighter ${phaseColorClass} drop-shadow-lg leading-none transition-colors duration-300`}>
-                        {mainValue}
+                {/* Milliseconds for stopwatch */}
+                {isStopwatch && (
+                    <span className="absolute -right-6 top-2 text-xl font-mono font-medium text-white/50">
+                        .{Math.floor((timeLeft % 1) * 10)}
                     </span>
-                    
-                    {/* Phase Timer */}
-                    {!isWimHof && mode !== 'stopwatch' && (
-                        <div className="mt-2 text-gray-400 text-[10px] font-bold uppercase tracking-widest bg-black/20 px-2 py-1 rounded-full border border-white/5">
-                            <span className="text-white font-mono">{timeLeft.toFixed(1)}с</span>
-                        </div>
-                    )}
-                </div>
+                )}
+            </div>
 
-                {/* Status Pill */}
-                <div className="mt-4 px-4 py-1.5 rounded-full border border-white/10 bg-black/40 backdrop-blur-md shadow-lg">
-                     <span className={`text-[10px] font-bold uppercase tracking-[0.2em] whitespace-nowrap text-gray-200`}>
+            {/* Label - Tight Spacing */}
+            <div className="mt-1 flex flex-col items-center gap-1">
+                 {/* Mini Pill Label */}
+                 <div 
+                    className="px-3 py-1 rounded-full bg-white/10 border border-white/5 backdrop-blur-md shadow-sm transition-colors duration-500"
+                    style={{ backgroundColor: `${glowColor}15`, borderColor: `${glowColor}30` }}
+                 >
+                    <span 
+                        className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/90"
+                        style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
+                    >
                         {subText}
                     </span>
-                </div>
+                 </div>
+                 
+                 {/* Secondary Info (seconds left in standard mode) */}
+                 {!isWimHof && !isStopwatch && isActive && (
+                     <span className="text-[10px] font-mono text-white/40 font-medium">
+                        {timeLeft.toFixed(1)}s
+                     </span>
+                 )}
             </div>
         </div>
     </div>

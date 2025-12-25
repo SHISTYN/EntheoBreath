@@ -91,7 +91,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
     };
 
     return (
-        <div className="animate-fade-in px-4 py-8 md:p-10 pb-48">
+        <div className="animate-fade-in px-4 py-8 md:p-10 pb-48 min-h-[calc(100%+1px)]">
             <div className="max-w-[1600px] mx-auto">
                 
                 <LibraryHeader 
@@ -178,21 +178,13 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
                             href="https://t.me/+D78P1fpaduBlOTc6" 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="inline-block mx-1 align-middle cursor-default"
+                            className="inline-block mx-1 align-middle transition-transform hover:scale-110 cursor-default"
+                            title=""
                         >
                             <span className="text-rose-500 animate-pulse text-lg">❤️</span>
                         </a> 
                         — <a href="https://t.me/nikolaiovchinnikov" target="_blank" rel="noopener noreferrer" className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 transition-colors border-b border-transparent hover:border-cyan-500">НИКОЛАЙ ОВЧИННИКОВ</a>
                     </div>
-                    <a 
-                        href="https://t.me/nikolaiovchinnikov" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white dark:bg-[#1c1c1e] border border-gray-200 dark:border-white/10 hover:border-cyan-500 dark:hover:border-cyan-500 hover:scale-105 transition-all text-xs font-bold uppercase tracking-widest shadow-lg"
-                    >
-                        <i className="fab fa-telegram-plane text-cyan-500 text-lg"></i>
-                        Предложения и обратная связь
-                    </a>
                 </div>
             </footer>
         </div>

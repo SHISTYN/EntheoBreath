@@ -88,7 +88,7 @@ const BoxTimerVisual: React.FC<BoxTimerProps> = ({
 
     // --- 4. RENDER ---
     return (
-        <div className="relative w-full max-w-[280px] md:max-w-[360px] aspect-square flex items-center justify-center">
+        <div className="relative w-full max-w-[280px] md:max-w-[360px] lg:max-w-[45vh] aspect-square flex items-center justify-center">
             
             {/* SVG CANVAS */}
             <svg 
@@ -159,7 +159,7 @@ const BoxTimerVisual: React.FC<BoxTimerProps> = ({
                 {/* Timer */}
                 <div className="flex flex-col items-center justify-center">
                     <span 
-                        className="text-7xl md:text-8xl font-mono font-bold text-white tabular-nums drop-shadow-2xl"
+                        className="text-7xl md:text-8xl lg:text-[10vh] font-mono font-bold text-white tabular-nums drop-shadow-2xl"
                         style={{ textShadow: `0 0 30px ${glowColor}` }}
                     >
                         {Math.ceil(timeLeft)}
@@ -183,7 +183,7 @@ const BoxTimerVisual: React.FC<BoxTimerProps> = ({
                 </div>
 
                 {/* Round Info */}
-                <div className="absolute bottom-16 opacity-40">
+                <div className="absolute bottom-16 lg:bottom-20 opacity-40">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-white">
                         Раунд {currentRound}
                     </span>

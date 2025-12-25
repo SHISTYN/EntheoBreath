@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { BreathingPattern } from '../types';
 import { CATEGORY_ICONS, CATEGORY_NAMES } from '../constants';
 import IconRenderer from './IconRenderer';
-import Controls from './Controls'; // Import Controls here to embed them in Sidebar
+import WimHofGuide from './techniques/WimHofGuide';
 
 const MotionButton = motion.button as any;
 const MotionDiv = motion.div as any;
@@ -27,18 +27,11 @@ const TimerSidebar: React.FC<TimerSidebarProps> = ({
     isAnalyzing
 }) => {
     return (
-        <div className={`
-            w-full flex flex-col
-            ${activePattern.mode === 'manual' ? 'lg:w-full' : 'lg:w-[480px]'} 
-            bg-white dark:bg-[#0a0a0b] lg:bg-white/80 lg:dark:bg-[#0a0a0b]/80 lg:backdrop-blur-3xl 
-            border-b lg:border-b-0 lg:border-r border-zinc-200 dark:border-white/5 
-            relative z-20 shadow-2xl transition-all duration-500
-            rounded-t-3xl lg:rounded-none shadow-[0_-10px_40px_rgba(0,0,0,0.2)] lg:shadow-none
-            lg:h-full h-full flex-1 min-h-0
-        `}>
+        <div className="w-full flex flex-col bg-transparent relative z-20 pb-10">
             
-            {/* 1. FIXED HEADER */}
-            <div className="flex-shrink-0 px-6 pt-6 pb-2 border-b border-zinc-200 dark:border-white/5 bg-white/95 dark:bg-[#0a0a0b]/95 backdrop-blur-xl z-20 rounded-t-3xl lg:rounded-none">
+            {/* 1. HEADER (Sticky inside the flow) */}
+            {/* Using sticky top-0 here ensures the tabs stick to the top of the viewport when scrolling down the long description on mobile */}
+            <div className="flex-shrink-0 px-6 py-6 border-b border-zinc-200 dark:border-white/5 bg-white/95 dark:bg-[#0a0a0b]/95 backdrop-blur-xl sticky top-0 z-30 transition-colors duration-300">
                 
                 {/* Back Button */}
                 <button 
@@ -50,19 +43,16 @@ const TimerSidebar: React.FC<TimerSidebarProps> = ({
 
                 {/* Title */}
                 <div className="flex items-baseline justify-between mb-4">
-                    <h2 className="text-xl md:text-3xl font-display font-bold text-zinc-900 dark:text-white leading-none tracking-tight">{activePattern.name}</h2>
+                    <h2 className="text-2xl md:text-3xl font-display font-bold text-zinc-900 dark:text-white leading-none tracking-tight">{activePattern.name}</h2>
                     <div className="flex items-center gap-2 text-xs text-cyan-600 dark:text-zen-accent font-bold">
                         <i className={`fas fa-${CATEGORY_ICONS[activePattern.category]}`}></i>
                         <span className="hidden sm:inline">{CATEGORY_NAMES[activePattern.category]}</span>
                     </div>
                 </div>
                 
-                {/* iOS Segmented Control Tabs */}
-                <div className="relative p-1 bg-zinc-100 dark:bg-white/5 rounded-xl flex items-center w-full mb-2">
+                {/* Tabs */}
+                <div className="relative p-1 bg-zinc-100 dark:bg-white/5 rounded-xl flex items-center w-full">
                     {(['about', 'guide', 'safety'] as const).map((tab) => {
-                        // Skip safety if not needed
-                        if (tab === 'safety' && activePattern.mode !== 'manual' && activePattern.category !== 'Toltec') return null;
-                        
                         const isActive = infoTab === tab;
                         return (
                             <button
@@ -81,7 +71,7 @@ const TimerSidebar: React.FC<TimerSidebarProps> = ({
                                     />
                                 )}
                                 <span className="relative z-20 flex items-center justify-center gap-2">
-                                    {tab === 'about' ? 'Настройки' : tab === 'guide' ? 'Техника' : 'Важно'}
+                                    {tab === 'about' ? 'Обзор' : tab === 'guide' ? 'Техника' : 'Важно'}
                                     {tab === 'safety' && <i className="fas fa-shield-alt text-rose-500"></i>}
                                 </span>
                             </button>
@@ -90,29 +80,22 @@ const TimerSidebar: React.FC<TimerSidebarProps> = ({
                 </div>
             </div>
 
-            {/* 2. SCROLLABLE CONTENT BODY */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8 pb-32">
+            {/* 2. CONTENT */}
+            <div className="flex-1 p-6 space-y-8">
                     
-                    {/* INJECT CONTROLS HERE FOR "ABOUT" TAB (Mobile UX Optimization) */}
-                    {infoTab === 'about' && activePattern.mode !== 'stopwatch' && activePattern.mode !== 'manual' && activePattern.mode !== 'wim-hof' && (
-                        <div className="mb-6">
-                            {/* Note: We are using a dummy onChange here because real state is in App.tsx. 
-                                In a real refactor, we should pass state down. 
-                                Since user asked for layout fix, we will keep the visual placeholder or move Controls here? 
-                                Actually, the user wants "Settings" here. 
-                                Ideally, Controls should be in Sidebar on mobile. 
-                                For now, I'll assume Controls stay below Visualizer in App.tsx for immediate access, 
-                                and this tab is purely info. 
-                            */}
-                            <div className="text-[10px] font-bold text-zinc-400 dark:text-gray-500 uppercase tracking-widest mb-2 opacity-80">
-                                Описание
-                            </div>
-                            <p className="text-zinc-700 dark:text-gray-300 leading-relaxed text-sm md:text-base font-light">{activePattern.description}</p>
-                        </div>
-                    )}
-
                     {infoTab === 'about' && (
                         <div className="space-y-8 animate-fade-in">
+                            {/* Essence */}
+                            {activePattern.mode !== 'stopwatch' && activePattern.mode !== 'manual' && activePattern.mode !== 'wim-hof' && (
+                                <div>
+                                    <div className="text-[10px] font-bold text-zinc-400 dark:text-gray-500 uppercase tracking-widest mb-2 opacity-80">
+                                        Суть практики
+                                    </div>
+                                    <p className="text-zinc-700 dark:text-gray-300 leading-relaxed text-sm md:text-base font-light">{activePattern.description}</p>
+                                </div>
+                            )}
+
+                            {/* Benefits */}
                             {activePattern.benefits && activePattern.benefits.length > 0 && (
                                 <div>
                                     <h4 className="text-[10px] font-bold text-purple-600 dark:text-premium-purple uppercase tracking-[0.2em] mb-3 opacity-80">Ключевые эффекты</h4>
@@ -129,6 +112,7 @@ const TimerSidebar: React.FC<TimerSidebarProps> = ({
                                 </div>
                             )}
                             
+                            {/* Tags */}
                             <div className="grid grid-cols-2 gap-4 mt-6">
                                 <div className="bg-zinc-50 dark:bg-white/5 p-3 rounded-xl border border-zinc-200 dark:border-white/5">
                                     <div className="text-[9px] text-zinc-400 uppercase tracking-wider mb-1 font-bold">Категория</div>
@@ -140,6 +124,7 @@ const TimerSidebar: React.FC<TimerSidebarProps> = ({
                                 </div>
                             </div>
 
+                            {/* AI Action */}
                             {activePattern.mode !== 'stopwatch' && activePattern.mode !== 'manual' && (
                                 <div className="w-full mt-6 group relative">
                                     <MotionButton
@@ -158,6 +143,14 @@ const TimerSidebar: React.FC<TimerSidebarProps> = ({
 
                     {infoTab === 'guide' && (
                         <div className="animate-fade-in">
+                            
+                            {/* WIM HOF SPECIAL VIDEO GUIDE */}
+                            {activePattern.id === 'wim-hof-session' && (
+                                <div className="mb-10">
+                                    <WimHofGuide />
+                                </div>
+                            )}
+
                             <ReactMarkdown
                             components={{
                                 p: ({node, ...props}) => <p className="mb-5 text-zinc-700 dark:text-gray-300 leading-relaxed font-light text-base md:text-lg" {...props} />,
@@ -201,10 +194,15 @@ const TimerSidebar: React.FC<TimerSidebarProps> = ({
 
                     {infoTab === 'safety' && (
                         <div className="space-y-8 animate-fade-in">
-                            {activePattern.safetyWarning && (
+                            {activePattern.safetyWarning ? (
                                 <div className="bg-rose-50 dark:bg-rose-900/10 border border-rose-200 dark:border-rose-500/20 p-6 rounded-2xl">
                                     <h4 className="text-xs font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider mb-3">Главное предупреждение</h4>
                                     <p className="text-rose-900 dark:text-rose-100 leading-relaxed font-medium text-lg">{activePattern.safetyWarning}</p>
+                                </div>
+                            ) : (
+                                <div className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-500/20 p-6 rounded-2xl">
+                                    <h4 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-3">Безопасность</h4>
+                                    <p className="text-emerald-900 dark:text-emerald-100 leading-relaxed font-medium text-lg">Эта практика считается безопасной для большинства людей при соблюдении инструкций.</p>
                                 </div>
                             )}
                             
@@ -239,13 +237,15 @@ const TimerSidebar: React.FC<TimerSidebarProps> = ({
                     )}
             </div>
 
-            {/* 3. STATIC FOOTER (Desktop Only) */}
+            {/* 3. FOOTER */}
             <div className="hidden lg:block flex-shrink-0 p-4 border-t border-zinc-200 dark:border-white/5 text-center text-zinc-500 dark:text-gray-500 bg-white/50 dark:bg-[#0a0a0b]/50 backdrop-blur-xl">
                 <div className="flex flex-col items-center gap-2">
                     <div className="text-[10px] font-bold tracking-[0.1em] opacity-50">
                         СОЗДАНО С 
-                        <span className="text-rose-500 animate-pulse text-sm mx-1">❤️</span>
-                        — НИКОЛАЙ ОВЧИННИКОВ
+                        <a href="https://t.me/+D78P1fpaduBlOTc6" target="_blank" rel="noopener noreferrer" className="inline-block mx-1 hover:scale-125 transition-transform cursor-default">
+                            <span className="text-rose-500 animate-pulse text-sm">❤️</span>
+                        </a>
+                        — <a href="https://t.me/nikolaiovchinnikov" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-900 dark:hover:text-white transition-colors border-b border-transparent hover:border-zinc-500">НИКОЛАЙ ОВЧИННИКОВ</a>
                     </div>
                 </div>
             </div>

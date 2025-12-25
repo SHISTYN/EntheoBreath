@@ -32,7 +32,8 @@ const HighlightedText: React.FC<{ text: string; query: string; className?: strin
     );
 };
 
-const TechniqueCard: React.FC<TechniqueCardProps> = ({ 
+// Memoized to prevent re-render of entire list on search keystrokes
+const TechniqueCard: React.FC<TechniqueCardProps> = React.memo(({ 
     pattern, 
     onClick, 
     isFavorite = false, 
@@ -43,7 +44,6 @@ const TechniqueCard: React.FC<TechniqueCardProps> = ({
     const isKing = pattern.id === 'wim-hof-session';
 
     // Helper for difficulty styling
-    // Replaced static colors with "expensive" gradient text + shimmer-slow animation
     const getDifficultyStyle = (diff: string) => {
         switch (diff) {
             case 'Новичок': 
@@ -164,6 +164,6 @@ const TechniqueCard: React.FC<TechniqueCardProps> = ({
             </div>
         </SpotlightCard>
     );
-};
+});
 
 export default TechniqueCard;

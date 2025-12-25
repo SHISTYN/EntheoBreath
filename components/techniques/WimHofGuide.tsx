@@ -21,8 +21,7 @@ const VIDEO_DATA = {
 };
 
 interface WimHofGuideProps {
-    onStartPractice: () => void;
-    // onBack is no longer needed as the parent tabs handle navigation/context
+    onStartPractice?: () => void;
     onBack?: () => void;
 }
 
@@ -31,9 +30,9 @@ const WimHofGuide: React.FC<WimHofGuideProps> = ({ onStartPractice }) => {
     const activeVideo = VIDEO_DATA[lang];
 
     return (
-        <div className="w-full flex flex-col bg-[#0B0E11] min-h-0 h-full overflow-y-auto custom-scrollbar">
+        <div className="w-full flex flex-col">
             
-            <div className="w-full max-w-2xl mx-auto flex flex-col gap-6 px-4 py-8 animate-fade-in">
+            <div className="w-full mx-auto flex flex-col gap-6 animate-fade-in">
                 
                 {/* 1. SOCIAL PROOF HEADER */}
                 <div className="text-center space-y-2">
@@ -111,20 +110,15 @@ const WimHofGuide: React.FC<WimHofGuideProps> = ({ onStartPractice }) => {
                         <div className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400 border border-cyan-500/30">
                             <i className="fas fa-check text-sm"></i>
                         </div>
-                        <h4 className="text-lg font-display font-bold text-white">Готовы начать?</h4>
+                        <h4 className="text-lg font-display font-bold text-white">Инструкция</h4>
                     </div>
 
-                    <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+                    <p className="text-sm text-gray-400 mb-2 leading-relaxed">
                         Рекомендуется выполнить 3-4 раунда. Дышите глубоко, но без напряжения. Если почувствуете головокружение — остановитесь.
                     </p>
-
-                    <button 
-                        onClick={onStartPractice}
-                        className="w-full py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-display font-bold text-lg uppercase tracking-[0.1em] shadow-[0_0_30px_rgba(6,182,212,0.4)] hover:shadow-[0_0_50px_rgba(6,182,212,0.6)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
-                    >
-                        <span>Начать Дыхание</span>
-                        <i className="fas fa-arrow-right"></i>
-                    </button>
+                    <p className="text-xs text-gray-500 italic">
+                        *Используйте таймер в левой панели для ведения статистики и ритма.
+                    </p>
                 </div>
 
             </div>
