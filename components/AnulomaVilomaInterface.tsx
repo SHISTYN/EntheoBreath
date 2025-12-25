@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { BreathingPhase } from '../types';
 
@@ -18,127 +18,142 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
     totalTime,
     currentRound
 }) => {
-    
+    const [isLeftHanded, setIsLeftHanded] = useState(false);
+
+    // --- ЛОГИКА РАУНДОВ ---
     const isOddRound = currentRound % 2 !== 0; 
 
-    // --- CONFIGURATION ---
+    // --- КОНФИГУРАЦИЯ ---
     const STROKE_WIDTH = 24; 
-    const PATH_LENGTH = 350; 
     
     // SVG Paths (Рисуются СНИЗУ ВВЕРХ)
     const leftPath = "M 70 380 C 70 180 70 60 150 60";
     const rightPath = "M 230 380 C 230 180 230 60 150 60";
 
-    // --- MATHEMATICS (0.0 -> 1.0) ---
+    // --- МАТЕМАТИКА ---
+    // Вычисляем прогресс (0.0 -> 1.0)
     const rawProgress = totalTime > 0 ? (totalTime - timeLeft) / totalTime : 1;
     const progress = Math.min(Math.max(rawProgress, 0), 1);
 
-    // Colors
+    // Цвета
     const COLOR_INHALE = "#22d3ee"; // Cyan
     const COLOR_HOLD = "#a855f7";   // Purple
     const COLOR_EXHALE = "#fb923c"; // Orange
+    const COLOR_GLASS = "rgba(255, 255, 255, 0.05)"; 
     
-    // Logic Variables
-    let leftDash = 0; // The active moving part
-    let rightDash = 0;
-    
-    // Base Dash (Background layer for HOLD phase)
-    // Когда идет задержка, трубка должна быть уже "полной" голубым цветом,
-    // а поверх нее ползет фиолетовый.
-    let leftBaseDash = 0;
-    let rightBaseDash = 0;
+    // --- STATE HELPERS ---
+    const emptyState = {
+        pathLength: 0,
+        pathOffset: 0,
+        color: COLOR_INHALE,
+        opacity: 0
+    };
 
-    let leftColor = COLOR_INHALE;
-    let rightColor = COLOR_INHALE;
-    
+    let leftState = { ...emptyState };
+    let rightState = { ...emptyState };
+
     let leftLockOpen = false;
     let rightLockOpen = false;
-    
     let mainText = "";
     let subText = "";
 
+    const leftFingerLabel = isLeftHanded ? "БОЛЬШОЙ" : "БЕЗЫМЯННЫЙ";
+    const rightFingerLabel = isLeftHanded ? "БЕЗЫМЯННЫЙ" : "БОЛЬШОЙ";
+
+    const setVisuals = (
+        targetState: any, 
+        length: number, 
+        color: string,
+        offset: number = 0
+    ) => {
+        targetState.pathLength = length;
+        targetState.pathOffset = offset;
+        targetState.color = color;
+        // HIDE if length is very small to prevent dot artifacts at 0 or 1 offset
+        targetState.opacity = length > 0.01 ? 1 : 0;
+    };
+
     switch (phase) {
         case BreathingPhase.Inhale:
+            // Вдох: наполняем от 0 до 1 (снизу вверх)
             if (isOddRound) {
-                // ВДОХ ЛЕВОЙ
                 mainText = "ВДОХ ЛЕВОЙ";
                 subText = "ПРАВАЯ ЗАКРЫТА";
                 leftLockOpen = true;
-                
-                // Левая наполняется СНИЗУ ВВЕРХ
-                leftDash = progress * PATH_LENGTH;
-                leftColor = COLOR_INHALE;
-                // База не нужна, мы рисуем саму жидкость
+                setVisuals(leftState, progress, COLOR_INHALE, 0);
             } else {
-                // ВДОХ ПРАВОЙ
                 mainText = "ВДОХ ПРАВОЙ";
                 subText = "ЛЕВАЯ ЗАКРЫТА";
                 rightLockOpen = true;
-
-                // Правая наполняется СНИЗУ ВВЕРХ
-                rightDash = progress * PATH_LENGTH;
-                rightColor = COLOR_INHALE;
+                setVisuals(rightState, progress, COLOR_INHALE, 0);
             }
             break;
 
         case BreathingPhase.HoldIn:
+            // Задержка: Убывает СНИЗУ ВВЕРХ
+            // Эффект: энергия "втягивается" в голову.
             mainText = "ЗАДЕРЖКА";
             subText = "ДЕРЖИТЕ"; 
             leftLockOpen = false;
             rightLockOpen = false;
             
-            // --- LOGIC FIX: FILL THE *SAME* TUBE PURPLE ---
-            
+            // progress идет от 0 до 1.
+            const currentOffset = progress;
+            const currentLength = Math.max(0, 1 - progress);
+
             if (isOddRound) {
-                // Вдохнули левой -> Держим в Левой
-                // Левая трубка полностью голубая (Base), и поверх нее ползет Фиолетовый (Active)
-                leftBaseDash = PATH_LENGTH; // Full Cyan Background
-                
-                leftDash = progress * PATH_LENGTH; // Purple rising
-                leftColor = COLOR_HOLD;
-                
-                // Правая пустая
+                // Вдыхали левой -> держим левую
+                setVisuals(leftState, currentLength, COLOR_HOLD, currentOffset);
             } else {
-                // Вдохнули Правой -> Держим в Правой
-                rightBaseDash = PATH_LENGTH; // Full Cyan Background
-                
-                rightDash = progress * PATH_LENGTH; // Purple rising
-                rightColor = COLOR_HOLD;
-                
-                // Левая пустая
+                // Вдыхали правой -> держим правую
+                setVisuals(rightState, currentLength, COLOR_HOLD, currentOffset);
             }
             break;
 
         case BreathingPhase.Exhale:
-            // Выдох идет СВЕРХУ ВНИЗ (уменьшение Dash)
-            const drain = (1 - progress) * PATH_LENGTH;
+            // Выдох: убываем от 1 до 0 (Сверху вниз)
+            // При Exhale pathOffset всегда 0 (стандартное поведение pathLength)
+            const drainProgress = Math.max(0, 1 - progress);
 
             if (isOddRound) {
-                // Выдох ПРАВОЙ (Смена стороны произошла)
                 mainText = "ВЫДОХ ПРАВОЙ";
                 subText = "ЛЕВАЯ ЗАКРЫТА";
                 rightLockOpen = true;
+                
+                // Active Side: Right (Draining down)
+                setVisuals(rightState, drainProgress, COLOR_EXHALE, 0);
 
-                // Правая полная и опускается
-                rightDash = drain;
-                rightColor = COLOR_EXHALE;
+                // Inactive Side: Left (Just finished holding UP)
+                // FIX: Keep offset at 1 (top) to prevent jump glitch at bottom
+                setVisuals(leftState, 0, COLOR_HOLD, 1);
             } else {
-                // Выдох ЛЕВОЙ
                 mainText = "ВЫДОХ ЛЕВОЙ";
                 subText = "ПРАВАЯ ЗАКРЫТА";
                 leftLockOpen = true;
 
-                leftDash = drain;
-                leftColor = COLOR_EXHALE;
+                // Active Side: Left (Draining down)
+                setVisuals(leftState, drainProgress, COLOR_EXHALE, 0);
+
+                // Inactive Side: Right (Just finished holding UP)
+                // FIX: Keep offset at 1 (top) to prevent jump glitch at bottom
+                setVisuals(rightState, 0, COLOR_HOLD, 1);
             }
             break;
             
-        default: // Ready / Done
+        default: 
             mainText = "ГОТОВНОСТЬ";
+            subText = "РАССЛАБЬТЕСЬ";
             leftLockOpen = true;
             rightLockOpen = true;
             break;
     }
+
+    const transitionConfig = {
+        pathLength: { duration: 0, ease: "linear" }, 
+        pathOffset: { duration: 0, ease: "linear" },
+        stroke: { duration: 0.2 }, // Slightly faster color transition
+        opacity: { duration: 0.1 }, // Fast fade in/out
+    };
 
     return (
         <div className="w-full flex flex-col items-center justify-center relative min-h-[500px]">
@@ -146,179 +161,161 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
                 
                 <svg viewBox="-40 -40 380 550" className="absolute inset-0 w-full h-full overflow-visible z-10 pointer-events-none">
                     <defs>
-                        <filter id="liquidGlow" x="-50%" y="-50%" width="200%" height="200%">
+                        <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
                             <feGaussianBlur stdDeviation="8" result="coloredBlur" />
                             <feMerge>
                                 <feMergeNode in="coloredBlur" />
                                 <feMergeNode in="SourceGraphic" />
                             </feMerge>
                         </filter>
-                        
-                        <linearGradient id="tubeBg" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="rgba(255,255,255,0.02)" />
-                            <stop offset="100%" stopColor="rgba(255,255,255,0.08)" />
-                        </linearGradient>
                     </defs>
 
-                    {/* 1. GLASS TUBES (Empty Structure) */}
-                    <path d={leftPath} stroke="url(#tubeBg)" strokeWidth={STROKE_WIDTH} fill="none" strokeLinecap="round" />
-                    <path d={rightPath} stroke="url(#tubeBg)" strokeWidth={STROKE_WIDTH} fill="none" strokeLinecap="round" />
+                    {/* 1. BACKGROUND TUBES (GLASS) */}
+                    <path d={leftPath} stroke={COLOR_GLASS} strokeWidth={STROKE_WIDTH} fill="none" strokeLinecap="round" />
+                    <path d={rightPath} stroke={COLOR_GLASS} strokeWidth={STROKE_WIDTH} fill="none" strokeLinecap="round" />
                     
-                    {/* 2. BASE LIQUID (Used during Hold to show Cyan background behind Purple) */}
-                    {/* Left Base */}
+                    {/* 2. ACTIVE LIQUID LAYER */}
+                    
+                    {/* LEFT SIDE */}
                     <MotionPath
                         d={leftPath}
                         fill="none"
                         strokeWidth={STROKE_WIDTH}
                         strokeLinecap="round"
-                        stroke={COLOR_INHALE} // Always Cyan base
+                        filter="url(#neonGlow)"
+                        initial={{ pathLength: 0 }}
                         animate={{ 
-                            strokeDasharray: `${leftBaseDash} ${PATH_LENGTH}`,
-                            opacity: leftBaseDash > 0 ? 1 : 0
+                            stroke: leftState.color,
+                            pathLength: leftState.pathLength,
+                            pathOffset: leftState.pathOffset || 0,
+                            opacity: leftState.opacity,
                         }}
-                        transition={{ duration: 0 }}
-                        style={{ filter: 'url(#liquidGlow)' }}
+                        transition={transitionConfig}
                     />
-                    {/* Right Base */}
+
+                    {/* RIGHT SIDE */}
                     <MotionPath
                         d={rightPath}
                         fill="none"
                         strokeWidth={STROKE_WIDTH}
                         strokeLinecap="round"
-                        stroke={COLOR_INHALE} // Always Cyan base
+                        filter="url(#neonGlow)"
+                        initial={{ pathLength: 0 }}
                         animate={{ 
-                            strokeDasharray: `${rightBaseDash} ${PATH_LENGTH}`,
-                            opacity: rightBaseDash > 0 ? 1 : 0
+                            stroke: rightState.color,
+                            pathLength: rightState.pathLength,
+                            pathOffset: rightState.pathOffset || 0,
+                            opacity: rightState.opacity,
                         }}
-                        transition={{ duration: 0 }}
-                        style={{ filter: 'url(#liquidGlow)' }}
+                        transition={transitionConfig}
                     />
 
-                    {/* 3. ACTIVE LIQUID ANIMATION (Foreground) */}
-                    {/* Left Active */}
-                    <MotionPath
-                        d={leftPath}
-                        fill="none"
-                        strokeWidth={STROKE_WIDTH}
-                        strokeLinecap="round"
-                        filter="url(#liquidGlow)"
-                        animate={{ 
-                            stroke: leftColor,
-                            strokeDasharray: `${leftDash} ${PATH_LENGTH}`,
-                            opacity: leftDash > 0 ? 1 : 0
-                        }}
-                        transition={{ 
-                            stroke: { duration: 0.2 },
-                            strokeDasharray: { duration: 0 },
-                            opacity: { duration: 0.1 }
-                        }}
-                    />
-
-                    {/* Right Active */}
-                    <MotionPath
-                        d={rightPath}
-                        fill="none"
-                        strokeWidth={STROKE_WIDTH}
-                        strokeLinecap="round"
-                        filter="url(#liquidGlow)"
-                        animate={{ 
-                            stroke: rightColor,
-                            strokeDasharray: `${rightDash} ${PATH_LENGTH}`,
-                            opacity: rightDash > 0 ? 1 : 0
-                        }}
-                        transition={{ 
-                            stroke: { duration: 0.2 },
-                            strokeDasharray: { duration: 0 },
-                            opacity: { duration: 0.1 }
-                        }}
-                    />
-
-                    {/* 4. CENTER CONNECTOR */}
+                    {/* 3. CENTER CONNECTOR */}
                     <circle cx="150" cy="60" r="6" fill="rgba(255,255,255,0.1)" />
                     
                     {/* Pulsing indicator during Hold */}
                     {phase === BreathingPhase.HoldIn && (
                         <MotionDiv
+                            key="hold-pulse"
                             className="origin-center"
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{ scale: [1, 1.3, 1], opacity: 1 }}
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+                            exit={{ opacity: 0, scale: 0.5 }}
                             transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
                         >
-                            <circle cx="150" cy="60" r="14" fill={COLOR_HOLD} filter="url(#liquidGlow)" opacity="0.4" />
-                            <circle cx="150" cy="60" r="6" fill="white" />
+                            <circle cx="150" cy="60" r="16" fill={COLOR_HOLD} filter="url(#neonGlow)" opacity="0.4" />
                         </MotionDiv>
                     )}
+                    <circle cx="150" cy="60" r="4" fill="white" opacity="0.8" />
 
-                    {/* 5. LOCKS (ICONS) */}
+                    {/* --- CONTROLS LAYER (LOCKS + SWITCHER) --- */}
+                    
                     {/* LEFT LOCK */}
-                    <foreignObject x="30" y="350" width="80" height="80">
+                    <foreignObject x="30" y="350" width="80" height="90">
                         <div className="flex flex-col items-center justify-center h-full">
                             <MotionDiv 
                                 animate={{
-                                    borderColor: leftLockOpen ? leftColor : 'rgba(255,255,255,0.05)',
-                                    boxShadow: leftLockOpen ? `0 0 20px ${leftColor}40` : 'none'
+                                    borderColor: leftLockOpen ? leftState.color : 'rgba(255,255,255,0.05)',
+                                    backgroundColor: leftLockOpen ? 'rgba(255,255,255,0.05)' : 'transparent',
+                                    scale: leftLockOpen ? 1.1 : 1
                                 }}
-                                transition={{ duration: 0.5 }}
                                 className={`
-                                    w-14 h-14 rounded-full flex items-center justify-center border-2 transition-all
-                                    ${leftLockOpen 
-                                        ? `text-white bg-white/10` 
-                                        : 'text-rose-500/50 bg-transparent'
-                                    }
+                                    w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300
+                                    ${leftLockOpen ? 'text-white shadow-[0_0_15px_rgba(255,255,255,0.1)]' : 'text-rose-500/50'}
                                 `}
                             >
-                                <i className={`fas fa-${leftLockOpen ? 'lock-open' : 'lock'} text-xl`}></i>
+                                <i className={`fas fa-${leftLockOpen ? 'lock-open' : 'lock'} text-base`}></i>
                             </MotionDiv>
-                            <span className="mt-2 text-[9px] font-bold uppercase text-zinc-600 dark:text-zinc-500 tracking-widest">Безымянный</span>
+                            <span className="mt-3 text-[9px] font-bold uppercase text-zinc-500 tracking-widest transition-all duration-300">
+                                {leftFingerLabel}
+                            </span>
+                        </div>
+                    </foreignObject>
+
+                    {/* HAND SWITCHER (CENTER) */}
+                    <foreignObject x="110" y="360" width="80" height="60">
+                        <div className="flex flex-col items-center justify-center h-full pointer-events-auto">
+                            <button 
+                                onClick={() => setIsLeftHanded(!isLeftHanded)}
+                                className="group flex flex-col items-center justify-center gap-1 active:scale-95 transition-transform"
+                                title="Сменить руку (Левша/Правша)"
+                            >
+                                <div className={`
+                                    w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-300
+                                    ${isLeftHanded ? 'bg-indigo-500/20 border-indigo-500 text-indigo-400' : 'bg-cyan-500/20 border-cyan-500 text-cyan-400'}
+                                `}>
+                                    <i className={`fas fa-hand-paper text-xs ${isLeftHanded ? '-scale-x-100' : ''} transition-transform duration-300`}></i>
+                                </div>
+                                <span className="text-[8px] font-bold text-zinc-600 uppercase tracking-wide group-hover:text-white transition-colors">
+                                    {isLeftHanded ? 'Лев. Рука' : 'Пр. Рука'}
+                                </span>
+                            </button>
                         </div>
                     </foreignObject>
 
                     {/* RIGHT LOCK */}
-                    <foreignObject x="190" y="350" width="80" height="80">
+                    <foreignObject x="190" y="350" width="80" height="90">
                         <div className="flex flex-col items-center justify-center h-full">
                             <MotionDiv 
                                 animate={{
-                                    borderColor: rightLockOpen ? rightColor : 'rgba(255,255,255,0.05)',
-                                    boxShadow: rightLockOpen ? `0 0 20px ${rightColor}40` : 'none'
+                                    borderColor: rightLockOpen ? rightState.color : 'rgba(255,255,255,0.05)',
+                                    backgroundColor: rightLockOpen ? 'rgba(255,255,255,0.05)' : 'transparent',
+                                    scale: rightLockOpen ? 1.1 : 1
                                 }}
-                                transition={{ duration: 0.5 }}
                                 className={`
-                                    w-14 h-14 rounded-full flex items-center justify-center border-2 transition-all
-                                    ${rightLockOpen 
-                                        ? `text-white bg-white/10` 
-                                        : 'text-rose-500/50 bg-transparent'
-                                    }
+                                    w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300
+                                    ${rightLockOpen ? 'text-white shadow-[0_0_15px_rgba(255,255,255,0.1)]' : 'text-rose-500/50'}
                                 `}
                             >
-                                <i className={`fas fa-${rightLockOpen ? 'lock-open' : 'lock'} text-xl`}></i>
+                                <i className={`fas fa-${rightLockOpen ? 'lock-open' : 'lock'} text-base`}></i>
                             </MotionDiv>
-                            <span className="mt-2 text-[9px] font-bold uppercase text-zinc-600 dark:text-zinc-500 tracking-widest">Большой</span>
+                            <span className="mt-3 text-[9px] font-bold uppercase text-zinc-500 tracking-widest transition-all duration-300">
+                                {rightFingerLabel}
+                            </span>
                         </div>
                     </foreignObject>
 
                 </svg>
 
-                {/* INFO - FIXED OVERLAP */}
-                {/* 
-                   Changed max-w to 120px to force text wrapping if needed,
-                   preventing it from hitting the tubes.
-                */}
-                <div className="absolute top-[35%] flex flex-col items-center z-20 pointer-events-none max-w-[120px] text-center">
-                    <span className="text-8xl font-display font-bold text-white tabular-nums drop-shadow-2xl mb-2">
+                {/* INFO TEXT */}
+                <div className="absolute top-[35%] flex flex-col items-center z-50 pointer-events-none max-w-[120px] text-center">
+                    <span className="text-7xl font-display font-bold text-white tabular-nums drop-shadow-2xl mb-2">
                         {Math.ceil(timeLeft)}
                     </span>
                     
                     <div className="flex flex-col items-center gap-2 w-full">
                         <MotionDiv 
-                            animate={{ color: phase === BreathingPhase.HoldIn ? COLOR_HOLD : (phase === BreathingPhase.Inhale ? COLOR_INHALE : COLOR_EXHALE) }}
-                            transition={{ duration: 0.5 }}
-                            className="text-xs font-bold tracking-wide uppercase leading-tight whitespace-normal"
+                            animate={{ 
+                                color: phase === BreathingPhase.HoldIn ? COLOR_HOLD : 
+                                       (phase === BreathingPhase.Inhale ? COLOR_INHALE : COLOR_EXHALE) 
+                            }}
+                            className="text-xs font-bold tracking-wide uppercase leading-tight whitespace-normal break-words w-full"
                         >
                             {mainText}
                         </MotionDiv>
                         
-                        <div className="px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/5">
-                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">
+                        <div className="px-3 py-1 rounded-full bg-black/60 backdrop-blur-xl border border-white/10">
+                            <span className="text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">
                                 {subText}
                             </span>
                         </div>
