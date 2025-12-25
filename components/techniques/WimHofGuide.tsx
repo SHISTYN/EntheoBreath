@@ -1,23 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ExternalLink, Copy, Check, AlertTriangle, Bug, Play, RefreshCw } from 'lucide-react';
+import { ExternalLink, Copy, Check, Play, Zap, MonitorPlay } from 'lucide-react';
 
 const MotionDiv = motion.div as any;
 
 const VIDEO_DATA = {
     ru: {
-        id: 'mD3QwerSmLs', // Official English with subs usually, but let's keep it as is for now or use a RU dub if preferred later.
+        id: 'mD3QwerSmLs', 
         label: 'RU 🇷🇺',
         views: '18M+',
-        title: 'Официальный гайд (Русский)',
-        color: 'from-cyan-400 to-blue-600'
+        title: 'Вим Хоф: Официальный Гайд',
+        duration: '11:00',
+        color: 'from-cyan-400 to-blue-600',
+        fallbackGradient: 'bg-gradient-to-br from-slate-900 to-slate-800'
     },
     en: {
         id: 'tybOi4hjZFQ',
         label: 'EN 🇬🇧',
         views: '108M+',
         title: 'Guided Breathing (Original)',
-        color: 'from-amber-400 to-orange-600'
+        duration: '11:00',
+        color: 'from-amber-400 to-orange-600',
+        fallbackGradient: 'bg-gradient-to-br from-stone-900 to-stone-800'
     }
 };
 
@@ -28,52 +32,27 @@ interface WimHofGuideProps {
 
 const WimHofGuide: React.FC<WimHofGuideProps> = ({ onStartPractice }) => {
     const [lang, setLang] = useState<'ru' | 'en'>('ru');
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [videoError, setVideoError] = useState(false);
-    const [copied, setCopied] = useState(false);
-    const [showDebug, setShowDebug] = useState(false);
+    const [mode, setMode] = useState<'launcher' | 'embed'>('launcher');
+    const [imgError, setImgError] = useState(false);
     const [origin, setOrigin] = useState('');
 
     useEffect(() => {
-        // Safe access to window location for the Origin parameter
         if (typeof window !== 'undefined') {
             setOrigin(window.location.origin);
         }
     }, []);
 
-    // Reset player state when language changes
     useEffect(() => {
-        setIsPlaying(false);
-        setVideoError(false);
+        // Reset state on language change
+        setMode('launcher');
+        setImgError(false);
     }, [lang]);
 
     const activeVideo = VIDEO_DATA[lang];
 
-    const handleVideoError = () => {
-        setVideoError(true);
-    };
-
-    const handleCopyReport = async () => {
-        const report = `EntheoBreath Video Report:
-Video ID: ${activeVideo.id} (${lang})
-Status: ${videoError ? 'Load Error' : 'Manual Report'}
-State: ${isPlaying ? 'Playing' : 'Thumbnail'}
-User Agent: ${navigator.userAgent}
-Time: ${new Date().toISOString()}
-Location: ${window.location.href}`;
-
-        try {
-            await navigator.clipboard.writeText(report);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        } catch (err) {
-            console.error('Failed to copy', err);
-        }
-    };
-
-    const reloadPlayer = () => {
-        setIsPlaying(false);
-        setTimeout(() => setIsPlaying(true), 100);
+    const handleOpenExternal = () => {
+        // Direct link is the most reliable method in 2025 against bot-checks
+        window.open(`https://www.youtube.com/watch?v=${activeVideo.id}`, '_blank');
     };
 
     return (
@@ -126,154 +105,113 @@ Location: ${window.location.href}`;
                                 {VIDEO_DATA[key].label}
                             </span>
                             <span className={`text-[9px] font-mono opacity-60 ${lang === key ? 'text-cyan-400' : ''}`}>
-                                {VIDEO_DATA[key].views} Views
+                                {VIDEO_DATA[key].views}
                             </span>
                         </button>
                     ))}
                 </div>
 
-                {/* 3. THE CINEMA (LITE EMBED PLAYER) */}
+                {/* 3. ROBUST MEDIA CARD (LAUNCHER) */}
                 <div className="relative group w-full">
-                    {/* Glow Effect behind */}
+                    
+                    {/* Glow Effect */}
                     <div className={`absolute -inset-4 bg-gradient-to-r ${activeVideo.color} opacity-20 blur-[50px] transition-all duration-700 group-hover:opacity-30 z-0`}></div>
                     
-                    {/* Video Container */}
-                    <div className="relative z-10 rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black aspect-video flex flex-col">
-                        {!videoError ? (
-                            !isPlaying ? (
-                                // THUMBNAIL MODE (Prevents black screen & bot checks)
-                                <div 
-                                    className="w-full h-full relative cursor-pointer group/play"
-                                    onClick={() => setIsPlaying(true)}
-                                >
+                    {/* The Box */}
+                    <div className="relative z-10 rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-[#0a0a0b] aspect-video flex flex-col">
+                        
+                        {mode === 'launcher' ? (
+                            // --- LAUNCHER MODE (100% Reliable) ---
+                            <div className={`w-full h-full relative flex flex-col ${imgError ? activeVideo.fallbackGradient : 'bg-black'}`}>
+                                
+                                {/* Background Image (If loaded) */}
+                                {!imgError && (
                                     <img 
                                         src={`https://i.ytimg.com/vi/${activeVideo.id}/maxresdefault.jpg`}
                                         alt={activeVideo.title}
-                                        className="w-full h-full object-cover opacity-80 group-hover/play:opacity-100 transition-opacity duration-500"
+                                        onError={() => setImgError(true)}
+                                        className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-500"
                                     />
-                                    {/* Play Button Overlay */}
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <div className="w-16 h-16 md:w-20 md:h-20 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 shadow-xl group-hover/play:scale-110 transition-transform duration-300 group-hover/play:bg-red-600 group-hover/play:border-red-500">
-                                            <Play size={32} className="text-white ml-1 fill-white" />
+                                )}
+
+                                {/* Content Overlay */}
+                                <div className="relative z-10 flex-1 flex flex-col items-center justify-center p-6 text-center">
+                                    
+                                    {/* Play Button */}
+                                    <MotionDiv 
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={handleOpenExternal}
+                                        className="cursor-pointer group/btn flex flex-col items-center gap-4"
+                                    >
+                                        <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.1)] group-hover/btn:bg-red-600 group-hover/btn:border-red-500 transition-all duration-300">
+                                            <Play size={36} className="text-white ml-2 fill-white" />
                                         </div>
-                                    </div>
-                                    <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-md px-3 py-2 rounded-xl border border-white/10 flex items-center gap-2">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
-                                        <span className="text-white text-xs font-bold truncate">{activeVideo.title}</span>
-                                    </div>
+                                        <div className="space-y-1">
+                                            <h4 className="text-lg md:text-xl font-bold text-white drop-shadow-md">
+                                                Смотреть на YouTube
+                                            </h4>
+                                            <p className="text-[10px] text-gray-300 font-medium uppercase tracking-wider bg-black/40 px-3 py-1 rounded-full backdrop-blur-sm inline-block">
+                                                Откроется в приложении
+                                            </p>
+                                        </div>
+                                    </MotionDiv>
                                 </div>
-                            ) : (
-                                // IFRAME MODE
-                                <div className="w-full h-full relative bg-black">
-                                    {/* Loading Spinner underneath */}
-                                    <div className="absolute inset-0 flex items-center justify-center z-0">
-                                        <div className="w-10 h-10 border-4 border-white/10 border-t-white/50 rounded-full animate-spin"></div>
+
+                                {/* Bottom Bar */}
+                                <div className="absolute bottom-0 left-0 right-0 p-4 flex justify-between items-end bg-gradient-to-t from-black/90 to-transparent">
+                                    <div className="flex flex-col">
+                                        <span className="text-white font-bold text-sm leading-tight max-w-[200px] md:max-w-xs truncate">{activeVideo.title}</span>
+                                        <span className="text-gray-400 text-xs font-mono">{activeVideo.duration}</span>
                                     </div>
-                                    <iframe 
-                                        key={activeVideo.id}
-                                        width="100%" 
-                                        height="100%" 
-                                        // CRITICAL FIX: Removed autoplay=1 to prevent 'black screen' & bot detection
-                                        // Added modestbranding, rel=0, controls=1
-                                        src={`https://www.youtube.com/embed/${activeVideo.id}?modestbranding=1&rel=0&controls=1&playsinline=1&enablejsapi=1&origin=${origin}`} 
-                                        title={activeVideo.title} 
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                                        allowFullScreen
-                                        onError={handleVideoError}
-                                        className="w-full h-full object-cover animate-fade-in relative z-10"
-                                    ></iframe>
+                                    
+                                    {/* Embed Toggle */}
+                                    <button 
+                                        onClick={() => setMode('embed')}
+                                        className="text-[10px] font-bold text-gray-500 hover:text-white flex items-center gap-1.5 transition-colors bg-white/5 hover:bg-white/10 px-2 py-1.5 rounded-lg backdrop-blur-sm"
+                                    >
+                                        <MonitorPlay size={10} />
+                                        Встроить
+                                    </button>
                                 </div>
-                            )
+                            </div>
                         ) : (
-                            // ERROR STATE
-                            <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-zinc-900">
-                                <AlertTriangle className="text-amber-500 w-12 h-12 mb-4 animate-pulse" />
-                                <h3 className="text-white font-bold text-lg mb-2">Видео недоступно</h3>
-                                <p className="text-gray-400 text-xs mb-6 max-w-[250px]">
-                                    Возможно, оно заблокировано в вашем регионе или браузером.
-                                </p>
-                                <a 
-                                    href={`https://www.youtube.com/watch?v=${activeVideo.id}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl flex items-center gap-2 transition-all"
-                                >
-                                    <ExternalLink size={16} /> Смотреть на YouTube
-                                </a>
+                            // --- EMBED MODE (Legacy/Risky) ---
+                            <div className="w-full h-full relative bg-black flex flex-col">
+                                <iframe 
+                                    key={activeVideo.id}
+                                    width="100%" 
+                                    height="100%" 
+                                    src={`https://www.youtube.com/embed/${activeVideo.id}?autoplay=1&rel=0&playsinline=1&modestbranding=1&origin=${origin}`} 
+                                    title={activeVideo.title} 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                    allowFullScreen
+                                    className="flex-1 w-full h-full object-cover"
+                                ></iframe>
+                                
+                                {/* Return to Launcher */}
+                                <div className="absolute top-2 right-2">
+                                     <button 
+                                        onClick={() => setMode('launcher')}
+                                        className="bg-black/60 text-white px-3 py-1 rounded-full text-[10px] font-bold backdrop-blur-md border border-white/10 hover:bg-red-600/80 transition-colors"
+                                    >
+                                        Закрыть
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* 4. FALLBACK ACTIONS (Always Visible) */}
-                <div className="flex flex-col gap-3">
-                    <a 
-                        href={`https://www.youtube.com/watch?v=${activeVideo.id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-white transition-all"
-                    >
-                        <ExternalLink size={14} />
-                        Открыть на YouTube
-                    </a>
-
-                    <div className="flex items-center justify-between px-2 gap-3">
-                        <button
-                            onClick={reloadPlayer}
-                            className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-gray-500 hover:text-white transition-colors"
-                        >
-                            <RefreshCw size={12} />
-                            Перезагрузить плеер
-                        </button>
-
-                        <button
-                            onClick={() => setShowDebug(!showDebug)}
-                            className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${showDebug ? 'text-amber-500' : 'text-gray-500 hover:text-white'}`}
-                        >
-                            <Bug size={12} />
-                            Сообщить о баге
-                        </button>
-                    </div>
+                {/* 4. HELPER TEXT */}
+                <div className="flex items-center justify-center gap-2 opacity-60">
+                    <Zap size={12} className="text-amber-500" />
+                    <p className="text-[10px] text-gray-400 font-medium">
+                        Если видео не грузится — нажмите большую кнопку Play.
+                    </p>
                 </div>
 
-                {/* DEBUG PANEL (Toggleable) */}
-                <AnimatePresence>
-                    {(showDebug || videoError) && (
-                        <MotionDiv
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            className="overflow-hidden"
-                        >
-                            <div className="bg-white/5 border border-white/10 rounded-xl p-4 mt-2">
-                                <div className="flex items-start justify-between mb-3">
-                                    <div className="flex flex-col">
-                                        <span className="text-xs font-bold text-white mb-1">Диагностика</span>
-                                        <span className="text-[10px] text-gray-500">Скопируйте этот отчет и отправьте разработчику.</span>
-                                    </div>
-                                    <button 
-                                        onClick={handleCopyReport}
-                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border ${
-                                            copied 
-                                            ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' 
-                                            : 'bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border-white/10'
-                                        }`}
-                                    >
-                                        {copied ? <Check size={12} /> : <Copy size={12} />}
-                                        {copied ? 'Скопировано' : 'Копировать'}
-                                    </button>
-                                </div>
-                                <code className="block p-3 bg-black/50 rounded-lg text-[10px] text-gray-400 font-mono break-all whitespace-pre-wrap border border-white/5">
-                                    ID: {activeVideo.id} | Lang: {lang}<br/>
-                                    State: {isPlaying ? 'Playing' : 'Thumbnail'}<br/>
-                                    UA: {navigator.userAgent.slice(0, 50)}...
-                                </code>
-                            </div>
-                        </MotionDiv>
-                    )}
-                </AnimatePresence>
-
-                {/* 5. PRINCIPLES & START CTA */}
+                {/* 5. INSTRUCTION CARD */}
                 <div className="bg-white/5 border border-white/5 rounded-3xl p-6 backdrop-blur-xl relative overflow-hidden mt-2">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-cyan-500/10 to-transparent blur-3xl"></div>
                     
