@@ -10,7 +10,6 @@ interface Props {
 const EntheoLogo: React.FC<Props> = ({ className, animated = true, size, idSuffix }) => {
     // Generate unique ID for gradients to avoid conflicts between Header/Splash instances
     const uniqueId = useId();
-    const capId = `magicCap-${uniqueId}`;
     const auraId = `goldAura-${uniqueId}`;
 
     // Handling size prop if provided, otherwise rely on className
@@ -27,17 +26,13 @@ const EntheoLogo: React.FC<Props> = ({ className, animated = true, size, idSuffi
             style={!className ? style : undefined}
         >
             <defs>
-                <linearGradient id={capId} x1="60" y1="20" x2="60" y2="70" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#ef4444" />
-                    <stop offset="1" stopColor="#991b1b" />
-                </linearGradient>
                 <radialGradient id={auraId} cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(60 60) rotate(90) scale(60)">
-                    <stop stopColor="#F59E0B" stopOpacity="0.3" /> 
+                    <stop stopColor="#F59E0B" stopOpacity="0.4" /> 
                     <stop offset="0.8" stopColor="#7C3AED" stopOpacity="0" />
                 </radialGradient>
             </defs>
 
-            {/* Aura (Pulse Animation) */}
+            {/* Aura (Soft Glow behind the pixels) */}
             <circle 
                 cx="60" 
                 cy="65" 
@@ -46,26 +41,50 @@ const EntheoLogo: React.FC<Props> = ({ className, animated = true, size, idSuffi
                 className={animated ? "animate-pulse-slow" : ""}
             />
 
-            {/* Mushroom Shape Group */}
-            <g transform="translate(0, 5)">
-                {/* Stem */}
-                <path d="M 50 65 Q 48 95 45 100 L 75 100 Q 72 95 70 65" fill="#FFF9E5" />
-                {/* Stem Shadow */}
-                <path d="M 50 65 L 70 65 L 70 100 L 45 100 Z" fill="rgba(0,0,0,0.05)" />
-                {/* Ring (Skirt) */}
-                <path d="M 50 70 Q 60 80 70 70 L 72 66 L 48 66 Z" fill="#FFF" />
+            {/* PIXEL ART GROUP (Crisp Edges) */}
+            <g shapeRendering="crispEdges" transform="translate(0, 5)">
                 
-                {/* Cap */}
-                <g className={animated ? "origin-bottom" : ""}>
-                    <path d="M 25 65 C 25 25, 95 25, 95 65 Q 60 55 25 65 Z" fill={`url(#${capId})`} />
-                    {/* Spots */}
-                    <g fill="#FFFFFF" fillOpacity="0.9">
-                        <ellipse cx="45" cy="40" rx="5" ry="3" transform="rotate(-20 45 40)" />
-                        <circle cx="65" cy="35" r="4" />
-                        <circle cx="82" cy="50" r="3" />
-                        <circle cx="35" cy="55" r="2.5" />
-                    </g>
-                </g>
+                {/* --- MUSHROOM --- */}
+                
+                {/* Stem (Cream) */}
+                <path d="M50 70 H70 V100 H50 Z" fill="#FFF9E5" />
+                <path d="M45 100 H75 V105 H45 Z" fill="#FFF9E5" /> {/* Base flare */}
+                <path d="M70 70 H75 V100 H70 Z" fill="#E5E7EB" opacity="0.3" /> {/* Shadow right */}
+
+                {/* Cap (Red) */}
+                <path d="M25 70 H95 V50 H85 V40 H35 V50 H25 Z" fill="#ef4444" />
+                <path d="M25 70 H95 V75 H25 Z" fill="#991b1b" /> {/* Cap Shadow/Rim */}
+
+                {/* Spots (White Pixels) */}
+                <rect x="35" y="55" width="5" height="5" fill="white" />
+                <rect x="75" y="60" width="5" height="5" fill="white" />
+                <rect x="55" y="45" width="5" height="5" fill="white" />
+                <rect x="85" y="50" width="5" height="5" fill="white" />
+                <rect x="30" y="65" width="5" height="5" fill="white" />
+
+                {/* --- KAMBO FROG (Sitting on top) --- */}
+                
+                {/* Body (Green) */}
+                <path d="M45 40 H75 V25 H45 Z" fill="#84cc16" />
+                
+                {/* Legs (Darker Green) */}
+                <rect x="40" y="35" width="5" height="5" fill="#65a30d" />
+                <rect x="75" y="35" width="5" height="5" fill="#65a30d" />
+
+                {/* Eyes (Protruding) */}
+                <rect x="45" y="20" width="10" height="5" fill="#84cc16" />
+                <rect x="65" y="20" width="10" height="5" fill="#84cc16" />
+                
+                {/* Eye Whites & Pupils */}
+                <rect x="45" y="20" width="5" height="5" fill="white" />
+                <rect x="47" y="22" width="2" height="2" fill="black" />
+                
+                <rect x="70" y="20" width="5" height="5" fill="white" />
+                <rect x="72" y="22" width="2" height="2" fill="black" />
+
+                {/* Belly/Throat (Light Green) */}
+                <rect x="55" y="30" width="10" height="10" fill="#bef264" />
+
             </g>
         </svg>
     );

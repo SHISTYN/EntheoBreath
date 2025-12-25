@@ -5,7 +5,7 @@ const MotionDiv = motion.div as any;
 
 const VIDEO_DATA = {
     ru: {
-        id: 'mD3QwerSmLs',
+        id: 'mD3QwerSmLs', // Official English with subs usually, but let's keep it as is for now or use a RU dub if preferred later.
         label: 'RU 🇷🇺',
         views: '18M+',
         title: 'Официальный гайд (Русский)',
@@ -87,14 +87,17 @@ const WimHofGuide: React.FC<WimHofGuideProps> = ({ onStartPractice }) => {
 
                 {/* 3. THE CINEMA (VIDEO PLAYER) */}
                 <div className="relative group w-full">
-                    <div className={`absolute -inset-4 bg-gradient-to-r ${activeVideo.color} opacity-20 blur-[50px] transition-all duration-700 group-hover:opacity-30`}></div>
+                    {/* Glow Effect behind */}
+                    <div className={`absolute -inset-4 bg-gradient-to-r ${activeVideo.color} opacity-20 blur-[50px] transition-all duration-700 group-hover:opacity-30 z-0`}></div>
                     
-                    <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black aspect-video">
+                    {/* Video Container */}
+                    <div className="relative z-10 rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black aspect-video">
                         <iframe 
+                            key={activeVideo.id}
                             width="100%" 
                             height="100%" 
-                            src={`https://www.youtube.com/embed/${activeVideo.id}?rel=0&modestbranding=1`} 
-                            title="Wim Hof Breathing Method" 
+                            src={`https://www.youtube-nocookie.com/embed/${activeVideo.id}?rel=0&autoplay=0&playsinline=1`} 
+                            title={activeVideo.title} 
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                             allowFullScreen
                             className="w-full h-full object-cover"
