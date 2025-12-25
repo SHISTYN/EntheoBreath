@@ -8,16 +8,45 @@ import { Header } from './components/layout/Header';
 import { useAudioSystem } from './hooks/useAudioSystem';
 import { useUserProgress } from './hooks/useUserProgress';
 
+// --- ROBUST LAZY LOADING HELPER ---
+// Automatically reloads the page once if a chunk fails to load (e.g. after a new deployment)
+const lazyWithRetry = (componentImport: () => Promise<any>) =>
+  lazy(async () => {
+    const pageHasAlreadyBeenForceRefreshed = JSON.parse(
+      window.sessionStorage.getItem('entheo-retry-refresh') || 'false'
+    );
+
+    try {
+      const component = await componentImport();
+      // If successful, reset the flag so next error can trigger refresh
+      window.sessionStorage.setItem('entheo-retry-refresh', 'false');
+      return component;
+    } catch (error: any) {
+      console.error("Lazy load error:", error);
+      // Check for fetch/chunk errors
+      if (
+          !pageHasAlreadyBeenForceRefreshed && 
+          (error.message?.includes("Failed to fetch") || error.message?.includes("Importing a module"))
+      ) {
+         window.sessionStorage.setItem('entheo-retry-refresh', 'true');
+         window.location.reload();
+         // Return a temporary placeholder while reloading
+         return { default: () => <div className="h-full flex items-center justify-center text-sm opacity-50 animate-pulse">Обновление версии...</div> };
+      }
+      throw error; // Propagate to ErrorBoundary if we already tried refreshing
+    }
+  });
+
 // --- LAZY IMPORTS ---
-const Controls = lazy(() => import('./components/Controls'));
-const TimerVisual = lazy(() => import('./components/TimerVisual'));
-const AnulomaVilomaInterface = lazy(() => import('./components/AnulomaVilomaInterface')); 
-const BoxTimerVisual = lazy(() => import('./components/BoxTimerVisual'));
-const WimHofInterface = lazy(() => import('./components/WimHofInterface'));
-const AnalysisModal = lazy(() => import('./components/AnalysisModal'));
-const LibraryView = lazy(() => import('./components/LibraryView'));
-const TimerSidebar = lazy(() => import('./components/TimerSidebar'));
-const MobileFaq = lazy(() => import('./components/MobileFaq'));
+const Controls = lazyWithRetry(() => import('./components/Controls'));
+const TimerVisual = lazyWithRetry(() => import('./components/TimerVisual'));
+const AnulomaVilomaInterface = lazyWithRetry(() => import('./components/AnulomaVilomaInterface')); 
+const BoxTimerVisual = lazyWithRetry(() => import('./components/BoxTimerVisual'));
+const WimHofInterface = lazyWithRetry(() => import('./components/WimHofInterface'));
+const AnalysisModal = lazyWithRetry(() => import('./components/AnalysisModal'));
+const LibraryView = lazyWithRetry(() => import('./components/LibraryView'));
+const TimerSidebar = lazyWithRetry(() => import('./components/TimerSidebar'));
+const MobileFaq = lazyWithRetry(() => import('./components/MobileFaq'));
 
 // --- TYPES ---
 type ThemeMode = 'dark' | 'light';
