@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ExternalLink, Copy, Check, AlertTriangle, Bug, Play } from 'lucide-react';
+import { ExternalLink, Copy, Check, AlertTriangle, Bug, Play, RefreshCw } from 'lucide-react';
 
 const MotionDiv = motion.div as any;
 
@@ -69,6 +69,11 @@ Location: ${window.location.href}`;
         } catch (err) {
             console.error('Failed to copy', err);
         }
+    };
+
+    const reloadPlayer = () => {
+        setIsPlaying(false);
+        setTimeout(() => setIsPlaying(true), 100);
     };
 
     return (
@@ -158,18 +163,26 @@ Location: ${window.location.href}`;
                                     </div>
                                 </div>
                             ) : (
-                                // IFRAME MODE (Loads only after click)
-                                <iframe 
-                                    key={activeVideo.id}
-                                    width="100%" 
-                                    height="100%" 
-                                    src={`https://www.youtube.com/embed/${activeVideo.id}?autoplay=1&rel=0&playsinline=1&origin=${origin}`} 
-                                    title={activeVideo.title} 
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                                    allowFullScreen
-                                    onError={handleVideoError}
-                                    className="w-full h-full object-cover animate-fade-in"
-                                ></iframe>
+                                // IFRAME MODE
+                                <div className="w-full h-full relative bg-black">
+                                    {/* Loading Spinner underneath */}
+                                    <div className="absolute inset-0 flex items-center justify-center z-0">
+                                        <div className="w-10 h-10 border-4 border-white/10 border-t-white/50 rounded-full animate-spin"></div>
+                                    </div>
+                                    <iframe 
+                                        key={activeVideo.id}
+                                        width="100%" 
+                                        height="100%" 
+                                        // CRITICAL FIX: Removed autoplay=1 to prevent 'black screen' & bot detection
+                                        // Added modestbranding, rel=0, controls=1
+                                        src={`https://www.youtube.com/embed/${activeVideo.id}?modestbranding=1&rel=0&controls=1&playsinline=1&enablejsapi=1&origin=${origin}`} 
+                                        title={activeVideo.title} 
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                        allowFullScreen
+                                        onError={handleVideoError}
+                                        className="w-full h-full object-cover animate-fade-in relative z-10"
+                                    ></iframe>
+                                </div>
                             )
                         ) : (
                             // ERROR STATE
@@ -193,24 +206,34 @@ Location: ${window.location.href}`;
                 </div>
 
                 {/* 4. FALLBACK ACTIONS (Always Visible) */}
-                <div className="flex items-center justify-between px-2 gap-3">
+                <div className="flex flex-col gap-3">
                     <a 
                         href={`https://www.youtube.com/watch?v=${activeVideo.id}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-gray-500 hover:text-red-500 transition-colors"
+                        className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-white transition-all"
                     >
-                        <ExternalLink size={12} />
-                        Смотреть на YouTube
+                        <ExternalLink size={14} />
+                        Открыть на YouTube
                     </a>
 
-                    <button
-                        onClick={() => setShowDebug(!showDebug)}
-                        className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${showDebug ? 'text-amber-500' : 'text-gray-500 hover:text-white'}`}
-                    >
-                        <Bug size={12} />
-                        Сообщить о баге
-                    </button>
+                    <div className="flex items-center justify-between px-2 gap-3">
+                        <button
+                            onClick={reloadPlayer}
+                            className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-gray-500 hover:text-white transition-colors"
+                        >
+                            <RefreshCw size={12} />
+                            Перезагрузить плеер
+                        </button>
+
+                        <button
+                            onClick={() => setShowDebug(!showDebug)}
+                            className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${showDebug ? 'text-amber-500' : 'text-gray-500 hover:text-white'}`}
+                        >
+                            <Bug size={12} />
+                            Сообщить о баге
+                        </button>
+                    </div>
                 </div>
 
                 {/* DEBUG PANEL (Toggleable) */}
