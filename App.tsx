@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef, useCallback, Suspense, lazy } from 'react';
 import { BreathState, BreathingPattern, BreathingPhase } from './types';
-import { DEFAULT_PATTERNS } from './constants';
+import { DEFAULT_PATTERNS, URL_SLUGS, REVERSE_SLUGS } from './constants';
 import { getBreathingAnalysis } from './services/geminiService';
 import AppBackground from './components/AppBackground';
 import SplashScreen from './components/SplashScreen';
@@ -104,12 +104,17 @@ const App: React.FC = () => {
   const previousTimeRef = useRef<number | undefined>(undefined);
   const wakeLockRef = useRef<any>(null);
 
-  // --- INIT LOGIC ---
+  // --- INIT LOGIC (PATH PARSING) ---
   useEffect(() => {
     try {
-      const params = new URLSearchParams(window.location.search);
-      const patternId = params.get('pattern');
-      if (patternId) {
+      // Clean URL: Remove leading slash and get the slug
+      const path = window.location.pathname.replace(/^\//, '');
+      
+      // Ignore if root or system files
+      if (path && path !== '' && !path.includes('.')) {
+          // Decode slug to ID (or use as is if not in map)
+          const patternId = REVERSE_SLUGS[path] || path;
+          
           const found = DEFAULT_PATTERNS.find(p => p.id === patternId);
           if (found) {
               setActivePattern(found);
@@ -124,16 +129,26 @@ const App: React.FC = () => {
               setRounds(found.mode === 'wim-hof' ? 3 : 12);
           }
       }
-    } catch (e) { console.warn("URL params error:", e); }
+    } catch (e) { console.warn("URL path error:", e); }
   }, []);
 
+  // --- URL UPDATING (PATH) ---
   useEffect(() => {
       try {
           if (window.location.protocol === 'blob:') return;
-          const url = new URL(window.location.href);
-          if (view === 'timer' && activePattern) url.searchParams.set('pattern', activePattern.id);
-          else if (view === 'library') url.searchParams.delete('pattern');
-          window.history.replaceState({}, '', url.toString());
+          
+          if (view === 'timer' && activePattern) {
+              const slug = URL_SLUGS[activePattern.id] || activePattern.id;
+              const newPath = `/${slug}`;
+              
+              if (window.location.pathname !== newPath) {
+                  window.history.replaceState({}, '', newPath);
+              }
+          } else if (view === 'library') {
+              if (window.location.pathname !== '/') {
+                  window.history.replaceState({}, '', '/');
+              }
+          }
       } catch (err) { console.debug("URL update skipped"); }
   }, [activePattern, view]);
 
