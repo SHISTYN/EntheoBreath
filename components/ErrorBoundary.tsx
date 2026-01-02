@@ -1,3 +1,4 @@
+
 import React, { Component, ErrorInfo, ReactNode, useState } from "react";
 import { Copy, Check, Send } from "lucide-react";
 
@@ -17,13 +18,24 @@ const ErrorView: React.FC<{ error: Error | null }> = ({ error }) => {
     const handleCopy = async () => {
         if (!error) return;
         try {
-            const text = `EntheoBreath Error Report:\n${error.toString()}\n\nStack:\n${error.stack || 'N/A'}\n\nUA: ${navigator.userAgent}`;
+            const text = `Error: ${error.toString()}\nStack: ${error.stack}`;
             await navigator.clipboard.writeText(text);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
             console.error('Failed to copy', err);
         }
+    };
+
+    const handleSendToTg = () => {
+        if (!error) return;
+        
+        const greeting = "Приветствую! 👋\nОбнаружил ошибку на сайте EntheoBreath. Вот лог:";
+        const errorDetails = `\n\nError: ${error.toString()}\n\nStack:\n${error.stack?.slice(0, 500) || 'N/A'}...`;
+        const fullMessage = encodeURIComponent(greeting + errorDetails);
+        
+        // Open Telegram with pre-filled message
+        window.open(`https://t.me/nikolaiovchinnikov?text=${fullMessage}`, '_blank');
     };
 
     return (
@@ -41,15 +53,6 @@ const ErrorView: React.FC<{ error: Error | null }> = ({ error }) => {
                     <br className="hidden md:block"/>
                     Дышите глубже, это всего лишь код.
                 </p>
-                
-                <div className="bg-rose-500/5 border border-rose-500/20 rounded-xl p-4 text-left">
-                    <p className="text-gray-300 text-sm mb-3 font-medium">
-                        Помогите исправить это:
-                    </p>
-                    <p className="text-xs text-gray-500 leading-relaxed">
-                        Если вы отправите мне текст этой ошибки, я смогу починить её в кратчайшие сроки (обычно в течение суток). Ваш вклад сделает приложение лучше для всех.
-                    </p>
-                </div>
             </div>
 
             {/* ERROR CODE BLOCK */}
@@ -71,25 +74,18 @@ const ErrorView: React.FC<{ error: Error | null }> = ({ error }) => {
                     <code className="text-[10px] md:text-xs text-rose-400 font-mono break-all whitespace-pre-wrap block font-bold opacity-90">
                         {error?.toString()}
                     </code>
-                    {error?.stack && (
-                        <code className="text-[10px] text-gray-600 font-mono break-all whitespace-pre-wrap block mt-2 opacity-60">
-                            {error.stack.slice(0, 300)}...
-                        </code>
-                    )}
                 </div>
             </div>
 
             {/* ACTION BUTTONS */}
             <div className="flex flex-col md:flex-row gap-3 w-full max-w-lg">
-                <a
-                    href="https://t.me/nikolaiovchinnikov"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 px-6 py-3.5 bg-[#229ED9]/10 border border-[#229ED9]/30 text-[#229ED9] font-bold rounded-xl hover:bg-[#229ED9]/20 transition-all flex items-center justify-center gap-2 group"
+                <button
+                    onClick={handleSendToTg}
+                    className="flex-1 px-6 py-3.5 bg-[#229ED9]/10 border border-[#229ED9]/30 text-[#229ED9] font-bold rounded-xl hover:bg-[#229ED9]/20 transition-all flex items-center justify-center gap-2 group hover:scale-[1.02]"
                 >
                     <Send size={18} className="group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
                     <span>Отправить в Telegram</span>
-                </a>
+                </button>
                 
                 <button
                     onClick={() => window.location.reload()}

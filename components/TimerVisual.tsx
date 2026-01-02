@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BreathingPhase } from '../types';
 
@@ -8,6 +9,7 @@ interface TimerVisualProps {
   label: string;
   patternId?: string;
   currentRound?: number;
+  totalRounds?: number;
   currentBreath?: number;
   totalBreaths?: number;
   mode?: 'loop' | 'wim-hof' | 'stopwatch' | 'manual';
@@ -21,6 +23,7 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
     totalTimeForPhase, 
     label, 
     currentRound = 1,
+    totalRounds = 0,
     currentBreath = 0,
     mode = 'loop',
     theme = 'dark',
@@ -34,81 +37,45 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
   const isWimHofRetention = isWimHof && phase === BreathingPhase.HoldOut;
   const isWimHofRecovery = isWimHof && phase === BreathingPhase.HoldIn;
 
+  // Calculate progress (0 to 1)
   const timeProgress = totalTimeForPhase > 0 ? (totalTimeForPhase - timeLeft) / totalTimeForPhase : 0;
   
-  let glowColor = '';
   let strokeColor = '';
 
   if (isWimHof) {
-      if (isWimHofBreathing) {
-          glowColor = '#22d3ee'; 
-          strokeColor = '#22d3ee';
-      } else if (isWimHofRetention) {
-          glowColor = '#f97316'; 
-          strokeColor = '#f97316';
-      } else if (isWimHofRecovery) {
-          glowColor = '#a855f7'; 
-          strokeColor = '#a855f7';
-      } else {
-          glowColor = '#9ca3af';
-          strokeColor = '#ffffff';
-      }
+      if (isWimHofBreathing) strokeColor = '#22d3ee'; 
+      else if (isWimHofRetention) strokeColor = '#f97316'; 
+      else if (isWimHofRecovery) strokeColor = '#a855f7'; 
+      else strokeColor = '#9ca3af';
   } else if (isStopwatch) {
-      glowColor = isActive ? '#ffffff' : '#52525b';
       strokeColor = isActive ? '#ffffff' : '#52525b';
   } else {
       switch (phase) {
-          case BreathingPhase.Inhale:
-              glowColor = '#22d3ee'; // Cyan
-              strokeColor = '#22d3ee';
-              break;
-          case BreathingPhase.Exhale:
-              glowColor = '#818cf8'; // Indigo/Purple mix
-              strokeColor = '#818cf8';
-              break;
-          case BreathingPhase.HoldIn:
-              glowColor = '#fbbf24'; // Amber
-              strokeColor = '#fbbf24';
-              break;
-          case BreathingPhase.HoldOut:
-              glowColor = '#fb7185'; // Rose
-              strokeColor = '#fb7185';
-              break;
-          default:
-              glowColor = '#9ca3af';
-              strokeColor = '#9ca3af';
+          case BreathingPhase.Inhale: strokeColor = '#22d3ee'; break; // Cyan
+          case BreathingPhase.Exhale: strokeColor = '#818cf8'; break; // Indigo
+          case BreathingPhase.HoldIn: strokeColor = '#fbbf24'; break; // Amber
+          case BreathingPhase.HoldOut: strokeColor = '#fb7185'; break; // Rose
+          default: strokeColor = '#52525b'; // Zinc
       }
   }
 
   // Value Logic
   let mainValue = "";
-  let subText = label;
 
   if (isStopwatch) {
       const totalSeconds = timeLeft;
       const minutes = Math.floor(totalSeconds / 60);
       const seconds = Math.floor(totalSeconds % 60);
       mainValue = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      subText = isActive ? "СЕКУНДОМЕР" : "ПАУЗА";
   } else if (isWimHof) {
       if (isWimHofBreathing) {
           mainValue = `${currentBreath}`;
-          subText = phase === BreathingPhase.Inhale ? "ВДОХ" : "ВЫДОХ";
       } else if (isWimHofRetention) {
           const m = Math.floor(timeLeft / 60);
           const s = Math.floor(timeLeft % 60);
-          if (timeLeft > 60) {
-              mainValue = `${m}:${s.toString().padStart(2, '0')}`;
-          } else {
-              mainValue = timeLeft.toFixed(1);
-          }
-          subText = "ЗАДЕРЖКА";
-      } else if (isWimHofRecovery) {
-          mainValue = Math.ceil(timeLeft).toString();
-          subText = "ВОССТАНОВЛЕНИЕ";
+          mainValue = timeLeft > 60 ? `${m}:${s.toString().padStart(2, '0')}` : timeLeft.toFixed(1);
       } else {
            mainValue = Math.ceil(timeLeft).toString();
-           subText = label;
       }
   } else {
       mainValue = Math.ceil(timeLeft).toString();
@@ -120,104 +87,77 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
     : 1;
 
   // Responsive Container
-  const containerSize = "w-[260px] h-[260px] md:w-[300px] md:h-[300px]";
-  const radius = 120; // Internal SVG radius
+  const containerSize = "w-[280px] h-[280px] md:w-[340px] md:h-[340px]";
+  const radius = 130; // Internal SVG radius
   const circumference = 2 * Math.PI * radius;
+  // Standard clockwise fill
   const strokeDashoffset = isStopwatch 
-    ? (circumference * 0.25) // Static ring for stopwatch
+    ? 0 // Stopwatch just shows ring
     : circumference * (1 - timeProgress);
 
   return (
     <div className={`relative ${containerSize} flex items-center justify-center flex-shrink-0 mx-auto transition-transform duration-[2000ms] ease-in-out`}
          style={{ transform: `scale(${breatheScale})` }}
     >
-        {/* 1. OUTER GLOW (Ambient Light) */}
-        <div 
-            className="absolute inset-0 rounded-full blur-[50px] transition-opacity duration-700"
-            style={{ 
-                background: `radial-gradient(circle, ${glowColor}40 0%, transparent 70%)`,
-                opacity: isActive ? 0.6 : 0.2
-            }}
-        />
-
-        {/* 2. GLASS ORB BACKGROUND (Apple Liquid Style) */}
-        <div className="absolute inset-2 rounded-full bg-gradient-to-br from-white/10 to-transparent dark:from-white/5 dark:to-black/20 backdrop-blur-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),0_10px_30px_rgba(0,0,0,0.2)] border border-white/10 ring-1 ring-black/5"></div>
-
-        {/* 3. SVG PROGRESS RING */}
+        {/* SVG PROGRESS RING - MINIMALIST */}
         <svg 
-            className="absolute inset-0 w-full h-full -rotate-90 drop-shadow-lg"
+            className="absolute inset-0 w-full h-full -rotate-90 drop-shadow-xl"
             viewBox="0 0 300 300"
         >
-            {/* Track */}
+            {/* Track (Darker, Thinner) */}
             <circle
                 cx="150"
                 cy="150"
                 r={radius}
                 fill="none"
-                stroke={theme === 'light' ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.06)"}
-                strokeWidth="12"
-                strokeLinecap="round"
+                stroke={theme === 'light' ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.08)"}
+                strokeWidth="4" 
             />
-            {/* Progress - Liquid Neon */}
+            {/* Progress - Clean Solid Line */}
             <circle
                 cx="150"
                 cy="150"
                 r={radius}
                 fill="none"
                 stroke={strokeColor}
-                strokeWidth="12"
+                strokeWidth="6" 
                 strokeLinecap="round"
                 strokeDasharray={circumference}
                 strokeDashoffset={strokeDashoffset}
-                className="transition-all duration-300 ease-linear"
-                style={{ 
-                    filter: `drop-shadow(0 0 6px ${glowColor})`
-                }}
+                className="transition-all duration-200 ease-linear"
             />
         </svg>
 
-        {/* 4. CONTENT (Inside the Glass) */}
+        {/* CONTENT */}
         <div className="relative z-10 flex flex-col items-center justify-center">
             
-            {/* Main Number - Super Clean Typography */}
+            {/* Main Number */}
             <div className="relative">
                 <span 
-                    className="font-display font-bold text-7xl md:text-8xl tabular-nums tracking-tighter leading-none text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 drop-shadow-sm"
-                    style={{ 
-                        fontVariantNumeric: 'tabular-nums',
-                        textShadow: `0 4px 20px ${glowColor}40`
-                    }}
+                    className="font-display font-bold text-8xl md:text-9xl tabular-nums tracking-tighter leading-none text-white drop-shadow-lg"
                 >
                     {mainValue}
                 </span>
                 
                 {/* Milliseconds for stopwatch */}
                 {isStopwatch && (
-                    <span className="absolute -right-6 top-2 text-xl font-mono font-medium text-white/50">
+                    <span className="absolute -right-8 top-4 text-2xl font-mono font-medium text-white/40">
                         .{Math.floor((timeLeft % 1) * 10)}
                     </span>
                 )}
             </div>
 
-            {/* Label - Tight Spacing */}
-            <div className="mt-1 flex flex-col items-center gap-1">
-                 {/* Mini Pill Label */}
-                 <div 
-                    className="px-3 py-1 rounded-full bg-white/10 border border-white/5 backdrop-blur-md shadow-sm transition-colors duration-500"
-                    style={{ backgroundColor: `${glowColor}15`, borderColor: `${glowColor}30` }}
-                 >
-                    <span 
-                        className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/90"
-                        style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
-                    >
-                        {subText}
-                    </span>
-                 </div>
-                 
-                 {/* Secondary Info (seconds left in standard mode) */}
-                 {!isWimHof && !isStopwatch && isActive && (
-                     <span className="text-[10px] font-mono text-white/40 font-medium">
-                        {timeLeft.toFixed(1)}s
+            {/* Cycle info & Phase Label */}
+            <div className="mt-4 flex flex-col items-center gap-2 opacity-80">
+                 {/* PHASE LABEL */}
+                 <span className="text-sm font-black uppercase tracking-[0.2em] text-white/90" style={{ color: strokeColor }}>
+                    {isWimHof ? (isWimHofBreathing ? 'Дыхание' : isWimHofRetention ? 'Задержка' : 'Отдых') : label}
+                 </span>
+
+                 {/* ROUND INFO - Integrated */}
+                 {!isWimHof && !isStopwatch && (
+                     <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/40">
+                        Раунд {currentRound} / {totalRounds === 0 ? '∞' : totalRounds}
                      </span>
                  )}
             </div>

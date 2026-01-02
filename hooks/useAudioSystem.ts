@@ -12,6 +12,21 @@ export const useAudioSystem = () => {
         await Tone.start();
     };
 
+    // Soft Tick for Countdown
+    const playCountdownTick = () => {
+        if (soundMode === 'mute') return;
+        // Soft Woodblock / Drop sound
+        const synth = new Tone.MembraneSynth({
+            pitchDecay: 0.008,
+            octaves: 2,
+            oscillator: { type: 'sine' },
+            envelope: { attack: 0.001, decay: 0.2, sustain: 0, release: 1 }
+        }).toDestination();
+        // Very quiet, subtle
+        synth.volume.value = -18; 
+        synth.triggerAttackRelease("C2", "32n");
+    };
+
     const playSoundEffect = async (mode: SoundMode) => {
         if (mode === 'mute') return;
         await Tone.start();
@@ -129,6 +144,7 @@ export const useAudioSystem = () => {
     return {
         soundMode,
         playSoundEffect,
+        playCountdownTick,
         changeSoundMode,
         initAudio
     };

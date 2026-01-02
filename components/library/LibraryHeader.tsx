@@ -1,6 +1,7 @@
+
 import React, { useEffect, useRef } from 'react';
 import { CATEGORY_NAMES } from '../../constants';
-import { Search, Zap, Moon, AlertCircle, BatteryCharging, Command, Target } from 'lucide-react';
+import { Search, Zap, Moon, AlertCircle, BatteryCharging, Command, Target, Heart } from 'lucide-react';
 import { motion, LayoutGroup } from 'framer-motion';
 
 const MotionDiv = motion.div as any;
@@ -215,8 +216,14 @@ const LibraryHeader: React.FC<LibraryHeaderProps> = ({
                                             />
                                         )}
                                         <span className="relative z-10 flex items-center gap-1.5">
-                                            {isFavorites && <span className={isSelected ? 'text-rose-400 dark:text-rose-600' : 'text-rose-500'}>❤️</span>}
-                                            {isAuthorChoice && !isSelected && <span>⚡️</span>}
+                                            {/* REPLACED EMOJIS WITH ICONS */}
+                                            {isFavorites && (
+                                                <Heart 
+                                                    size={12} 
+                                                    className={isSelected ? 'fill-rose-400 text-rose-400' : 'fill-rose-500 text-rose-500'} 
+                                                />
+                                            )}
+                                            {isAuthorChoice && !isSelected && <Zap size={12} className="text-amber-500 fill-amber-500" />}
                                             {getCategoryLabel(cat)}
                                         </span>
                                     </MotionButton>

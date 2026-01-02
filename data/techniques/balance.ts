@@ -25,9 +25,9 @@ const generateAnulomaCompletePresets = (): BreathPreset[] => {
       });
   }
 
-  // 3. МАСТЕРСТВО (1:4:2) - ТЕ САМЫЕ 40 УРОВНЕЙ С ЗАДЕРЖКОЙ
-  // Начинаем с 3 сек, идем до 42 сек (очень глубокая практика)
-  for (let inhale = 3; inhale <= 42; inhale++) {
+  // 3. МАСТЕРСТВО (1:4:2) - ТЕ САМЫЕ УРОВНИ С ЗАДЕРЖКОЙ
+  // Начинаем с 1 сек (1-4-2), как просил пользователь
+  for (let inhale = 1; inhale <= 42; inhale++) {
       const hold = inhale * 4;
       const exhale = inhale * 2;
       

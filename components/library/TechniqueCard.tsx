@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { BreathingPattern } from '../../types';
 import SpotlightCard from '../SpotlightCard';
 import IconRenderer from '../IconRenderer';
-import { Heart } from 'lucide-react';
+import { Heart, Crown } from 'lucide-react';
 
 interface TechniqueCardProps {
     pattern: BreathingPattern;
@@ -116,9 +117,10 @@ const TechniqueCard: React.FC<TechniqueCardProps> = React.memo(({
                     </span>
                     {/* 👑 MAX EFFECT BADGE */}
                     {isKing && (
-                        <span className="text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded bg-gradient-to-r from-amber-400 to-orange-500 text-black shadow-glow-gold animate-pulse">
-                            👑 KING
-                        </span>
+                        <div className="flex items-center gap-1 text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded bg-gradient-to-r from-amber-400 to-orange-500 text-black shadow-glow-gold animate-pulse">
+                            <Crown size={10} fill="black" />
+                            <span>KING</span>
+                        </div>
                     )}
                 </div>
                 <h3 className={`text-base md:text-lg font-display font-extrabold group-hover:text-cyan-600 dark:group-hover:text-zen-accent transition-colors leading-tight ${isKing ? 'text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-200' : 'text-zinc-900 dark:text-white'}`}>

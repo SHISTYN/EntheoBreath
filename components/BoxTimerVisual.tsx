@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { BreathingPhase } from '../types';
@@ -7,6 +8,7 @@ interface BoxTimerProps {
     timeLeft: number;
     totalTimeForPhase: number;
     currentRound: number;
+    totalRounds: number;
     label: string;
 }
 
@@ -15,6 +17,7 @@ const BoxTimerVisual: React.FC<BoxTimerProps> = ({
     timeLeft, 
     totalTimeForPhase, 
     currentRound,
+    totalRounds,
     label
 }) => {
 
@@ -180,13 +183,13 @@ const BoxTimerVisual: React.FC<BoxTimerProps> = ({
                             {phaseLabel}
                         </span>
                     </motion.div>
-                </div>
 
-                {/* Round Info */}
-                <div className="absolute bottom-16 lg:bottom-20 opacity-40">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white">
-                        Раунд {currentRound}
-                    </span>
+                    {/* Round Info */}
+                    <div className="mt-2 opacity-60">
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">
+                            {currentRound} / {totalRounds === 0 ? '∞' : totalRounds}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BreathingPattern } from '../types';
+import { Maximize2, Minimize2 } from 'lucide-react';
 
 // Fix for Framer Motion type mismatch
 const MotionPath = motion.path as any;
@@ -127,9 +129,11 @@ const HarmonicHexagon: React.FC<{
 interface Props {
     pattern: BreathingPattern;
     onExit: () => void;
+    isZenMode?: boolean;
+    onToggleZen?: () => void;
 }
 
-const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
+const WimHofInterface: React.FC<Props> = ({ pattern, onExit, isZenMode, onToggleZen }) => {
     // --- BREATHING STATE ---
     const [phase, setPhase] = useState<WhmPhase>('SETUP');
     
@@ -272,6 +276,7 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
 
     // --- INTERACTIONS ---
     const startSession = () => {
+        if (onToggleZen && !isZenMode) onToggleZen(); // Auto-collapse menu on start
         setPhase('PREP');
         setCurrentRound(1);
         setTimerVal(3);
@@ -294,14 +299,13 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
     // --- RENDER ---
     return (
         <div className="w-full flex flex-col relative font-sans">
-            
             {phase === 'SETUP' ? (
                 // --- SETUP VIEW ---
-                // Removed mt-6, centering handled by parent
-                <div className="w-full flex flex-col items-center">
+                // FIX: Changed items-center to justify-start to allow top content flow in landscape
+                <div className="w-full flex flex-col items-center justify-start pt-4 md:pt-0">
                     
                     {/* VISUALIZER */}
-                    <div className="w-full flex flex-col items-center justify-center animate-fade-in py-6">
+                    <div className="w-full flex flex-col items-center justify-center animate-fade-in py-4 relative shrink-0">
                         <div className="text-[10px] font-bold text-zinc-400 dark:text-gray-500 uppercase tracking-widest mb-4 opacity-60">
                             Предпросмотр темпа
                         </div>
@@ -313,7 +317,7 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
                             color="#48CFE1"
                         />
                         {/* SPEED SELECTOR */}
-                        <div className="flex gap-2 mt-8 bg-zinc-100 dark:bg-white/5 p-1 rounded-xl border border-zinc-200 dark:border-white/5 relative z-20">
+                        <div className="flex gap-2 mt-6 bg-zinc-100 dark:bg-white/5 p-1 rounded-xl border border-zinc-200 dark:border-white/5 relative z-20">
                             {(['slow', 'normal', 'fast'] as SpeedKey[]).map(k => (
                                 <button
                                     key={k}
@@ -331,7 +335,15 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
                     </div>
 
                     {/* CONTROLS AREA */}
-                    <div className="w-full max-w-md bg-white/50 dark:bg-[#050505]/50 backdrop-blur-md border border-zinc-200 dark:border-white/5 p-6 rounded-2xl mb-2">
+                    <div className="w-full max-w-md bg-white/50 dark:bg-[#050505]/50 backdrop-blur-md border border-zinc-200 dark:border-white/5 p-6 rounded-2xl mb-safe relative group shrink-0">
+                        
+                        {/* Header of Card */}
+                        <div className="flex items-center justify-between mb-6 pb-4 border-b border-zinc-200 dark:border-white/5">
+                            <span className="text-xs font-bold uppercase text-zinc-400 tracking-widest flex items-center gap-2">
+                                <i className="fas fa-sliders-h"></i> Настройки
+                            </span>
+                        </div>
+
                         <div className="flex flex-col gap-6">
                             {/* Inputs Row */}
                             <div className="flex items-center gap-6">
@@ -365,7 +377,8 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit }) => {
                 </div>
             ) : (
                 // --- ACTIVE SESSION VIEW (Fullscreen takeover) ---
-                <div className="fixed inset-0 z-50 bg-[#050505] flex flex-col items-center justify-center p-4">
+                // CRITICAL FIX: Z-Index 200 to overlay Header (z-50) and Sidebar Button (z-50)
+                <div className="fixed inset-0 z-[200] bg-[#050505] flex flex-col items-center justify-center p-4">
                     {/* Top Status - Pushed down to avoid overlap */}
                     <div className="absolute top-12 w-full flex justify-between px-6 z-20">
                          <div className="flex flex-col">

@@ -73,6 +73,15 @@ export interface BreathState {
   sessionResults: number[];
 }
 
+export interface SessionHistoryItem {
+    id: string;
+    patternId: string;
+    patternName: string;
+    date: string; // ISO string
+    durationSeconds: number;
+    roundsCompleted: number;
+}
+
 export interface GeminiAnalysis {
   history: string;
   benefits: string;

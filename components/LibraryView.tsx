@@ -1,8 +1,10 @@
+
 import React, { useState, useMemo } from 'react';
 import { BreathingPattern } from '../types';
 import { DEFAULT_PATTERNS, CATEGORY_NAMES, CATEGORY_ICONS } from '../constants';
 import TechniqueCard from './library/TechniqueCard';
 import LibraryHeader from './library/LibraryHeader';
+import { Heart, Wind, Zap } from 'lucide-react';
 
 // High Impact Techniques selected by Author (Ordered)
 const POWER_PACK_IDS = [
@@ -108,7 +110,10 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
                 {selectedCategory === 'AuthorChoice' && !selectedTag && (
                     <div className="max-w-3xl mx-auto mb-12 text-center animate-fade-in mt-8">
                         <div className="inline-block p-6 rounded-3xl bg-gradient-to-br from-amber-500/10 to-orange-600/10 border border-amber-500/20 backdrop-blur-md shadow-[0_0_30px_rgba(245,158,11,0.1)]">
-                            <h3 className="text-xl font-display font-bold text-amber-500 mb-2">Золотой Стандарт</h3>
+                            <div className="flex items-center justify-center gap-2 mb-2">
+                                <Zap className="text-amber-500" size={20} />
+                                <h3 className="text-xl font-display font-bold text-amber-500">Золотой Стандарт</h3>
+                            </div>
                             <p className="text-amber-800 dark:text-amber-200 font-medium text-sm md:text-base leading-relaxed opacity-80">
                                 "Эти 5 практик дают 80% результата за 20% усилий. Если у вас мало времени — делайте только их."
                             </p>
@@ -153,13 +158,13 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
                         <div className="text-center py-20 opacity-50 flex flex-col items-center">
                             {selectedCategory === 'Favorites' ? (
                                 <>
-                                    <i className="fas fa-heart-broken text-4xl mb-4 text-gray-400"></i>
+                                    <Heart size={48} className="mb-4 text-gray-400 stroke-1" />
                                     <p className="text-xl font-display">У вас пока нет любимых техник</p>
                                     <p className="text-sm mt-2">Добавляйте техники в избранное, нажимая на сердечко</p>
                                 </>
                             ) : (
                                 <>
-                                    <i className="fas fa-wind text-4xl mb-4 text-gray-400"></i>
+                                    <Wind size={48} className="mb-4 text-gray-400 stroke-1" />
                                     <p className="text-xl font-display">Техники не найдены</p>
                                     <p className="text-sm mt-2">Попробуйте изменить фильтры или поиск</p>
                                 </>
@@ -172,16 +177,16 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
             {/* FOOTER */}
             <footer className="mt-24 pb-10 text-center animate-fade-in text-gray-500 dark:text-gray-500 border-t border-gray-100 dark:border-white/5 pt-10">
                 <div className="flex flex-col items-center gap-6">
-                    <div className="text-sm font-bold tracking-[0.1em] opacity-70">
+                    <div className="text-xs font-bold tracking-[0.2em] opacity-70 uppercase flex items-center gap-2">
                         СОЗДАНО С 
                         <a 
                             href="https://t.me/+D78P1fpaduBlOTc6" 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="inline-block mx-1 align-middle transition-transform hover:scale-110 cursor-default"
+                            className="inline-block transition-transform hover:scale-110 cursor-default"
                             title=""
                         >
-                            <span className="text-rose-500 animate-pulse text-lg">❤️</span>
+                            <Heart size={14} className="text-rose-500 fill-rose-500 animate-pulse" />
                         </a> 
                         — <a href="https://t.me/nikolaiovchinnikov" target="_blank" rel="noopener noreferrer" className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 transition-colors border-b border-transparent hover:border-cyan-500">НИКОЛАЙ ОВЧИННИКОВ</a>
                     </div>

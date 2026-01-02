@@ -1,11 +1,12 @@
+
 {
-  "name": "EntheoBreath",
+  "name": "EntheoBreath: Дыхание и Биохакинг",
   "short_name": "EntheoBreath",
-  "description": "Энтеогенные дыхательные практики и таймеры сознания",
+  "description": "Настройте свою нервную систему. Лучшие техники для глубокого сна, мгновенного фокуса и управления энергией.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#050505",
-  "theme_color": "#050505",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "orientation": "portrait",
   "icons": [
     {

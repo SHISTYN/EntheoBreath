@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { BreathingPhase } from '../types';
 
 const MotionPath = motion.path as any;
@@ -12,6 +12,8 @@ interface Props {
     timeLeft: number;
     totalTime: number; 
     currentRound: number;
+    totalRounds: number;
+    isActive?: boolean;
 }
 
 // Утилита для смешивания цветов
@@ -30,7 +32,9 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
     phase, 
     timeLeft, 
     totalTime,
-    currentRound
+    currentRound,
+    totalRounds,
+    isActive
 }) => {
     const [isLeftHanded, setIsLeftHanded] = useState(false);
 
@@ -38,8 +42,6 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
     const STROKE_WIDTH = 24; 
     
     // Единый путь: 0.0 (Низ Лев) -> 0.5 (Верх Центр) -> 1.0 (Низ Прав)
-    // M 70 380 - это координата начала (Низ левой)
-    // M 230 380 - это координата конца (Низ правой)
     const combinedPath = "M 70 380 C 70 180 70 60 150 60 C 230 60 230 180 230 380";
 
     // Прогресс фазы: 0 -> 1
@@ -215,38 +217,29 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
     const rightFingerLabel = isLeftHanded ? "БЕЗЫМЯННЫЙ" : "БОЛЬШОЙ";
 
     // --- ЛОГИКА БЕСШОВНОГО ШАРА ---
-    // Определяем, где сейчас должен быть "Стартовый Шар".
-    // Для нечетных раундов (1,3,5) старт СЛЕВА (x=70).
-    // Для четных раундов (2,4,6) старт СПРАВА (x=230).
     const startNodeX = isOddRound ? 70 : 230;
 
-    // Состояние шарика:
-    // 1. Ready: Растет с 0 до 1.
-    // 2. Inhale: Остается полным (1), сливаясь с линией.
-    // 3. Другие фазы: Исчезает (0).
     let circleScale = 0;
     let circleOpacity = 0;
 
     if (isReadyState) {
-        circleScale = readyProgress * 1.2; // Надуваем чуть больше
+        circleScale = readyProgress * 1.2; 
         circleOpacity = readyProgress;
     } else if (phase === BreathingPhase.Inhale) {
-        // Во время вдоха шар остается на месте, служа "заглушкой" начала линии
         circleScale = 1; 
         circleOpacity = 1; 
     } else {
-        // В других фазах (задержка, выдох) стартовый шар не нужен
         circleScale = 0;
         circleOpacity = 0;
     }
 
-    // UPDATED: Tightened height (min-h-[300px]) and viewBox (-20 20 340 430) to remove vertical gap
     return (
-        <div className="w-full flex flex-col items-center justify-center relative min-h-[300px]">
-            <div className="relative w-[300px] h-[380px] flex items-center justify-center">
+        <div className="w-full flex flex-col items-center justify-center relative min-h-[320px]">
+            {/* Reduced container height to pull graphics closer to top label */}
+            <div className="relative w-[300px] h-[320px] flex items-center justify-center">
                 
-                {/* SVG viewBox cropped to content */}
-                <svg viewBox="-20 20 340 430" className="absolute inset-0 w-full h-full overflow-visible z-10 pointer-events-none">
+                {/* Updated viewBox: Cropped top from 20 to 40 to bring Third Eye closer to edge */}
+                <svg viewBox="-20 40 340 380" className="absolute inset-0 w-full h-full overflow-visible z-10 pointer-events-none">
                     <defs>
                         <filter id="neonGlowAV" x="-50%" y="-50%" width="200%" height="200%">
                             <feGaussianBlur stdDeviation="6" result="coloredBlur" />
@@ -260,7 +253,7 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
                     {/* Стеклянная трубка (фон) */}
                     <path d={combinedPath} stroke={COLOR_GLASS} strokeWidth={STROKE_WIDTH} fill="none" strokeLinecap="round" />
                     
-                    {/* === СТАРТОВЫЙ ШАР (БЕСШОВНЫЙ) === */}
+                    {/* === СТАРТОВЫЙ ШАР === */}
                     <MotionCircle 
                         cx={startNodeX} 
                         cy="380"
@@ -278,7 +271,7 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
                         style={{ filter: 'url(#neonGlowAV)', originX: '50%', originY: '50%' }}
                     />
 
-                    {/* === ОСНОВНАЯ АНИМАЦИЯ (ЖИДКОСТЬ) === */}
+                    {/* === ОСНОВНАЯ АНИМАЦИЯ === */}
                     <MotionPath
                         d={combinedPath}
                         fill="none"
@@ -317,16 +310,26 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
                         </div>
                     </foreignObject>
 
-                    {/* Свитчер рук */}
+                    {/* Свитчер рук - Fades out when active */}
                     <foreignObject x="110" y="360" width="80" height="60">
-                        <div className="flex flex-col items-center justify-center h-full pointer-events-auto">
-                            <button onClick={() => setIsLeftHanded(!isLeftHanded)} className="flex flex-col items-center gap-1 group">
-                                <div className={`w-8 h-8 rounded-full border flex items-center justify-center transition-colors ${isLeftHanded ? 'border-indigo-500 text-indigo-400 bg-indigo-500/10' : 'border-cyan-500 text-cyan-400 bg-cyan-500/10'}`}>
-                                    <i className={`fas fa-hand-paper text-xs ${isLeftHanded ? '-scale-x-100' : ''}`}></i>
-                                </div>
-                                <span className="text-[8px] font-bold text-zinc-600 uppercase tracking-wide">{isLeftHanded ? 'Левша' : 'Правша'}</span>
-                            </button>
-                        </div>
+                        <AnimatePresence>
+                            {(!isActive || isReadyState) && (
+                                <MotionDiv 
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.5 }}
+                                    className="flex flex-col items-center justify-center h-full pointer-events-auto"
+                                >
+                                    <button onClick={() => setIsLeftHanded(!isLeftHanded)} className="flex flex-col items-center gap-1 group">
+                                        <div className={`w-8 h-8 rounded-full border flex items-center justify-center transition-colors ${isLeftHanded ? 'border-indigo-500 text-indigo-400 bg-indigo-500/10' : 'border-cyan-500 text-cyan-400 bg-cyan-500/10'}`}>
+                                            <i className={`fas fa-hand-paper text-xs ${isLeftHanded ? '-scale-x-100' : ''}`}></i>
+                                        </div>
+                                        <span className="text-[8px] font-bold text-zinc-600 uppercase tracking-wide">{isLeftHanded ? 'Левша' : 'Правша'}</span>
+                                    </button>
+                                </MotionDiv>
+                            )}
+                        </AnimatePresence>
                     </foreignObject>
 
                     {/* Правый замок */}
@@ -349,11 +352,28 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
 
                 {/* Центр таймер */}
                 <div className="absolute top-[35%] flex flex-col items-center z-50 pointer-events-none">
-                    <span className="text-7xl font-display font-bold text-white tabular-nums mb-2 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                    <span className="text-7xl font-display font-bold text-white tabular-nums mb-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                         {Math.ceil(timeLeft)}
                     </span>
-                    <div className="px-4 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 shadow-lg">
-                        <span className="text-[10px] font-bold text-gray-300 uppercase tracking-wider">{mainText}</span>
+                    
+                    <div className="flex flex-col items-center gap-2">
+                        {/* PHASE PILL */}
+                        <div className="px-4 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 shadow-lg">
+                            <span className="text-[10px] font-black text-gray-200 uppercase tracking-widest">{mainText}</span>
+                        </div>
+
+                        {/* ROUND COUNTER - MOVED INSIDE */}
+                        {!isReadyState && !isDoneState && (
+                            <motion.div 
+                                className="flex items-center gap-1 opacity-60"
+                                animate={{ opacity: [0.4, 0.8, 0.4] }}
+                                transition={{ duration: 4, repeat: Infinity }}
+                            >
+                                <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">
+                                    Раунд {currentRound} / {totalRounds === 0 ? '∞' : totalRounds}
+                                </span>
+                            </motion.div>
+                        )}
                     </div>
                 </div>
             </div>
