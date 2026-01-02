@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -6,7 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import { 
   Music, Menu, X, Share2, Download, BookOpen, Library,
   Sparkles, Waves, Brain, PlayCircle, PauseCircle, Infinity as InfinityIcon, Clock,
-  Volume2, CloudRain, Bell, Drum, CircleDot, Wind, Sliders, Radio, Gem, CircleHelp
+  Volume2, CloudRain, Bell, Drum, CircleDot, Wind, Sliders, Radio, Gem, HelpCircle
 } from 'lucide-react';
 import { PHILOSOPHY_CONTENT, CATEGORY_ICONS } from '../../constants';
 import EntheoLogo from '../EntheoLogo';
@@ -16,8 +15,10 @@ import YinYangToggle from '../YinYangToggle';
 import ChangelogSystem from '../ChangelogSystem';
 import { CURRENT_VERSION } from '../../data/changelog'; // Import version
 
+
 const MotionHeader = motion.header as any;
 const MotionDiv = motion.div as any;
+
 
 interface HeaderProps {
     view: 'timer' | 'library';
@@ -32,10 +33,12 @@ interface HeaderProps {
     changeSoundMode: (m: SoundMode) => void;
 }
 
+
 // REMOVED 'Library' as per request. Only Philosophy remains.
 const NAV_ITEMS = [
   { id: 'philosophy', label: 'Философия', icon: BookOpen },
 ] as const;
+
 
 const SOLFEGGIO_LIST: { freq: SolfeggioFreq; label: string; desc: string }[] = [
     { freq: 396, label: '396 Гц', desc: 'Освобождение от вины и страха' },
@@ -47,6 +50,7 @@ const SOLFEGGIO_LIST: { freq: SolfeggioFreq; label: string; desc: string }[] = [
     { freq: 852, label: '852 Гц', desc: 'Духовный порядок' },
 ];
 
+
 const TIMER_SOUNDS: { id: SoundMode; label: string; icon: any }[] = [
     { id: 'mute', label: 'Тишина', icon: Volume2 },
     { id: 'bell', label: 'Колокольчик', icon: Bell },
@@ -55,6 +59,7 @@ const TIMER_SOUNDS: { id: SoundMode; label: string; icon: any }[] = [
     { id: 'om', label: 'ОМ (Вибрация)', icon: Sparkles },
     { id: 'rain', label: 'Дождь (Стик)', icon: CloudRain },
 ];
+
 
 export const Header: React.FC<HeaderProps> = ({
     view,
@@ -74,6 +79,7 @@ export const Header: React.FC<HeaderProps> = ({
     const [isChangelogOpen, setIsChangelogOpen] = useState(false); 
     const [mounted, setMounted] = useState(false);
 
+
     useEffect(() => {
         setMounted(true);
     }, []);
@@ -87,6 +93,7 @@ export const Header: React.FC<HeaderProps> = ({
         activeNoise, toggleNoise, noiseColor, setNoiseColor
     } = useAudioEngine();
 
+
     const handleNavClick = (id: string) => {
         if (id === 'philosophy') {
             setIsPhilosophyOpen(true);
@@ -96,11 +103,14 @@ export const Header: React.FC<HeaderProps> = ({
         }
     };
 
+
     const isAudioActive = activeBinaural !== 'none' || activeSolfeggio !== 0 || activeAmbience || activeNoise || activeCrystalMode;
+
 
     return (
         <>
         <ChangelogSystem isOpenManual={isChangelogOpen} onCloseManual={() => setIsChangelogOpen(false)} />
+
 
         <MotionHeader
             initial={{ y: -100, opacity: 0 }}
@@ -133,6 +143,7 @@ export const Header: React.FC<HeaderProps> = ({
                     </span>
                 </div>
 
+
                 {/* 2. NAVIGATION (CENTER) */}
                 <nav className="hidden md:flex items-center absolute left-1/2 -translate-x-1/2 bg-zinc-100 dark:bg-white/5 rounded-full p-1 border border-zinc-200 dark:border-white/5 transition-colors duration-500">
                     {NAV_ITEMS.map((item) => {
@@ -164,6 +175,7 @@ export const Header: React.FC<HeaderProps> = ({
                     })}
                 </nav>
 
+
                 {/* 3. ACTIONS (RIGHT) */}
                 <div className="flex items-center gap-1 md:gap-2 pr-1 shrink-0">
                     
@@ -174,6 +186,7 @@ export const Header: React.FC<HeaderProps> = ({
                     >
                         v{CURRENT_VERSION.split('.')[0]}.{CURRENT_VERSION.split('.')[1]}
                     </button>
+
 
                     {/* Sound Toggle */}
                     <div className="relative">
@@ -187,6 +200,7 @@ export const Header: React.FC<HeaderProps> = ({
                         >
                             <Music size={18} className={isAudioActive ? 'animate-pulse' : ''} />
                         </button>
+
 
                         <AnimatePresence>
                             {isSoundMenuOpen && (
@@ -213,6 +227,7 @@ export const Header: React.FC<HeaderProps> = ({
                                             <Clock size={12} /> В таймере
                                         </button>
                                     </div>
+
 
                                     <div className="overflow-y-auto custom-scrollbar">
                                         {/* (SOUND MENU CONTENT REMAINED SAME) */}
@@ -267,7 +282,9 @@ export const Header: React.FC<HeaderProps> = ({
                         </AnimatePresence>
                     </div>
 
+
                     <YinYangToggle theme={theme} toggleTheme={toggleTheme} className="ml-1" />
+
 
                     <button 
                         onClick={handleShare}
@@ -276,6 +293,7 @@ export const Header: React.FC<HeaderProps> = ({
                         <Share2 size={18} />
                     </button>
 
+
                     <button 
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                         className="md:hidden w-9 h-9 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-300 bg-black/5 dark:bg-white/5 border border-zinc-200 dark:border-white/10 ml-2"
@@ -283,19 +301,21 @@ export const Header: React.FC<HeaderProps> = ({
                         {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
                     </button>
 
+
                     {isMobileMenuOpen && (
                         <div className="absolute top-full right-0 mt-4 w-64 bg-white/95 dark:bg-[#121212]/95 backdrop-blur-2xl border border-gray-200 dark:border-white/10 rounded-3xl shadow-2xl p-4 z-50 animate-fade-in origin-top-right md:hidden">
                             {/* ... Mobile Menu Content ... */}
                             <div className="flex flex-col gap-2">
                                 <button onClick={() => { setIsPhilosophyOpen(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold bg-gray-50 dark:bg-white/5 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"><BookOpen size={18} className="text-purple-600 dark:text-premium-purple" /><span className="tracking-wide">Философия</span></button>
                                 <button onClick={() => { handleShare(); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold bg-gray-50 dark:bg-white/5 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"><Share2 size={18} className="text-zen-accent" /><span className="tracking-wide">Поделиться</span></button>
-                                <button onClick={() => { setShowMobileFaq(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold bg-gray-50 dark:bg-white/5 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"><CircleHelp size={18} className="text-gray-400" /><span className="tracking-wide">Помощь</span></button>
+                                <button onClick={() => { setShowMobileFaq(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold bg-gray-50 dark:bg-white/5 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"><HelpCircle size={18} className="text-gray-400" /><span className="tracking-wide">Помощь</span></button>
                             </div>
                         </div>
                     )}
                 </div>
             </div>
         </MotionHeader>
+
 
         {/* --- PHILOSOPHY MODAL: PORTAL (FIXED POSITIONING) --- */}
         {mounted && createPortal(
@@ -346,6 +366,7 @@ export const Header: React.FC<HeaderProps> = ({
                                     <X size={20} />
                                 </button>
                             </div>
+
 
                             {/* CONTENT */}
                             <div className="overflow-y-auto custom-scrollbar flex-1 p-6 md:p-10 bg-gradient-to-b from-transparent to-black/40 relative z-0">
