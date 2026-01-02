@@ -1,6 +1,10 @@
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import { BreathingPhase } from '../types';
+
+const MotionCircle = motion.circle as any;
+const MotionDiv = motion.div as any;
 
 interface TimerVisualProps {
   phase: BreathingPhase;
@@ -38,7 +42,7 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
   const isWimHofRecovery = isWimHof && phase === BreathingPhase.HoldIn;
 
   // Calculate progress (0 to 1)
-  const timeProgress = totalTimeForPhase > 0 ? (totalTimeForPhase - timeLeft) / totalTimeForPhase : 0;
+  const timeProgress = totalTimeForPhase > 0 ? Math.max(0, Math.min(1, (totalTimeForPhase - timeLeft) / totalTimeForPhase)) : 0;
   
   let strokeColor = '';
 
@@ -81,30 +85,54 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
       mainValue = Math.ceil(timeLeft).toString();
   }
 
-  // Breathing Animation for container
+  // Breathing Animation for container scale
   const breatheScale = !isStopwatch && isActive 
     ? (phase === BreathingPhase.Inhale ? 1.05 : phase === BreathingPhase.Exhale ? 0.95 : 1)
     : 1;
 
   // Responsive Container
   const containerSize = "w-[280px] h-[280px] md:w-[340px] md:h-[340px]";
-  const radius = 130; // Internal SVG radius
+  const radius = 130; 
   const circumference = 2 * Math.PI * radius;
-  // Standard clockwise fill
+  
+  // Logic for the progress ring
+  // Standard clockwise fill: offset starts at circumference (empty) and goes to 0 (full) OR vice versa depending on logic.
+  // Here: We want it to "deplete" or "fill" smoothly.
+  // Let's make it deplete: 0 offset = Full. Circumference offset = Empty.
   const strokeDashoffset = isStopwatch 
-    ? 0 // Stopwatch just shows ring
-    : circumference * (1 - timeProgress);
+    ? 0 
+    : circumference * timeProgress; // As timeProgress goes 0->1, offset goes 0->C (line disappears)
+
+  // Wait, usually timers "empty". 
+  // If timeProgress is 0 (start), we want full circle? Or empty circle filling up?
+  // Let's stick to standard "Fan" effect:
+  // Starts full (offset 0), ends empty (offset C)
+  
+  // Rotation for the Spark Particle
+  // 0 progress = Top (-90deg).
+  // 1 progress = Top (-90deg - 360deg).
+  const rotationDeg = -90 - (timeProgress * 360);
 
   return (
     <div className={`relative ${containerSize} flex items-center justify-center flex-shrink-0 mx-auto transition-transform duration-[2000ms] ease-in-out`}
          style={{ transform: `scale(${breatheScale})` }}
     >
-        {/* SVG PROGRESS RING - MINIMALIST */}
+        {/* SVG PROGRESS RING */}
         <svg 
-            className="absolute inset-0 w-full h-full -rotate-90 drop-shadow-xl"
+            className="absolute inset-0 w-full h-full drop-shadow-2xl overflow-visible"
             viewBox="0 0 300 300"
         >
-            {/* Track (Darker, Thinner) */}
+            <defs>
+                <filter id="neonGlowCircle" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+            </defs>
+
+            {/* Track (Background Ring) */}
             <circle
                 cx="150"
                 cy="150"
@@ -113,31 +141,66 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
                 stroke={theme === 'light' ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.08)"}
                 strokeWidth="4" 
             />
-            {/* Progress - Clean Solid Line */}
-            <circle
+
+            {/* Progress - The Active Line */}
+            <MotionCircle
                 cx="150"
                 cy="150"
                 r={radius}
                 fill="none"
-                stroke={strokeColor}
                 strokeWidth="6" 
                 strokeLinecap="round"
                 strokeDasharray={circumference}
                 strokeDashoffset={strokeDashoffset}
-                className="transition-all duration-200 ease-linear"
+                animate={{ stroke: strokeColor }}
+                transition={{ duration: 0.5 }} // Smooth color change
+                style={{ 
+                    transform: 'rotate(-90deg)', 
+                    transformOrigin: '50% 50%',
+                    filter: isActive && !isStopwatch ? 'url(#neonGlowCircle)' : 'none'
+                }}
             />
+
+            {/* THE SPARK (Leading Particle) */}
+            {/* We rotate a group containing a circle at the top position */}
+            {!isStopwatch && isActive && timeLeft > 0 && (
+                <g transform={`rotate(${rotationDeg}, 150, 150)`}>
+                    {/* Glowy blob at the tip */}
+                    <circle 
+                        cx="150" 
+                        cy={150 - radius} 
+                        r="6" 
+                        fill="white"
+                        style={{ filter: 'drop-shadow(0 0 8px white)' }}
+                    />
+                    {/* Colored halo around the spark */}
+                    <MotionCircle 
+                        cx="150" 
+                        cy={150 - radius} 
+                        r="12" 
+                        fill={strokeColor}
+                        opacity="0.3"
+                        animate={{ fill: strokeColor }}
+                        style={{ filter: 'blur(4px)' }}
+                    />
+                </g>
+            )}
         </svg>
 
-        {/* CONTENT */}
+        {/* CONTENT CENTER */}
         <div className="relative z-10 flex flex-col items-center justify-center">
             
             {/* Main Number */}
             <div className="relative">
-                <span 
+                <MotionDiv 
+                    key={phase} // Re-animate slightly on phase change
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     className="font-display font-bold text-8xl md:text-9xl tabular-nums tracking-tighter leading-none text-white drop-shadow-lg"
                 >
                     {mainValue}
-                </span>
+                </MotionDiv>
                 
                 {/* Milliseconds for stopwatch */}
                 {isStopwatch && (
@@ -149,12 +212,15 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
 
             {/* Cycle info & Phase Label */}
             <div className="mt-4 flex flex-col items-center gap-2 opacity-80">
-                 {/* PHASE LABEL */}
-                 <span className="text-sm font-black uppercase tracking-[0.2em] text-white/90" style={{ color: strokeColor }}>
+                 {/* PHASE LABEL with Color Animation */}
+                 <motion.span 
+                    animate={{ color: strokeColor }}
+                    className="text-sm font-black uppercase tracking-[0.2em]"
+                 >
                     {isWimHof ? (isWimHofBreathing ? 'Дыхание' : isWimHofRetention ? 'Задержка' : 'Отдых') : label}
-                 </span>
+                 </motion.span>
 
-                 {/* ROUND INFO - Integrated */}
+                 {/* ROUND INFO */}
                  {!isWimHof && !isStopwatch && (
                      <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/40">
                         Раунд {currentRound} / {totalRounds === 0 ? '∞' : totalRounds}

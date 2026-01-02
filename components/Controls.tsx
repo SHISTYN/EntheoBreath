@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { BreathingPattern } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Minus, Plus, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Settings2, List, Clock } from 'lucide-react';
+import { Minus, Plus, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Settings2, List, Clock, Hourglass } from 'lucide-react';
 
 const MotionDiv = motion.div as any;
 
@@ -322,8 +322,12 @@ const Controls: React.FC<ControlsProps> = ({ pattern, onChange, rounds, onRounds
           {pattern.mode !== 'stopwatch' && pattern.mode !== 'wim-hof' && (
               <div className="flex items-center gap-1 bg-[#0a0a0b] border border-white/10 rounded-xl px-1 h-12 hover:border-white/20 transition-colors shrink-0 shadow-lg">
                   <button onClick={() => onRoundsChange(Math.max(0, rounds - 1))} className="w-8 h-full flex items-center justify-center text-zinc-500 hover:text-white transition-colors active:scale-90"><Minus size={16} /></button>
-                  <div className="flex flex-col items-center w-8">
-                      <span className="font-mono font-bold text-sm text-white leading-none">{rounds === 0 ? '∞' : rounds}</span>
+                  <div className="flex flex-col items-center w-8 justify-center min-h-[20px]">
+                      {rounds === 0 ? (
+                          <Hourglass size={14} className="text-white rotate-90" />
+                      ) : (
+                          <span className="font-mono font-bold text-sm text-white leading-none">{rounds}</span>
+                      )}
                       <span className="text-[7px] font-bold uppercase text-zinc-600 mt-0.5">Круги</span>
                   </div>
                   <button onClick={() => onRoundsChange(rounds + 1)} className="w-8 h-full flex items-center justify-center text-zinc-500 hover:text-white transition-colors active:scale-90"><Plus size={16} /></button>

@@ -450,11 +450,8 @@ const App: React.FC = () => {
       }
       setRounds(p.mode === 'wim-hof' ? 3 : 12); 
       resetTimer();
-      if (window.innerWidth < 1024) {
-          setZenMode(true); // Default to Zen on mobile start to show timer immediately
-      } else {
-          setZenMode(false);
-      }
+      // FIX: Always start with Zen Mode OFF so the Sidebar (Overview) is visible
+      setZenMode(false);
   };
 
   const getPhaseDuration = () => {
@@ -603,7 +600,10 @@ const App: React.FC = () => {
 
                                     {/* Remaining Time */}
                                     <div className="flex items-center gap-2 px-5 py-2.5">
-                                        <Hourglass size={12} className="text-cyan-500" />
+                                        <Hourglass 
+                                            size={12} 
+                                            className={`text-cyan-500 transition-transform duration-1000 ease-in-out ${remainingSeconds === -1 ? 'rotate-90' : 'rotate-0'}`} 
+                                        />
                                         <span className="text-sm font-mono font-bold text-cyan-400">
                                             {remainingSeconds === -1 ? '∞' : formatDuration(remainingSeconds)}
                                         </span>
