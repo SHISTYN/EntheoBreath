@@ -604,9 +604,11 @@ const App: React.FC = () => {
                                             size={12} 
                                             className={`text-cyan-500 transition-transform duration-1000 ease-in-out ${remainingSeconds === -1 ? 'rotate-90' : 'rotate-0'}`} 
                                         />
-                                        <span className="text-sm font-mono font-bold text-cyan-400">
-                                            {remainingSeconds === -1 ? '∞' : formatDuration(remainingSeconds)}
-                                        </span>
+                                        {remainingSeconds !== -1 && (
+                                            <span className="text-sm font-mono font-bold text-cyan-400">
+                                                {formatDuration(remainingSeconds)}
+                                            </span>
+                                        )}
                                     </div>
 
                                 </div>
