@@ -1,0 +1,22 @@
+{
+  "name": "EntheoBreath: Дыхание и Биохакинг",
+  "short_name": "EntheoBreath",
+  "description": "Настройте свою нервную систему. Лучшие техники для глубокого сна, мгновенного фокуса и управления энергией.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/pwa-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
