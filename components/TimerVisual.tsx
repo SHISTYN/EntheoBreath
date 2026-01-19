@@ -14,6 +14,7 @@ interface TimerVisualProps {
     totalBreaths?: number;
     mode?: 'loop' | 'wim-hof' | 'stopwatch' | 'manual';
     isActive?: boolean;
+    theme?: 'light' | 'dark'; // Added to fix TS error
 }
 
 const TimerVisual: React.FC<TimerVisualProps> = ({
@@ -24,8 +25,10 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
     currentRound = 1,
     totalRounds = 0,
     currentBreath = 0,
+    currentBreath = 0,
     mode = 'loop',
-    isActive = false
+    isActive = false,
+    theme: appTheme // Destructure but rename to avoid conflict with internal theme
 }) => {
 
     const isWimHof = mode === 'wim-hof';
