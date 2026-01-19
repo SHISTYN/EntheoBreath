@@ -25,7 +25,6 @@ const TimerVisual: React.FC<TimerVisualProps> = ({
     currentRound = 1,
     totalRounds = 0,
     currentBreath = 0,
-    currentBreath = 0,
     mode = 'loop',
     isActive = false,
     theme: appTheme // Destructure but rename to avoid conflict with internal theme
