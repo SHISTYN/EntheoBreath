@@ -509,7 +509,7 @@ const App: React.FC = () => {
     const remainingSeconds = calculateRemainingTime();
 
     return (
-        <div className="w-full flex flex-col h-[100dvh] font-sans bg-black text-zinc-900 dark:text-gray-100 transition-colors duration-500 overflow-hidden relative overscroll-none">
+        <div className="w-full flex flex-col h-full font-sans bg-black text-zinc-900 dark:text-gray-100 transition-colors duration-500 overflow-hidden relative overscroll-none">
 
             <SplashScreen isLoading={isLoadingApp} />
             <AppBackground theme={theme} />
