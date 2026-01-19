@@ -233,7 +233,7 @@ const TimerSidebar: React.FC<TimerSidebarProps> = ({
             </div>
 
             {/* --- MOBILE FLOATING ACTION BUTTON --- */}
-            <div className="lg:hidden absolute bottom-0 left-0 right-0 p-4 pb-safe pt-6 bg-[#0a0a0b]/80 backdrop-blur-2xl border-t border-white/5 z-50 shadow-[0_-20px_40px_-10px_rgba(0,0,0,0.8)]">
+            <div className="lg:hidden absolute bottom-0 left-0 right-0 p-4 pt-6 z-50">
                 <MotionButton
                     whileTap={{ scale: 0.96 }}
                     onClick={onStart}
