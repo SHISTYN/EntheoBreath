@@ -488,7 +488,7 @@ const App: React.FC = () => {
     const remainingSeconds = calculateRemainingTime();
 
     return (
-        <div className="w-full flex flex-col h-[100dvh] font-sans bg-zinc-50 dark:bg-[#000000] text-zinc-900 dark:text-gray-100 transition-colors duration-500 overflow-hidden relative">
+        <div className="w-full flex flex-col h-[100dvh] font-sans text-zinc-900 dark:text-gray-100 transition-colors duration-500 overflow-hidden relative overscroll-none">
 
             <SplashScreen isLoading={isLoadingApp} />
             <AppBackground theme={theme} />
@@ -505,7 +505,7 @@ const App: React.FC = () => {
             <main className="flex-1 flex flex-col w-full relative z-10 overflow-hidden h-full pt-safe">
 
                 {view === 'library' && (
-                    <div className="flex-1 overflow-y-auto custom-scrollbar alive-scroll pt-24 pb-safe">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar alive-scroll pt-24 pb-safe overscroll-y-none">
                         <Suspense fallback={<LoadingFallback />}>
                             <LibraryView selectPattern={selectPattern} favorites={favorites} toggleFavorite={toggleFavorite} />
                         </Suspense>
@@ -559,7 +559,7 @@ const App: React.FC = () => {
                                 </div>
                             )}
 
-                            <div className="flex-1 w-full flex flex-col p-4 relative z-10 overflow-y-auto custom-scrollbar">
+                            <div className="flex-1 w-full flex flex-col p-4 relative z-10 overflow-y-auto custom-scrollbar overscroll-y-none">
 
                                 {/* A. TOP HUD (Floating Island) */}
                                 {!isWimHof && (
@@ -646,7 +646,7 @@ const App: React.FC = () => {
                                 </div>
 
                                 {/* C. BOTTOM STACK - AIR UI (FLOATING ISLANDS) */}
-                                <div className="w-full max-w-md lg:max-w-2xl flex flex-col gap-6 lg:gap-8 mt-auto lg:mt-4 mb-2 lg:mb-8 shrink-0 pb-safe transition-all duration-300 self-center z-50">
+                                <div className="w-full max-w-md lg:max-w-2xl flex flex-col gap-6 lg:gap-8 mt-auto lg:mt-4 mb-2 lg:mb-8 shrink-0 pb-2 transition-all duration-300 self-center z-50">
 
                                     {/* 1. DOCK (FLOATING BUTTONS) */}
                                     {/* Removed container background for "Air" feel */}
