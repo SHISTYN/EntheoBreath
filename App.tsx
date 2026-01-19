@@ -35,16 +35,24 @@ const lazyWithRetry = (componentImport: () => Promise<any>) =>
         }
     });
 
-// --- LAZY IMPORTS ---
-const Controls = lazyWithRetry(() => import('./components/Controls'));
-const TimerVisual = lazyWithRetry(() => import('./components/TimerVisual'));
-const AnulomaVilomaInterface = lazyWithRetry(() => import('./components/AnulomaVilomaInterface'));
-const BoxTimerVisual = lazyWithRetry(() => import('./components/BoxTimerVisual'));
-const WimHofInterface = lazyWithRetry(() => import('./components/WimHofInterface'));
-const AnalysisModal = lazyWithRetry(() => import('./components/AnalysisModal'));
-const LibraryView = lazyWithRetry(() => import('./components/LibraryView'));
-const TimerSidebar = lazyWithRetry(() => import('./components/TimerSidebar'));
-const MobileFaq = lazyWithRetry(() => import('./components/MobileFaq'));
+// --- EAGER IMPORTS (STABILITY) ---
+import Controls from './components/Controls';
+import TimerVisual from './components/TimerVisual';
+import AnulomaVilomaInterface from './components/AnulomaVilomaInterface';
+import BoxTimerVisual from './components/BoxTimerVisual';
+import WimHofInterface from './components/WimHofInterface';
+import LibraryView from './components/LibraryView';
+import TimerSidebar from './components/TimerSidebar';
+// AnalysisModal is heavy, but let's make it eager too to be safe for now, or keep lazy if isolated.
+// User complained about "Change Theme" crashing. Theme is in Header. Header doesn't lazy load YinYang.
+// But the error 'text/html' implies a CHUNK failed.
+// Best to be safe: Eager load everything for this "Emergency" fix.
+import AnalysisModal from './components/AnalysisModal';
+import MobileFaq from './components/MobileFaq';
+
+// --- LAZY IMPORTS (None for stability) ---
+// const AnalysisModal = lazyWithRetry(() => import('./components/AnalysisModal'));
+// const MobileFaq = lazyWithRetry(() => import('./components/MobileFaq'));
 
 // --- TYPES ---
 type ThemeMode = 'dark' | 'light';
