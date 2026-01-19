@@ -6,7 +6,10 @@ const SplashScreen: React.FC<{ isLoading: boolean }> = ({ isLoading }) => {
     if (!isLoading) return null;
 
     return (
-        <div className="fixed -inset-10 z-[100] bg-[#000000] flex flex-col items-center justify-center transition-opacity duration-1000 animate-fade-in overflow-hidden h-[120vh]">
+        <div
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center transition-opacity duration-1000 animate-fade-in overflow-hidden"
+            style={{ background: 'linear-gradient(to bottom, #0f0518, #2e1065)' }}
+        >
 
             {/* --- VISUAL LAYER: PIXEL FOREST --- */}
             <div className="absolute inset-0 w-full h-full z-0">
