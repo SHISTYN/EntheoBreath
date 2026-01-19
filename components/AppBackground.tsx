@@ -14,96 +14,59 @@ const AppBackground: React.FC<Props> = ({ theme }) => {
     return (
         <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden transition-colors duration-1000 bg-[#000000]">
 
-            {/* --- DARK MODE: LIQUID GLASS ATMOSPHERE --- */}
+            {/* --- DARK MODE: OPTIMIZED LIQUID GLASS --- */}
             <div
                 className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${theme === 'dark' ? 'opacity-100' : 'opacity-0'}`}
             >
                 {/* 1. Deep Space Base */}
                 <div className="absolute inset-0 bg-[#000000]"></div>
 
-                {/* 2. Fluid Mesh Gradient (Organic Movement) */}
-                <MotionDiv
-                    animate={{
-                        backgroundPosition: ['0% 0%', '100% 100%', '0% 100%', '0% 0%'],
-                    }}
-                    transition={{
-                        duration: 40,
-                        repeat: Infinity,
-                        ease: "linear"
-                    }}
-                    className="absolute inset-0 opacity-30"
+                {/* 2. Optimized Mesh Gradient (CSS Only, No JS Animation Loop) */}
+                <div
+                    className="absolute inset-0 opacity-40"
                     style={{
-                        background: 'radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.15), transparent 50%), radial-gradient(circle at 0% 0%, rgba(168, 85, 247, 0.1), transparent 50%), radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.1), transparent 50%)',
-                        filter: 'blur(80px)',
-                        backgroundSize: '200% 200%'
+                        background: 'radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.1), transparent 60%), radial-gradient(circle at 10% 10%, rgba(168, 85, 247, 0.08), transparent 50%), radial-gradient(circle at 90% 90%, rgba(59, 130, 246, 0.08), transparent 50%)',
+                        filter: 'blur(40px)', // Reduced blur radius for performance
                     }}
                 />
 
-                {/* 3. God Ray (Breathing Light) */}
-                <MotionDiv
-                    animate={{
-                        opacity: [0.3, 0.6, 0.3],
-                        scale: [1, 1.1, 1],
-                        rotate: [-5, 5, -5]
-                    }}
-                    transition={{
-                        duration: 15,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                    }}
-                    className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[140%] h-[1000px]"
+                {/* 3. Static God Ray (Subtle) */}
+                <div
+                    className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[120%] h-[80vh] opacity-20 pointer-events-none"
                     style={{
-                        background: 'conic-gradient(from 180deg at 50% 0%, transparent 0deg, rgba(34, 211, 238, 0.1) 20deg, transparent 40deg)',
-                        filter: 'blur(60px)',
-                        transform: 'translateZ(0)',
+                        background: 'conic-gradient(from 180deg at 50% 0%, transparent 0deg, rgba(34, 211, 238, 0.15) 20deg, transparent 40deg)',
+                        filter: 'blur(40px)',
                         mixBlendMode: 'screen'
                     }}
                 />
 
-                {/* 4. Drifting Nebula (Purple) */}
-                <MotionDiv
-                    animate={{
-                        x: [0, 100, -50, 0],
-                        y: [0, -50, 50, 0],
-                        opacity: [0.2, 0.4, 0.2]
-                    }}
-                    transition={{
-                        duration: 25,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                    }}
-                    className="absolute bottom-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full"
+                {/* 4. Bottom Glow */}
+                <div
+                    className="absolute bottom-[-10%] right-[-10%] w-[60vh] h-[60vh] rounded-full opacity-20 pointer-events-none"
                     style={{
                         background: 'radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent 70%)',
-                        filter: 'blur(100px)',
-                        transform: 'translateZ(0)',
+                        filter: 'blur(50px)',
                         mixBlendMode: 'screen'
                     }}
                 />
-
-                {/* 5. Vignette & Grain Overlay handled by global noise below */}
             </div>
 
-            {/* --- LIGHT MODE: ZEN CLEAN (WARMER TINT) --- */}
+            {/* --- LIGHT MODE: ZEN CLEAN --- */}
             <div
                 className={`absolute inset-0 bg-[#F5F5F7] transition-opacity duration-1000 ease-in-out ${theme === 'light' ? 'opacity-100' : 'opacity-0'}`}
             >
-                <MotionDiv
-                    animate={{ scale: [1, 1.05, 1], opacity: [0.3, 0.5, 0.3] }}
-                    transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+                <div
                     className="absolute inset-0 opacity-40"
                     style={{
                         background: 'radial-gradient(circle at 50% 0%, #e0f2fe, transparent 80%)',
-                        filter: 'blur(60px)',
+                        filter: 'blur(40px)',
                     }}
                 />
-                {/* Warm ambient glow bottom right */}
-                <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-amber-100/30 blur-[80px] rounded-full pointer-events-none"></div>
             </div>
 
-            {/* Глобальный шум (Cinematic Grain) */}
+            {/* 5. Static Noise (Performance Optimized) */}
             <div
-                className="absolute inset-0 opacity-[0.05] mix-blend-overlay pointer-events-none"
+                className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none"
                 style={{ backgroundImage: NOISE_SVG }}
             />
         </div>
