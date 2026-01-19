@@ -35,17 +35,15 @@ const lazyWithRetry = (componentImport: () => Promise<any>) =>
         }
     });
 
-// --- EAGER IMPORTS (CORE) - To fix navigation lag ---
-import Controls from './components/Controls';
-import TimerVisual from './components/TimerVisual';
-import AnulomaVilomaInterface from './components/AnulomaVilomaInterface';
-import BoxTimerVisual from './components/BoxTimerVisual';
-import WimHofInterface from './components/WimHofInterface';
-import LibraryView from './components/LibraryView';
-import TimerSidebar from './components/TimerSidebar';
-
-// --- LAZY IMPORTS (SECONDARY) ---
+// --- LAZY IMPORTS ---
+const Controls = lazyWithRetry(() => import('./components/Controls'));
+const TimerVisual = lazyWithRetry(() => import('./components/TimerVisual'));
+const AnulomaVilomaInterface = lazyWithRetry(() => import('./components/AnulomaVilomaInterface'));
+const BoxTimerVisual = lazyWithRetry(() => import('./components/BoxTimerVisual'));
+const WimHofInterface = lazyWithRetry(() => import('./components/WimHofInterface'));
 const AnalysisModal = lazyWithRetry(() => import('./components/AnalysisModal'));
+const LibraryView = lazyWithRetry(() => import('./components/LibraryView'));
+const TimerSidebar = lazyWithRetry(() => import('./components/TimerSidebar'));
 const MobileFaq = lazyWithRetry(() => import('./components/MobileFaq'));
 
 // --- TYPES ---
