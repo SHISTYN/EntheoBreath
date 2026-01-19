@@ -33,22 +33,22 @@ const TimerSidebar: React.FC<TimerSidebarProps> = ({
 
     return (
         <div className="w-full h-full flex flex-col bg-white/80 dark:bg-[#0a0a0b]/80 backdrop-blur-3xl border-r border-white/5 shadow-[20px_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden transition-colors duration-500">
-            
+
             {/* Background Texture (Subtle Noise) */}
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E")` }}></div>
 
             {/* 1. TOP NAVIGATION (Liquid Glass Header) */}
             <div className="flex-shrink-0 pt-8 pb-6 px-6 relative z-20">
                 <div className="flex items-center justify-between mb-6">
-                    
+
                     {/* LIQUID BACK BUTTON (Icon Only, Pulsing Arrow) */}
-                    <button 
+                    <button
                         onClick={() => setView('library')}
                         className="group w-12 h-12 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 hover:border-white/30 hover:bg-white/10 flex items-center justify-center transition-all duration-500 shadow-[0_0_15px_-5px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_-5px_rgba(255,255,255,0.3)] active:scale-95"
                     >
                         <ArrowLeft size={20} className="text-white/80 group-hover:text-white transition-colors animate-pulse-slow" />
                     </button>
-                    
+
                     {/* Category Pill with Difficulty Badge */}
                     <div className="flex items-center gap-2">
                         {/* Difficulty Micro-Badge */}
@@ -145,7 +145,7 @@ const TimerSidebar: React.FC<TimerSidebarProps> = ({
                                         className="w-full relative overflow-hidden rounded-2xl group shadow-[0_0_30px_-10px_rgba(168,85,247,0.4)] ring-1 ring-white/10"
                                     >
                                         <div className="absolute inset-0 bg-[#121212]/80 backdrop-blur-xl border border-white/10 group-hover:border-purple-500/30 transition-colors"></div>
-                                        
+
                                         {/* Shimmer Border */}
                                         <div className="absolute inset-0 p-[1px] rounded-2xl bg-gradient-to-r from-transparent via-purple-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
@@ -167,12 +167,12 @@ const TimerSidebar: React.FC<TimerSidebarProps> = ({
                         {infoTab === 'guide' && (
                             <div className="prose prose-sm dark:prose-invert max-w-none">
                                 {activePattern.id === 'wim-hof-session' && <div className="mb-8"><WimHofGuide /></div>}
-                                
+
                                 <div className="bg-transparent border border-white/10 p-6 rounded-3xl backdrop-blur-md shadow-lg">
                                     <ReactMarkdown components={{
-                                        strong: ({node, ...props}) => <span className="text-cyan-400 font-extrabold" {...props} />,
-                                        h3: ({node, ...props}) => <h3 className="text-lg font-bold text-white mt-6 mb-3 font-display uppercase tracking-wide border-b border-white/10 pb-2 flex items-center gap-2" {...props} />,
-                                        li: ({node, ...props}) => <li className="marker:text-cyan-500 pl-1 mb-2 text-gray-300 font-medium" {...props} />
+                                        strong: ({ node, ...props }) => <span className="text-cyan-400 font-extrabold" {...props} />,
+                                        h3: ({ node, ...props }) => <h3 className="text-lg font-bold text-white mt-6 mb-3 font-display uppercase tracking-wide border-b border-white/10 pb-2 flex items-center gap-2" {...props} />,
+                                        li: ({ node, ...props }) => <li className="marker:text-cyan-500 pl-1 mb-2 text-gray-300 font-medium" {...props} />
                                     }}>
                                         {activePattern.instruction}
                                     </ReactMarkdown>
@@ -233,14 +233,14 @@ const TimerSidebar: React.FC<TimerSidebarProps> = ({
             </div>
 
             {/* --- MOBILE FLOATING ACTION BUTTON --- */}
-            <div className="lg:hidden absolute bottom-0 left-0 right-0 p-4 pb-safe bg-gradient-to-t from-[#0a0a0b] via-[#0a0a0b]/95 to-transparent z-50">
+            <div className="lg:hidden absolute bottom-0 left-0 right-0 p-4 pb-safe pt-6 bg-[#0a0a0b]/80 backdrop-blur-2xl border-t border-white/5 z-50 shadow-[0_-20px_40px_-10px_rgba(0,0,0,0.8)]">
                 <MotionButton
                     whileTap={{ scale: 0.96 }}
                     onClick={onStart}
-                    className="w-full h-16 rounded-2xl bg-white text-black font-display font-black text-sm uppercase tracking-widest shadow-[0_0_40px_rgba(255,255,255,0.2)] flex items-center justify-center gap-3 relative overflow-hidden group"
+                    className="w-full h-14 rounded-2xl bg-white text-black font-display font-black text-sm uppercase tracking-widest shadow-[0_0_30px_rgba(255,255,255,0.15)] flex items-center justify-center gap-3 relative overflow-hidden group ring-1 ring-white/50"
                 >
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 pointer-events-none"></div>
-                    <span className="relative z-10">Перейти к таймеру</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/80 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 pointer-events-none"></div>
+                    <span className="relative z-10">Начать Практику</span>
                     <Play size={18} fill="black" className="relative z-10" />
                 </MotionButton>
             </div>
@@ -260,4 +260,4 @@ const TimerSidebar: React.FC<TimerSidebarProps> = ({
     );
 };
 
-export default TimerSidebar;
+export default React.memo(TimerSidebar);

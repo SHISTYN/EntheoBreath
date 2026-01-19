@@ -1,158 +1,185 @@
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import * as Tone from 'tone';
 import { BreathingPhase } from '../types';
 
 export type SoundMode = 'mute' | 'bell' | 'hang' | 'bowl' | 'rain' | 'om' | 'gong' | 'harp' | 'flute';
 
 export const useAudioSystem = () => {
-    // Legacy state, kept for compatibility with prop types
+    // Внутреннее состояние для режима звука (по умолчанию 'bell')
     const [soundMode, setSoundMode] = useState<SoundMode>('bell');
-    
-    // Shared Reverb Node (High quality spatializer)
+
+    // --- ИНСТРУМЕНТЫ (Refs - это как кладовка, они хранятся между "кадрами" отрисовки) ---
+    // Храним синтезаторы здесь, чтобы не создавать их заново каждый раз.
     const reverbRef = useRef<Tone.Reverb | null>(null);
     const volumeRef = useRef<Tone.Volume | null>(null);
 
-    const initAudio = async () => {
+    const inhaleSynthRef = useRef<Tone.PolySynth | null>(null);
+    const exhaleSynthRef = useRef<Tone.PolySynth | null>(null);
+    const holdInSynthRef = useRef<Tone.MetalSynth | null>(null);
+    const holdOutSynthRef = useRef<Tone.Synth | null>(null);
+    const doneSynthRef = useRef<Tone.PolySynth | null>(null);
+    const tickSynthRef = useRef<Tone.FMSynth | null>(null);
+
+    // Эта функция запускается один раз при "смерти" компонента (закрытии)
+    // Она выбрасывает мусор, чтобы очистить память.
+    useEffect(() => {
+        return () => {
+            inhaleSynthRef.current?.dispose();
+            exhaleSynthRef.current?.dispose();
+            holdInSynthRef.current?.dispose();
+            holdOutSynthRef.current?.dispose();
+            doneSynthRef.current?.dispose();
+            tickSynthRef.current?.dispose();
+            reverbRef.current?.dispose();
+            volumeRef.current?.dispose();
+        };
+    }, []);
+
+    // Инициализация (Настройка инструментов)
+    const initAudio = useCallback(async () => {
         await Tone.start();
-        if (!reverbRef.current) {
-            // Apple-like cleanliness needs a pristine reverb
+
+        // Если громкость еще не создана - создаем всю цепочку
+        if (!volumeRef.current) {
+            // Эффект Эха (Reverb) - создает ощущение пространства
+            // decay: как долго звучит эхо
+            // wet: насколько много эха (0.3 = 30%)
             reverbRef.current = new Tone.Reverb({ decay: 2.5, wet: 0.3 }).toDestination();
             await reverbRef.current.generate();
-            
-            // Global FX Volume
+
+            // Громкость (Мастер-канал)
             volumeRef.current = new Tone.Volume(-2).connect(reverbRef.current);
         }
-    };
 
-    // --- PHASE TRANSITION SOUNDS ---
-    const playPhaseSound = async (phase: BreathingPhase) => {
+        // --- СОЗДАНИЕ ИНСТРУМЕНТОВ (Если их нет) ---
+
+        // 1. Вдох (Светлый, воздушный звук)
+        if (!inhaleSynthRef.current && volumeRef.current) {
+            inhaleSynthRef.current = new Tone.PolySynth(Tone.FMSynth, {
+                harmonicity: 3,
+                modulationIndex: 3.5,
+                oscillator: { type: "sine" },
+                envelope: { attack: 0.2, decay: 0.1, sustain: 0.3, release: 2 },
+                modulation: { type: "sine" },
+                modulationEnvelope: { attack: 0.5, decay: 0, sustain: 1, release: 0.5 }
+            }).connect(volumeRef.current);
+        }
+
+        // 2. Выдох (Теплый, мягкий звук)
+        if (!exhaleSynthRef.current && volumeRef.current) {
+            exhaleSynthRef.current = new Tone.PolySynth(Tone.AMSynth, {
+                harmonicity: 2,
+                oscillator: { type: "sine" },
+                envelope: { attack: 0.1, decay: 2, sustain: 0.1, release: 3 },
+                modulation: { type: "sine" },
+                modulationEnvelope: { attack: 0.5, decay: 0, sustain: 1, release: 0.5 }
+            }).connect(volumeRef.current);
+        }
+
+        // 3. Задержка на вдохе (Металлический, высокий звук)
+        if (!holdInSynthRef.current && volumeRef.current) {
+            holdInSynthRef.current = new Tone.MetalSynth({
+                envelope: { attack: 0.005, decay: 1.4, release: 0.2 },
+                harmonicity: 5.1,
+                modulationIndex: 32,
+                resonance: 4000,
+                octaves: 1.5
+            }).connect(volumeRef.current);
+            holdInSynthRef.current.frequency.value = 200;
+            holdInSynthRef.current.volume.value = -12; // Потише
+        }
+
+        // 4. Задержка на выдохе (Глубокий, низкий пульс)
+        if (!holdOutSynthRef.current && volumeRef.current) {
+            holdOutSynthRef.current = new Tone.Synth({
+                oscillator: { type: "sine" },
+                envelope: { attack: 0.5, decay: 0.5, sustain: 0, release: 1 }
+            }).connect(volumeRef.current);
+            holdOutSynthRef.current.volume.value = -5;
+        }
+
+        // 5. Завершение (Аккорд победы)
+        if (!doneSynthRef.current && volumeRef.current) {
+            doneSynthRef.current = new Tone.PolySynth(Tone.Synth).connect(volumeRef.current);
+        }
+
+        // 6. Тиканье таймера (Стеклянный "дзынь")
+        if (!tickSynthRef.current && volumeRef.current) {
+            tickSynthRef.current = new Tone.FMSynth({
+                harmonicity: 1.5,
+                modulationIndex: 3,
+                oscillator: { type: "sine" },
+                modulation: { type: "sine" },
+                envelope: { attack: 0.005, decay: 0.15, sustain: 0, release: 1 },
+                modulationEnvelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.1 }
+            }).connect(volumeRef.current);
+            tickSynthRef.current.volume.value = -4;
+        }
+    }, []);
+
+    // --- ФУНКЦИИ ВОСПРОИЗВЕДЕНИЯ ---
+
+    const playPhaseSound = useCallback(async (phase: BreathingPhase) => {
         if (soundMode === 'mute') return;
-        await initAudio();
-        if (!volumeRef.current) return;
+
+        // Убеждаемся, что всё готово
+        if (!volumeRef.current) await initAudio();
 
         switch (phase) {
-            case BreathingPhase.Inhale: {
-                // "Airy Swell" - Soft attack, opening filter, rising sensation
-                const synth = new Tone.PolySynth(Tone.FMSynth, {
-                    harmonicity: 3,
-                    modulationIndex: 3.5,
-                    oscillator: { type: "sine" },
-                    envelope: { attack: 0.2, decay: 0.1, sustain: 0.3, release: 2 },
-                    modulation: { type: "sine" },
-                    modulationEnvelope: { attack: 0.5, decay: 0, sustain: 1, release: 0.5 }
-                }).connect(volumeRef.current);
-                
-                // A Major Add9 chord for uplifting feeling
-                synth.triggerAttackRelease(["A3", "C#4", "E4", "B4"], "2n"); 
+            case BreathingPhase.Inhale:
+                // Аккорд A Major Add9 (Светлый)
+                inhaleSynthRef.current?.triggerAttackRelease(["A3", "C#4", "E4", "B4"], "2n");
                 break;
-            }
-            case BreathingPhase.Exhale: {
-                // "Grounding Release" - Descending, warm, resolving
-                const synth = new Tone.PolySynth(Tone.AMSynth, {
-                    harmonicity: 2,
-                    oscillator: { type: "sine" },
-                    envelope: { attack: 0.1, decay: 2, sustain: 0.1, release: 3 },
-                    modulation: { type: "sine" },
-                    modulationEnvelope: { attack: 0.5, decay: 0, sustain: 1, release: 0.5 }
-                }).connect(volumeRef.current);
-
-                // F Major 7 (Resolving)
-                synth.triggerAttackRelease(["F3", "A3", "C4", "E4"], "1n");
+            case BreathingPhase.Exhale:
+                // Аккорд F Major 7 (Успокаивающий)
+                exhaleSynthRef.current?.triggerAttackRelease(["F3", "A3", "C4", "E4"], "1n");
                 break;
-            }
-            case BreathingPhase.HoldIn: {
-                // "Suspension" - High, thin, static glass ping
-                const metal = new Tone.MetalSynth({
-                    frequency: 200,
-                    envelope: { attack: 0.005, decay: 1.4, release: 0.2 },
-                    harmonicity: 5.1,
-                    modulationIndex: 32,
-                    resonance: 4000,
-                    octaves: 1.5
-                }).connect(volumeRef.current);
-                
-                // Very soft high ping
-                metal.volume.value = -12;
-                metal.triggerAttackRelease("32n", undefined, 0.4);
+            case BreathingPhase.HoldIn:
+                // Короткий "дзынь" - note, duration, time, velocity
+                holdInSynthRef.current?.triggerAttackRelease(200, "32n", undefined, 0.4);
                 break;
-            }
-            case BreathingPhase.HoldOut: {
-                // "Void" - Minimal low sine pulse (instead of stomping membrane)
-                const synth = new Tone.Synth({
-                    oscillator: { type: "sine" },
-                    envelope: { attack: 0.5, decay: 0.5, sustain: 0, release: 1 }
-                }).connect(volumeRef.current);
-                
-                synth.volume.value = -5;
-                synth.triggerAttackRelease("C2", "2n");
+            case BreathingPhase.HoldOut:
+                // Низкая нота C2
+                holdOutSynthRef.current?.triggerAttackRelease("C2", "2n");
                 break;
-            }
-            case BreathingPhase.Done: {
-                // Success Chime
-                const synth = new Tone.PolySynth(Tone.Synth).connect(volumeRef.current);
-                synth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "1n");
+            case BreathingPhase.Done:
+                // Финальный аккорд C Major
+                doneSynthRef.current?.triggerAttackRelease(["C4", "E4", "G4", "C5"], "1n");
                 break;
-            }
         }
-    };
+    }, [soundMode]); // Зависит только от soundMode
 
-    // --- COUNTDOWN SOUNDS (3... 2... 1...) ---
-    // UPDATED: "Glass Blip" instead of "Wood Stomp"
-    const playCountdownTick = async (number: number) => {
+    const playCountdownTick = useCallback(async (number: number) => {
         if (soundMode === 'mute') return;
-        await initAudio();
-        if (!volumeRef.current) return;
+        if (!volumeRef.current) await initAudio();
 
-        // Apple-style: Clean, sine-based, snappy envelope, slight FM modulation for "glassiness"
-        const blip = new Tone.FMSynth({
-            harmonicity: 1.5, // Ratio creates a consonant, glassy bell tone
-            modulationIndex: 3, 
-            oscillator: { type: "sine" }, // Pure carrier
-            modulation: { type: "sine" }, // Pure modulator
-            envelope: { 
-                attack: 0.005, // Instant but smooth attack (no click)
-                decay: 0.15,   // Short decay (tight)
-                sustain: 0, 
-                release: 1 
-            },
-            modulationEnvelope: { 
-                attack: 0.001, 
-                decay: 0.1,    // Modulation fades fast leaving pure tone
-                sustain: 0, 
-                release: 0.1 
-            }
-        }).connect(volumeRef.current);
+        const blip = tickSynthRef.current;
+        if (!blip) return;
 
-        blip.volume.value = -4; // Balance volume
-
-        // Frequencies chosen for "Medical/Scientific" precision
         if (number > 1) {
-            // 3, 2: Neutral High "Blip" (G5 - 784Hz)
+            // 3, 2: Обычный "блип"
+            blip.modulationIndex.value = 3;
             blip.triggerAttackRelease("G5", "32n");
         } else {
-            // 1: Accent High "Ping" (C6 - 1046Hz) - The "Ready" signal
-            // Slightly brighter modulation
+            // 1: Акцент (более яркий звук) - "Внимание!"
             blip.modulationIndex.value = 5;
             blip.triggerAttackRelease("C6", "32n");
         }
-    };
+    }, [soundMode]);
 
-    const playSoundEffect = async (mode: SoundMode) => {
-        // Legacy wrapper for manual sound menu clicks
+    const playSoundEffect = useCallback(async (mode: SoundMode) => {
         if (mode === 'mute') return;
-        await initAudio();
-        
-        // Simple preview sound logic
-        const synth = new Tone.PolySynth().toDestination();
-        synth.volume.value = -10;
-        synth.triggerAttackRelease(["C5", "E5"], "8n");
-    };
+        if (!volumeRef.current) await initAudio();
 
-    const changeSoundMode = (mode: SoundMode) => {
+        // Для предпрослушивания можно использовать Inhale синт
+        inhaleSynthRef.current?.triggerAttackRelease(["C5", "E5"], "8n");
+    }, [initAudio]);
+
+    const changeSoundMode = useCallback((mode: SoundMode) => {
         setSoundMode(mode);
         playSoundEffect(mode);
-    };
+    }, [playSoundEffect]);
 
     return {
         soundMode,

@@ -20,7 +20,7 @@ const HighlightedText: React.FC<{ text: string; query: string; className?: strin
     const parts = text.split(new RegExp(`(${query})`, 'gi'));
     return (
         <span className={className}>
-            {parts.map((part, i) => 
+            {parts.map((part, i) =>
                 part.toLowerCase() === query.toLowerCase() ? (
                     <span key={i} className="bg-yellow-400/30 text-yellow-900 dark:text-yellow-100 rounded-sm px-0.5 box-decoration-clone">
                         {part}
@@ -34,12 +34,12 @@ const HighlightedText: React.FC<{ text: string; query: string; className?: strin
 };
 
 // Memoized to prevent re-render of entire list on search keystrokes
-const TechniqueCard: React.FC<TechniqueCardProps> = React.memo(({ 
-    pattern, 
-    onClick, 
-    isFavorite = false, 
+const TechniqueCard: React.FC<TechniqueCardProps> = React.memo(({
+    pattern,
+    onClick,
+    isFavorite = false,
     onToggleFavorite,
-    searchQuery = "" 
+    searchQuery = ""
 }) => {
     // 👑 THE KING CHECK
     const isKing = pattern.id === 'wim-hof-session';
@@ -47,22 +47,22 @@ const TechniqueCard: React.FC<TechniqueCardProps> = React.memo(({
     // Helper for difficulty styling
     const getDifficultyStyle = (diff: string) => {
         switch (diff) {
-            case 'Новичок': 
+            case 'Новичок':
                 return {
                     bg: 'bg-emerald-500/10 border-emerald-500/20',
                     text: 'bg-gradient-to-r from-emerald-600 via-emerald-300 to-emerald-600 dark:from-emerald-400 dark:via-white dark:to-emerald-400 bg-[length:200%_auto] bg-clip-text text-transparent animate-shimmer-slow'
                 };
-            case 'Средний': 
+            case 'Средний':
                 return {
                     bg: 'bg-amber-500/10 border-amber-500/20',
                     text: 'bg-gradient-to-r from-amber-600 via-amber-200 to-amber-600 dark:from-amber-400 dark:via-white dark:to-amber-400 bg-[length:200%_auto] bg-clip-text text-transparent animate-shimmer-slow'
                 };
-            case 'Профи': 
+            case 'Профи':
                 return {
                     bg: 'bg-rose-500/10 border-rose-500/20',
                     text: 'bg-gradient-to-r from-rose-600 via-rose-200 to-rose-600 dark:from-rose-500 dark:via-white dark:to-rose-500 bg-[length:200%_auto] bg-clip-text text-transparent animate-shimmer-slow'
                 };
-            default: 
+            default:
                 return {
                     bg: 'bg-gray-100 dark:bg-white/10 border-gray-200 dark:border-white/10',
                     text: 'text-gray-500'
@@ -80,15 +80,15 @@ const TechniqueCard: React.FC<TechniqueCardProps> = React.memo(({
     };
 
     // Styling overrides for The King
-    const containerClasses = isKing 
-        ? "relative overflow-hidden rounded-2xl cursor-pointer flex flex-col h-full min-h-[220px] group transition-all duration-500 bg-gradient-to-br from-[#0f1014] to-[#000000] backdrop-blur-2xl ring-1 ring-cyan-400/30 shadow-[0_0_30px_-5px_rgba(34,211,238,0.15)] hover:shadow-[0_0_50px_-5px_rgba(34,211,238,0.3)] [&>div.absolute]:!hidden"
-        : "bg-white dark:bg-[#0f0f10]/80 backdrop-blur-xl rounded-2xl cursor-pointer shadow-sm hover:shadow-xl dark:shadow-black/50 border border-zinc-200 dark:border-white/5 flex flex-col h-full min-h-[220px] group relative transition-colors duration-300";
+    const containerClasses = isKing
+        ? "relative overflow-hidden rounded-3xl cursor-pointer flex flex-col h-full min-h-[220px] group transition-all duration-500 bg-gradient-to-br from-[#0f1014] to-[#000000] backdrop-blur-3xl ring-1 ring-cyan-400/30 shadow-[0_0_30px_-5px_rgba(34,211,238,0.15)] hover:shadow-[0_0_50px_-5px_rgba(34,211,238,0.3)] hover:scale-[1.02] active:scale-[0.98] [&>div.absolute]:!hidden"
+        : "bg-white/80 dark:bg-[#0f0f10]/60 backdrop-blur-2xl rounded-3xl cursor-pointer shadow-sm hover:shadow-2xl dark:shadow-black/60 border border-zinc-200 dark:border-white/10 flex flex-col h-full min-h-[220px] group relative transition-all duration-300 hover:border-zinc-300 dark:hover:border-white/20 active:scale-[0.98]";
 
     return (
-        <SpotlightCard 
+        <SpotlightCard
             onClick={onClick}
             className={containerClasses}
-            contentClassName="p-4 md:p-5 flex flex-col h-full"
+            contentClassName="p-5 md:p-6 flex flex-col h-full"
         >
             {/* 👑 King Effects */}
             {isKing && (
@@ -99,20 +99,20 @@ const TechniqueCard: React.FC<TechniqueCardProps> = React.memo(({
             )}
 
             {/* Favorite Button */}
-            <button 
+            <button
                 onClick={handleFavoriteClick}
                 className="absolute top-3 right-3 z-30 p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-all active:scale-90"
             >
-                <Heart 
-                    size={18} 
-                    className={`transition-colors duration-300 ${isFavorite ? 'fill-rose-500 text-rose-500' : 'text-zinc-300 dark:text-zinc-600 hover:text-rose-500'}`} 
+                <Heart
+                    size={18}
+                    className={`transition-colors duration-300 ${isFavorite ? 'fill-rose-500 text-rose-500' : 'text-zinc-300 dark:text-zinc-600 hover:text-rose-500'}`}
                 />
             </button>
 
             {/* Header */}
             <div className="flex flex-col gap-1.5 mb-2 pr-8 relative z-20">
                 <div className="flex items-center gap-2">
-                     <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded border shrink-0 ${diffStyle.bg} ${diffStyle.text}`}>
+                    <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded border shrink-0 ${diffStyle.bg} ${diffStyle.text}`}>
                         {pattern.difficulty}
                     </span>
                     {/* 👑 MAX EFFECT BADGE */}
@@ -132,15 +132,14 @@ const TechniqueCard: React.FC<TechniqueCardProps> = React.memo(({
             <div className={`text-[13px] mb-4 line-clamp-3 leading-snug font-medium flex-grow opacity-90 relative z-20 ${isKing ? 'text-gray-300' : 'text-zinc-500 dark:text-zinc-400'}`}>
                 <HighlightedText text={pattern.description} query={searchQuery} />
             </div>
-            
+
             {/* Benefits Grid */}
             <div className="grid grid-cols-2 gap-1.5 mb-3 mt-auto relative z-20 w-full">
                 {pattern.benefits && pattern.benefits.slice(0, 4).map((b, i) => (
-                    <div key={i} className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide px-2 py-1.5 rounded border overflow-hidden transition-colors ${
-                        isKing 
-                            ? 'bg-white/5 border-white/10 text-gray-300 group-hover:border-cyan-500/30' 
+                    <div key={i} className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide px-2 py-1.5 rounded border overflow-hidden transition-colors ${isKing
+                            ? 'bg-white/5 border-white/10 text-gray-300 group-hover:border-cyan-500/30'
                             : 'bg-zinc-50 dark:bg-white/5 border-zinc-100 dark:border-white/5 text-zinc-600 dark:text-zinc-400 group-hover:border-zinc-300 dark:group-hover:border-white/10'
-                    }`}>
+                        }`}>
                         <IconRenderer iconName={b.icon} size={12} className={isKing ? "text-cyan-400 shrink-0" : "text-cyan-600 dark:text-zen-accent shrink-0"} />
                         <span className="truncate">{b.label}</span>
                     </div>

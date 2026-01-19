@@ -10,7 +10,7 @@ const MotionCircle = motion.circle as any;
 interface Props {
     phase: BreathingPhase;
     timeLeft: number;
-    totalTime: number; 
+    totalTime: number;
     currentRound: number;
     totalRounds: number;
     isActive?: boolean;
@@ -19,18 +19,18 @@ interface Props {
 // Утилита для смешивания цветов
 const lerpColor = (a: string, b: string, amount: number) => {
     const ah = parseInt(a.replace(/#/g, ''), 16),
-          ar = ah >> 16, ag = ah >> 8 & 0xff, ab = ah & 0xff,
-          bh = parseInt(b.replace(/#/g, ''), 16),
-          br = bh >> 16, bg = bh >> 8 & 0xff, bb = bh & 0xff,
-          rr = ar + amount * (br - ar),
-          rg = ag + amount * (bg - ag),
-          rb = ab + amount * (bb - ab);
+        ar = ah >> 16, ag = ah >> 8 & 0xff, ab = ah & 0xff,
+        bh = parseInt(b.replace(/#/g, ''), 16),
+        br = bh >> 16, bg = bh >> 8 & 0xff, bb = bh & 0xff,
+        rr = ar + amount * (br - ar),
+        rg = ag + amount * (bg - ag),
+        rb = ab + amount * (bb - ab);
     return '#' + ((1 << 24) + (rr << 16) + (rg << 8) + rb | 0).toString(16).slice(1);
 }
 
-const AnulomaVilomaInterface: React.FC<Props> = ({ 
-    phase, 
-    timeLeft, 
+const AnulomaVilomaInterface: React.FC<Props> = ({
+    phase,
+    timeLeft,
     totalTime,
     currentRound,
     totalRounds,
@@ -38,9 +38,9 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
 }) => {
     const [isLeftHanded, setIsLeftHanded] = useState(false);
 
-    const isOddRound = currentRound % 2 !== 0; 
-    const STROKE_WIDTH = 24; 
-    
+    const isOddRound = currentRound % 2 !== 0;
+    const STROKE_WIDTH = 24;
+
     // Единый путь: 0.0 (Низ Лев) -> 0.5 (Верх Центр) -> 1.0 (Низ Прав)
     const combinedPath = "M 70 380 C 70 180 70 60 150 60 C 230 60 230 180 230 380";
 
@@ -51,7 +51,7 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
     const COLOR_INHALE = "#22d3ee"; // Cyan
     const COLOR_HOLD = "#a855f7";   // Purple
     const COLOR_EXHALE = "#fbbf24"; // Yellow/Orange
-    const COLOR_GLASS = "rgba(255, 255, 255, 0.05)"; 
+    const COLOR_GLASS = "rgba(255, 255, 255, 0.05)";
 
     // --- Логика Цвета ---
     let activeColor = COLOR_INHALE;
@@ -72,19 +72,19 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
 
     let pathOffset = 0;
     let pathLength = 0;
-    
+
     let mainText = "";
     let subText = "";
-    
+
     let leftLockOpen = false;
     let rightLockOpen = false;
-    
-    const isReadyState = phase === BreathingPhase.Ready; 
+
+    const isReadyState = phase === BreathingPhase.Ready;
     const isDoneState = phase === BreathingPhase.Done;
     let liquidOpacity = 1;
 
     // Спец. переменные для пре-анимации (Ready Phase)
-    let readyProgress = 0; 
+    let readyProgress = 0;
 
     if (isOddRound) {
         // === РАУНД 1, 3, 5: СЛЕВА -> НАПРАВО ===
@@ -94,12 +94,12 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
             leftLockOpen = true;
             pathOffset = 0;
             pathLength = 0.5 * p;
-        } 
+        }
         else if (phase === BreathingPhase.HoldIn) {
             mainText = "Задержка";
             subText = "Держите";
-            const startPos = 0 + (TOP_START * p); 
-            const endPos = 0.5 + ((TOP_END - 0.5) * p); 
+            const startPos = 0 + (TOP_START * p);
+            const endPos = 0.5 + ((TOP_END - 0.5) * p);
             pathOffset = startPos;
             pathLength = endPos - startPos;
         }
@@ -107,8 +107,8 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
             mainText = "Выдох правой";
             subText = "Левая закрыта";
             rightLockOpen = true;
-            const startPos = TOP_START + ((1.0 - TOP_START) * p); 
-            const endPos = TOP_END + ((1.0 - TOP_END) * p); 
+            const startPos = TOP_START + ((1.0 - TOP_START) * p);
+            const endPos = TOP_END + ((1.0 - TOP_END) * p);
             pathOffset = startPos;
             pathLength = Math.max(0, endPos - startPos);
         }
@@ -120,12 +120,12 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
             rightLockOpen = true;
             pathOffset = 1.0 - (0.5 * p);
             pathLength = 0.5 * p;
-        } 
+        }
         else if (phase === BreathingPhase.HoldIn) {
             mainText = "Задержка";
             subText = "Держите";
             const startPos = 0.5 - ((0.5 - TOP_START) * p);
-            const endPos = 1.0 - ((1.0 - TOP_END) * p); 
+            const endPos = 1.0 - ((1.0 - TOP_END) * p);
             pathOffset = startPos;
             pathLength = endPos - startPos;
         }
@@ -134,7 +134,7 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
             subText = "Правая закрыта";
             leftLockOpen = true;
             const startPos = TOP_START - (TOP_START * p);
-            const endPos = TOP_END - (TOP_END * p); 
+            const endPos = TOP_END - (TOP_END * p);
             pathOffset = startPos;
             pathLength = Math.max(0, endPos - startPos);
         }
@@ -158,32 +158,32 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
     const getLockStyle = (isLeft: boolean, isOpen: boolean) => {
         // В фазе готовности подсвечиваем ту ноздрю, с которой начнем
         if (isReadyState) {
-             const targetIsLeft = isOddRound; // Нечетные раунды начинаем слева
-             const isTarget = isLeft === targetIsLeft;
+            const targetIsLeft = isOddRound; // Нечетные раунды начинаем слева
+            const isTarget = isLeft === targetIsLeft;
 
-             if (isTarget) {
-                 // Плавно разгорается
-                 const opacity = 0.2 + (readyProgress * 0.3); 
-                 return {
-                    borderColor: `rgba(34, 211, 238, ${opacity})`, 
+            if (isTarget) {
+                // Плавно разгорается
+                const opacity = 0.2 + (readyProgress * 0.3);
+                return {
+                    borderColor: `rgba(34, 211, 238, ${opacity})`,
                     bg: `rgba(34, 211, 238, ${opacity * 0.2})`,
                     textColor: "text-cyan-400",
                     scale: 1 + (readyProgress * 0.05),
                     icon: 'lock'
-                 };
-             } else {
-                 return {
+                };
+            } else {
+                return {
                     borderColor: "rgba(255,255,255,0.05)",
                     bg: "transparent",
                     textColor: "text-zinc-700",
                     scale: 1,
                     icon: 'lock'
-                 };
-             }
+                };
+            }
         }
 
         if (isDoneState) {
-             return {
+            return {
                 borderColor: "rgba(255,255,255,0.1)",
                 bg: "rgba(255,255,255,0.02)",
                 textColor: "text-zinc-600",
@@ -223,11 +223,11 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
     let circleOpacity = 0;
 
     if (isReadyState) {
-        circleScale = readyProgress * 1.2; 
+        circleScale = readyProgress * 1.2;
         circleOpacity = readyProgress;
     } else if (phase === BreathingPhase.Inhale) {
-        circleScale = 1; 
-        circleOpacity = 1; 
+        circleScale = 1;
+        circleOpacity = 1;
     } else {
         circleScale = 0;
         circleOpacity = 0;
@@ -237,7 +237,7 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
         <div className="w-full flex flex-col items-center justify-center relative min-h-[320px]">
             {/* Reduced container height to pull graphics closer to top label */}
             <div className="relative w-[300px] h-[320px] flex items-center justify-center">
-                
+
                 {/* Updated viewBox: Cropped top from 20 to 40 to bring Third Eye closer to edge */}
                 <svg viewBox="-20 40 340 380" className="absolute inset-0 w-full h-full overflow-visible z-10 pointer-events-none">
                     <defs>
@@ -252,22 +252,22 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
 
                     {/* Стеклянная трубка (фон) */}
                     <path d={combinedPath} stroke={COLOR_GLASS} strokeWidth={STROKE_WIDTH} fill="none" strokeLinecap="round" />
-                    
+
                     {/* === СТАРТОВЫЙ ШАР === */}
-                    <MotionCircle 
-                        cx={startNodeX} 
+                    <MotionCircle
+                        cx={startNodeX}
                         cy="380"
                         r={STROKE_WIDTH / 2}
-                        fill={COLOR_INHALE} 
-                        animate={{ 
-                            opacity: circleOpacity, 
+                        fill={COLOR_INHALE}
+                        animate={{
+                            opacity: circleOpacity,
                             scale: circleScale,
                             filter: isReadyState ? `blur(${10 - readyProgress * 10}px)` : 'blur(0px)'
                         }}
-                        transition={{ 
-                            duration: 0.1, 
-                            ease: "linear" 
-                        }} 
+                        transition={{
+                            duration: 0.1,
+                            ease: "linear"
+                        }}
                         style={{ filter: 'url(#neonGlowAV)', originX: '50%', originY: '50%' }}
                     />
 
@@ -277,14 +277,14 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
                         fill="none"
                         strokeLinecap="round"
                         filter="url(#neonGlowAV)"
-                        animate={{ 
+                        animate={{
                             stroke: activeColor,
                             pathLength: pathLength,
                             pathOffset: pathOffset,
-                            opacity: liquidOpacity 
+                            opacity: liquidOpacity
                         }}
-                        transition={{ 
-                            duration: 0.1, 
+                        transition={{
+                            duration: 0.1,
                             ease: "linear"
                         }}
                         style={{ strokeWidth: STROKE_WIDTH }}
@@ -296,7 +296,7 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
                     {/* Левый замок */}
                     <foreignObject x="30" y="350" width="80" height="90">
                         <div className="flex flex-col items-center justify-center h-full">
-                            <MotionDiv 
+                            <MotionDiv
                                 animate={{
                                     borderColor: leftStyle.borderColor,
                                     backgroundColor: leftStyle.bg,
@@ -314,7 +314,7 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
                     <foreignObject x="110" y="360" width="80" height="60">
                         <AnimatePresence>
                             {(!isActive || isReadyState) && (
-                                <MotionDiv 
+                                <MotionDiv
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
@@ -335,7 +335,7 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
                     {/* Правый замок */}
                     <foreignObject x="190" y="350" width="80" height="90">
                         <div className="flex flex-col items-center justify-center h-full">
-                            <MotionDiv 
+                            <MotionDiv
                                 animate={{
                                     borderColor: rightStyle.borderColor,
                                     backgroundColor: rightStyle.bg,
@@ -351,25 +351,25 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
                 </svg>
 
                 {/* Центр таймер */}
-                <div className="absolute top-[35%] flex flex-col items-center z-50 pointer-events-none">
+                <div className="absolute top-[42%] flex flex-col items-center z-50 pointer-events-none">
                     <span className="text-7xl font-display font-bold text-white tabular-nums mb-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                         {Math.ceil(timeLeft)}
                     </span>
-                    
+
                     <div className="flex flex-col items-center gap-2">
                         {/* PHASE PILL */}
-                        <div className="px-4 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 shadow-lg">
-                            <span className="text-[10px] font-black text-gray-200 uppercase tracking-widest">{mainText}</span>
+                        <div className="px-5 py-2 rounded-full bg-[#0a0a0b]/80 backdrop-blur-xl border border-white/10 shadow-[0_0_20px_-5px_rgba(0,0,0,0.5)]">
+                            <span className="text-[11px] font-black text-gray-100 uppercase tracking-widest">{mainText}</span>
                         </div>
 
                         {/* ROUND COUNTER - MOVED INSIDE */}
                         {!isReadyState && !isDoneState && (
-                            <motion.div 
-                                className="flex items-center gap-1 opacity-60"
-                                animate={{ opacity: [0.4, 0.8, 0.4] }}
+                            <motion.div
+                                className="flex items-center gap-1 opacity-50 mt-1"
+                                animate={{ opacity: [0.3, 0.6, 0.3] }}
                                 transition={{ duration: 4, repeat: Infinity }}
                             >
-                                <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">
+                                <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">
                                     Раунд {currentRound} / {totalRounds === 0 ? '∞' : totalRounds}
                                 </span>
                             </motion.div>

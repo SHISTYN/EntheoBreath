@@ -60,13 +60,26 @@
         padding-bottom: var(--sab);
       }
 
-      /* Стилизация скроллбара */
+      .pt-safe { padding-top: env(safe-area-inset-top); }
+      .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+      .pl-safe { padding-left: env(safe-area-inset-left); }
+      .pr-safe { padding-right: env(safe-area-inset-right); }
+      
+      /* Glass Scrollbar */
       .custom-scrollbar::-webkit-scrollbar {
         width: 4px;
+        height: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
       }
       .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.15);
         border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.3);
       }
 
       /* Анимация Shimmer */
