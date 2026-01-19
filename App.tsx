@@ -35,15 +35,17 @@ const lazyWithRetry = (componentImport: () => Promise<any>) =>
         }
     });
 
-// --- LAZY IMPORTS ---
-const Controls = lazyWithRetry(() => import('./components/Controls'));
-const TimerVisual = lazyWithRetry(() => import('./components/TimerVisual'));
-const AnulomaVilomaInterface = lazyWithRetry(() => import('./components/AnulomaVilomaInterface'));
-const BoxTimerVisual = lazyWithRetry(() => import('./components/BoxTimerVisual'));
-const WimHofInterface = lazyWithRetry(() => import('./components/WimHofInterface'));
+// --- EAGER IMPORTS (CORE) - To fix navigation lag ---
+import Controls from './components/Controls';
+import TimerVisual from './components/TimerVisual';
+import AnulomaVilomaInterface from './components/AnulomaVilomaInterface';
+import BoxTimerVisual from './components/BoxTimerVisual';
+import WimHofInterface from './components/WimHofInterface';
+import LibraryView from './components/LibraryView';
+import TimerSidebar from './components/TimerSidebar';
+
+// --- LAZY IMPORTS (SECONDARY) ---
 const AnalysisModal = lazyWithRetry(() => import('./components/AnalysisModal'));
-const LibraryView = lazyWithRetry(() => import('./components/LibraryView'));
-const TimerSidebar = lazyWithRetry(() => import('./components/TimerSidebar'));
 const MobileFaq = lazyWithRetry(() => import('./components/MobileFaq'));
 
 // --- TYPES ---
@@ -646,7 +648,7 @@ const App: React.FC = () => {
                                 </div>
 
                                 {/* C. BOTTOM STACK - AIR UI (FLOATING ISLANDS) */}
-                                <div className="w-full max-w-md lg:max-w-2xl flex flex-col gap-6 lg:gap-8 mt-auto lg:mt-4 mb-8 lg:mb-safe shrink-0 pb-8 lg:pb-8 transition-all duration-300 self-center">
+                                <div className="w-full max-w-md lg:max-w-2xl flex flex-col gap-6 lg:gap-8 mt-auto lg:mt-4 mb-2 lg:mb-8 shrink-0 pb-safe transition-all duration-300 self-center z-50">
 
                                     {/* 1. DOCK (FLOATING BUTTONS) */}
                                     {/* Removed container background for "Air" feel */}
