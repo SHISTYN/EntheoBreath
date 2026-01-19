@@ -29,7 +29,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
     // Memoize filtering
     const filteredGroupedPatterns = useMemo(() => {
         let patterns = DEFAULT_PATTERNS;
-        
+
         // 1. Tag Filter
         if (selectedTag) {
             const QUICK_FILTERS_MAP: Record<string, string[]> = {
@@ -40,7 +40,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
                 'energy-return': ['energy-return', 'clearing']
             };
             const targetTags = QUICK_FILTERS_MAP[selectedTag] || [selectedTag];
-            patterns = patterns.filter(p => 
+            patterns = patterns.filter(p =>
                 p.tags && p.tags.some(t => targetTags.includes(t))
             );
         }
@@ -48,8 +48,8 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
         // 2. Search Filter
         if (searchQuery) {
             const lowerQuery = searchQuery.toLowerCase();
-            patterns = patterns.filter(p => 
-                p.name.toLowerCase().includes(lowerQuery) || 
+            patterns = patterns.filter(p =>
+                p.name.toLowerCase().includes(lowerQuery) ||
                 p.description.toLowerCase().includes(lowerQuery) ||
                 p.category.toLowerCase().includes(lowerQuery) ||
                 (p.tags && p.tags.some(t => t.toLowerCase().includes(lowerQuery)))
@@ -82,7 +82,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
     // HANDLERS FOR MUTUAL EXCLUSIVITY
     const handleCategoryChange = (cat: string) => {
         setSelectedCategory(cat);
-        setSelectedTag(null); 
+        setSelectedTag(null);
     };
 
     const handleTagSelect = (tag: string | null) => {
@@ -93,10 +93,10 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
     };
 
     return (
-        <div className="animate-fade-in px-4 py-8 md:p-10 pb-48 min-h-[calc(100%+1px)]">
+        <div className="animate-fade-in px-4 py-8 md:p-10 pb-24 min-h-[calc(100%+1px)]">
             <div className="max-w-[1600px] mx-auto">
-                
-                <LibraryHeader 
+
+                <LibraryHeader
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
                     selectedCategory={selectedCategory}
@@ -120,12 +120,12 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
                         </div>
                     </div>
                 )}
-                
+
                 {/* GRID SECTION */}
                 <div className="space-y-16 mt-8">
                     {(Object.entries(filteredGroupedPatterns) as [string, BreathingPattern[]][]).map(([category, patterns], catIdx) => (
                         <div key={category} className="animate-fade-in-up" style={{ animationDelay: `${catIdx * 100}ms` }}>
-                            
+
                             {/* Category Title - Hide for AuthorChoice as we have a custom header above */}
                             {category !== 'AuthorChoice' && (
                                 <div className="flex items-center gap-4 mb-8 px-2">
@@ -137,13 +137,13 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
                                     </h3>
                                 </div>
                             )}
-                            
+
                             {/* Cards Grid */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                 {patterns.map((p) => (
-                                    <TechniqueCard 
-                                        key={p.id} 
-                                        pattern={p} 
+                                    <TechniqueCard
+                                        key={p.id}
+                                        pattern={p}
                                         onClick={() => selectPattern(p)}
                                         isFavorite={favorites.includes(p.id)}
                                         onToggleFavorite={toggleFavorite}
@@ -173,21 +173,21 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
                     )}
                 </div>
             </div>
-            
+
             {/* FOOTER - STEALTH LINKS */}
             <footer className="mt-24 pb-10 text-center animate-fade-in text-gray-500 dark:text-gray-500 border-t border-gray-100 dark:border-white/5 pt-10">
                 <div className="flex flex-col items-center gap-6">
                     <div className="text-xs font-bold tracking-[0.2em] opacity-70 uppercase flex items-center gap-2">
-                        СОЗДАНО С 
-                        <a 
-                            href="https://t.me/+D78P1fpaduBlOTc6" 
-                            target="_blank" 
+                        СОЗДАНО С
+                        <a
+                            href="https://t.me/+D78P1fpaduBlOTc6"
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="inline-block transition-transform hover:scale-110 cursor-pointer group"
                             title="Love Is All Love"
                         >
                             <Heart size={14} className="text-orange-500 fill-orange-500 animate-pulse group-hover:scale-125 transition-transform" />
-                        </a> 
+                        </a>
                         — <a href="https://t.me/nikolaiovchinnikov" target="_blank" rel="noopener noreferrer" className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-300 transition-colors border-b border-transparent hover:border-cyan-500 cursor-pointer">НИКОЛАЙ ОВЧИННИКОВ</a>
                     </div>
                 </div>

@@ -81,7 +81,7 @@ const LiquidInput: React.FC<{
             </div>
 
             {/* Glass Island Container */}
-            <div className="relative flex items-stretch w-full h-16 md:h-20 rounded-2xl md:rounded-3xl overflow-hidden shadow-lg transition-all duration-300 bg-[#0a0a0b]/60 backdrop-blur-2xl group-hover:shadow-[0_0_30px_-10px_rgba(255,255,255,0.15)] border border-white/10 ring-1 ring-white/5">
+            <div className="relative flex items-stretch w-full h-16 md:h-20 rounded-2xl md:rounded-3xl overflow-hidden shadow-lg transition-all duration-300 bg-white/40 dark:bg-[#0a0a0b]/60 backdrop-blur-2xl group-hover:shadow-[0_0_30px_-10px_rgba(34,211,238,0.15)] border border-black/5 dark:border-white/10 ring-1 ring-black/5 dark:ring-white/5">
 
                 {/* Glow */}
                 <div
@@ -199,7 +199,7 @@ const Controls: React.FC<ControlsProps> = ({ pattern, onChange, rounds, onRounds
                 {/* Custom Presets Selector */}
                 {pattern.presets && pattern.presets.length > 0 && (
                     <div className="relative flex-grow min-w-0">
-                        <div className="grid grid-cols-[44px_1fr_44px] items-center bg-[#0a0a0b]/80 backdrop-blur-xl border border-white/10 rounded-2xl h-14 hover:border-white/20 transition-colors shadow-lg ring-1 ring-white/5">
+                        <div className="grid grid-cols-[44px_1fr_44px] items-center bg-white/40 dark:bg-[#0a0a0b]/80 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-2xl h-14 hover:border-black/10 dark:hover:border-white/20 transition-colors shadow-lg ring-1 ring-black/5 dark:ring-white/5">
 
                             <button
                                 onClick={() => pattern.presets && applyPreset(currentPresetIndex > 0 ? currentPresetIndex - 1 : 0)}
@@ -300,7 +300,7 @@ const Controls: React.FC<ControlsProps> = ({ pattern, onChange, rounds, onRounds
 
                 {/* Rounds Selector */}
                 {pattern.mode !== 'stopwatch' && pattern.mode !== 'wim-hof' && (
-                    <div className="flex items-center gap-1 bg-[#0a0a0b]/80 backdrop-blur-xl border border-white/10 rounded-2xl px-1 h-14 hover:border-white/20 transition-colors shrink-0 shadow-lg ring-1 ring-white/5">
+                    <div className="flex items-center gap-1 bg-white/40 dark:bg-[#0a0a0b]/80 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-2xl px-1 h-14 hover:border-black/10 dark:hover:border-white/20 transition-colors shrink-0 shadow-lg ring-1 ring-black/5 dark:ring-white/5">
                         <button onClick={() => onRoundsChange(Math.max(0, rounds - 1))} className="w-10 h-full flex items-center justify-center text-zinc-500 hover:text-white transition-colors active:scale-90"><Minus size={18} /></button>
                         <div className="flex flex-col items-center w-10 justify-center min-h-[20px]">
                             {rounds === 0 ? (
