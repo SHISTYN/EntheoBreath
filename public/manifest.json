@@ -1,4 +1,3 @@
-
 {
   "name": "EntheoBreath: Дыхание и Биохакинг",
   "short_name": "EntheoBreath",
@@ -10,9 +9,14 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/favicon.svg",
-      "type": "image/svg+xml",
-      "sizes": "any"
+      "src": "/pwa-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
     }
   ]
 }
