@@ -526,7 +526,7 @@ const App: React.FC = () => {
             <main className="flex-1 flex flex-col w-full relative z-10 overflow-hidden h-full pt-safe">
 
                 {view === 'library' && (
-                    <div className="flex-1 overflow-y-auto custom-scrollbar alive-scroll pt-24 overscroll-y-none">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar alive-scroll pt-24 pb-40 overscroll-y-none">
                         <Suspense fallback={<LoadingFallback />}>
                             <LibraryView selectPattern={selectPattern} favorites={favorites} toggleFavorite={toggleFavorite} />
                         </Suspense>
@@ -666,86 +666,86 @@ const App: React.FC = () => {
                                     </Suspense>
                                 </div>
 
-                                {/* C. BOTTOM STACK - AIR UI (FLOATING ISLANDS) */}
-                                <div className="w-full max-w-md lg:max-w-2xl flex flex-col gap-6 lg:gap-8 mt-auto shrink-0 transition-all duration-300 self-center z-50">
+                                {/* C. BOTTOM STACK - AIR UI (FLOATING OVERLAY) */}
+                                <div className="absolute bottom-0 left-0 right-0 w-full flex flex-col items-center gap-6 lg:gap-8 pb-4 lg:pb-8 transition-all duration-300 z-50 pointer-events-none">
+                                    {/* Wrapper to restore pointer events for buttons */}
+                                    <div className="w-full max-w-md lg:max-w-2xl px-4 flex flex-col gap-4 pointer-events-auto">
 
-                                    {/* 1. DOCK (FLOATING BUTTONS) */}
-                                    {/* Removed container background for "Air" feel */}
-                                    {!isWimHof && (
-                                        <div className="flex justify-center transition-all duration-300 relative z-20 gap-6">
-                                            {/* RESET */}
-                                            <button
-                                                onClick={resetTimer}
-                                                className="w-14 h-14 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-all shadow-[0_4px_20px_rgba(0,0,0,0.2)] hover:shadow-[0_0_30px_-5px_rgba(255,255,255,0.2)] hover:border-white/20 active:scale-90 hover:bg-white/10"
-                                                title="Сброс"
-                                            >
-                                                <RotateCcw size={20} />
-                                            </button>
+                                        {/* 1. DOCK (FLOATING BUTTONS) */}
+                                        {/* Removed container background for "Air" feel */}
+                                        {!isWimHof && (
+                                            <div className="flex justify-center transition-all duration-300 relative z-20 gap-6">
+                                                {/* RESET */}
+                                                <button
+                                                    onClick={resetTimer}
+                                                    className="w-14 h-14 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-all shadow-[0_4px_20px_rgba(0,0,0,0.2)] hover:shadow-[0_0_30px_-5px_rgba(255,255,255,0.2)] hover:border-white/20 active:scale-90 hover:bg-white/10"
+                                                    title="Сброс"
+                                                >
+                                                    <RotateCcw size={20} />
+                                                </button>
 
-                                            {/* MAIN ACTION - GLOWING ISLAND */}
-                                            <button
-                                                onClick={toggleTimer}
-                                                className="w-24 h-16 rounded-3xl flex items-center justify-center bg-white text-black shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_-5px_rgba(255,255,255,0.5)] transition-all active:scale-95 border-2 border-white/50 active:shadow-none hover:scale-105"
-                                            >
-                                                {showPlayIcon ? <Play size={28} fill="black" className="ml-1" /> : <Pause size={28} fill="black" />}
-                                            </button>
+                                                {/* MAIN ACTION - GLOWING ISLAND */}
+                                                <button
+                                                    onClick={toggleTimer}
+                                                    className="w-24 h-16 rounded-3xl flex items-center justify-center bg-white text-black shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_-5px_rgba(255,255,255,0.5)] transition-all active:scale-95 border-2 border-white/50 active:shadow-none hover:scale-105"
+                                                >
+                                                    {showPlayIcon ? <Play size={28} fill="black" className="ml-1" /> : <Pause size={28} fill="black" />}
+                                                </button>
 
-                                            {/* ZEN MODE */}
-                                            <button
-                                                onClick={() => setZenMode(!isZenMode)}
-                                                className="w-14 h-14 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-all shadow-[0_4px_20px_rgba(0,0,0,0.2)] hover:shadow-[0_0_30px_-5px_rgba(255,255,255,0.2)] hover:border-white/20 active:scale-90 hover:bg-white/10"
-                                                title={isZenMode ? "Показать меню" : "Дзен режим"}
-                                            >
-                                                {isZenMode ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
-                                            </button>
+                                                {/* ZEN MODE */}
+                                                <button
+                                                    onClick={() => setZenMode(!isZenMode)}
+                                                    className="w-14 h-14 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-all shadow-[0_4px_20px_rgba(0,0,0,0.2)] hover:shadow-[0_0_30px_-5px_rgba(255,255,255,0.2)] hover:border-white/20 active:scale-90 hover:bg-white/10"
+                                                    title={isZenMode ? "Показать меню" : "Дзен режим"}
+                                                >
+                                                    {isZenMode ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
+                                                </button>
+                                            </div>
+                                        )}
+
+                                        {/* 2. CONTROLS (SLIDE IN/OUT) */}
+                                        <div className={`transition-all duration-500 ease-in-out w-full overflow-hidden ${isSetupControlsVisible ? 'opacity-100 max-h-[600px]' : 'opacity-0 max-h-0'}`}>
+                                            {!isWimHof && !isHolotropic && (
+                                                <div className="flex flex-col gap-6 pt-2">
+                                                    {!isManual && executionMode === 'timer' && (
+                                                        <Suspense fallback={null}>
+                                                            <Controls
+                                                                pattern={{ ...activePattern, mode: activePattern.mode }}
+                                                                onChange={handlePatternChange}
+                                                                rounds={rounds}
+                                                                onRoundsChange={setRounds}
+                                                                readOnly={false}
+                                                            />
+                                                        </Suspense>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
 
-                                    {/* 2. CONTROLS (SLIDE IN/OUT) */}
-                                    <div className={`transition-all duration-500 ease-in-out w-full overflow-hidden ${isSetupControlsVisible ? 'opacity-100 max-h-[600px]' : 'opacity-0 max-h-0'}`}>
-                                        {!isWimHof && !isHolotropic && (
-                                            <div className="flex flex-col gap-6 pt-2">
-                                                {!isManual && executionMode === 'timer' && (
-                                                    <Suspense fallback={null}>
-                                                        <Controls
-                                                            pattern={{ ...activePattern, mode: activePattern.mode }}
-                                                            onChange={handlePatternChange}
-                                                            rounds={rounds}
-                                                            onRoundsChange={setRounds}
-                                                            readOnly={false}
-                                                        />
-                                                    </Suspense>
-                                                )}
+                                        {/* 3. HISTORY */}
+                                        {currentPatternHistory.length > 0 && (
+                                            <div className="w-full bg-white/5 border border-white/10 rounded-3xl p-5 mt-2 backdrop-blur-md shadow-lg">
+                                                <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
+                                                    <div className="flex items-center gap-2 text-zinc-400"><History size={14} /><span className="text-[10px] font-bold uppercase tracking-widest">История</span></div>
+                                                </div>
+                                                <div className="space-y-2 max-h-[160px] overflow-y-auto custom-scrollbar">
+                                                    {currentPatternHistory.map((item) => (
+                                                        <div key={item.id} className="flex items-center justify-between p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+                                                            <span className="text-xs font-bold text-zinc-200">{formatDate(item.date)}</span>
+                                                            <span className="text-xs font-mono font-bold text-cyan-400">{formatDuration(item.durationSeconds)}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
                                         )}
                                     </div>
-
-                                    {/* 3. HISTORY */}
-                                    {currentPatternHistory.length > 0 && (
-                                        <div className="w-full bg-white/5 border border-white/10 rounded-3xl p-5 mt-2 backdrop-blur-md shadow-lg">
-                                            <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
-                                                <div className="flex items-center gap-2 text-zinc-400"><History size={14} /><span className="text-[10px] font-bold uppercase tracking-widest">История</span></div>
-                                            </div>
-                                            <div className="space-y-2 max-h-[160px] overflow-y-auto custom-scrollbar">
-                                                {currentPatternHistory.map((item) => (
-                                                    <div key={item.id} className="flex items-center justify-between p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
-                                                        <span className="text-xs font-bold text-zinc-200">{formatDate(item.date)}</span>
-                                                        <span className="text-xs font-mono font-bold text-cyan-400">{formatDuration(item.durationSeconds)}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
 
                             </div>
-                        </div>
-
-                    </div>
                 )}
-            </main>
-        </div>
-    );
+                        </main>
+                    </div>
+                );
 };
 
-export default App;
+                export default App;
