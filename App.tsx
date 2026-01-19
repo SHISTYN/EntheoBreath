@@ -496,7 +496,7 @@ const App: React.FC = () => {
     const remainingSeconds = calculateRemainingTime();
 
     return (
-        <div className="w-full flex flex-col h-[100dvh] font-sans text-zinc-900 dark:text-gray-100 transition-colors duration-500 overflow-hidden relative overscroll-none">
+        <div className="w-full flex flex-col h-[100dvh] font-sans bg-black text-zinc-900 dark:text-gray-100 transition-colors duration-500 overflow-hidden relative overscroll-none">
 
             <SplashScreen isLoading={isLoadingApp} />
             <AppBackground theme={theme} />
@@ -513,7 +513,7 @@ const App: React.FC = () => {
             <main className="flex-1 flex flex-col w-full relative z-10 overflow-hidden h-full pt-safe">
 
                 {view === 'library' && (
-                    <div className="flex-1 overflow-y-auto custom-scrollbar alive-scroll pt-24 pb-safe overscroll-y-none">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar alive-scroll pt-24 pb-4 overscroll-y-none">
                         <Suspense fallback={<LoadingFallback />}>
                             <LibraryView selectPattern={selectPattern} favorites={favorites} toggleFavorite={toggleFavorite} />
                         </Suspense>
