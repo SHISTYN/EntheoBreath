@@ -175,7 +175,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
             </div>
 
             {/* FOOTER - STEALTH LINKS */}
-            <footer className="mt-8 pb-6 text-center animate-fade-in text-gray-500 dark:text-gray-500 border-t border-gray-100 dark:border-white/5 pt-6">
+            <footer className="mt-8 pb-4 text-center animate-fade-in text-gray-500 dark:text-gray-500 pt-2">
                 <div className="flex flex-col items-center gap-6">
                     <div className="text-xs font-bold tracking-[0.2em] opacity-70 uppercase flex items-center gap-2">
                         СОЗДАНО С

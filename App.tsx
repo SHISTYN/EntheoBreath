@@ -667,7 +667,7 @@ const App: React.FC = () => {
                                 </div>
 
                                 {/* C. BOTTOM STACK - AIR UI (FLOATING ISLANDS) */}
-                                <div className="w-full max-w-md lg:max-w-2xl flex flex-col gap-6 lg:gap-8 mt-auto lg:mt-4 mb-2 lg:mb-8 shrink-0 pb-2 transition-all duration-300 self-center z-50">
+                                <div className="w-full max-w-md lg:max-w-2xl flex flex-col gap-6 lg:gap-8 mt-auto shrink-0 transition-all duration-300 self-center z-50">
 
                                     {/* 1. DOCK (FLOATING BUTTONS) */}
                                     {/* Removed container background for "Air" feel */}
