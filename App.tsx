@@ -526,7 +526,7 @@ const App: React.FC = () => {
             <main className="flex-1 flex flex-col w-full relative z-10 overflow-hidden h-full pt-safe">
 
                 {view === 'library' && (
-                    <div className="flex-1 overflow-y-auto custom-scrollbar alive-scroll pt-24 pb-4 overscroll-y-none">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar alive-scroll pt-24 overscroll-y-none">
                         <Suspense fallback={<LoadingFallback />}>
                             <LibraryView selectPattern={selectPattern} favorites={favorites} toggleFavorite={toggleFavorite} />
                         </Suspense>
