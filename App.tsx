@@ -493,6 +493,19 @@ const App: React.FC = () => {
         return remaining;
     };
 
+    // --- THEME SYNC (Fix for Black Strip in Light Mode) ---
+    useEffect(() => {
+        const bg = theme === 'dark' ? '#000000' : '#F5F5F7';
+        document.body.style.backgroundColor = bg;
+        document.documentElement.style.backgroundColor = bg;
+
+        // Update PWA Theme Color
+        const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        if (metaThemeColor) {
+            metaThemeColor.setAttribute('content', bg);
+        }
+    }, [theme]);
+
     const remainingSeconds = calculateRemainingTime();
 
     return (
