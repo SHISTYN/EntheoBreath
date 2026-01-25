@@ -580,7 +580,7 @@ const App: React.FC = () => {
                                 </div>
                             )}
 
-                            <div className="flex-1 w-full flex flex-col p-4 relative z-10 overflow-y-auto custom-scrollbar overscroll-y-none">
+                            <div className="flex-1 w-full flex flex-col p-4 relative z-10 overflow-y-auto custom-scrollbar overscroll-y-none pb-32">
 
                                 {/* A. TOP HUD (Floating Island) */}
                                 {!isWimHof && (
@@ -667,7 +667,7 @@ const App: React.FC = () => {
                                 </div>
 
                                 {/* C. BOTTOM STACK - AIR UI (FLOATING OVERLAY) */}
-                                <div className="absolute bottom-0 left-0 right-0 w-full flex flex-col items-center gap-6 lg:gap-8 pb-4 lg:pb-8 transition-all duration-300 z-50 pointer-events-none">
+                                <div className="absolute bottom-0 left-0 right-0 w-full flex flex-col items-center gap-6 lg:gap-8 pb-4 lg:pb-8 transition-all duration-300 z-50 pointer-events-none pb-safe">
                                     {/* Wrapper to restore pointer events for buttons */}
                                     <div className="w-full max-w-md lg:max-w-2xl px-4 flex flex-col gap-4 pointer-events-auto">
 
