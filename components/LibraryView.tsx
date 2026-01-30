@@ -15,13 +15,35 @@ const POWER_PACK_IDS = [
     '4-7-8',               // 5. Sleep King
 ];
 
+// English → Russian search aliases for international users
+const ENGLISH_ALIASES: Record<string, string[]> = {
+    'box': ['квадратное', 'box-breathing'],
+    'wim hof': ['вим хоф', 'wim-hof'],
+    'buteyko': ['бутейко'],
+    'tummo': ['туммо', 'внутренний огонь'],
+    'holotropic': ['холотропное'],
+    'pranayama': ['пранаяма'],
+    'kapalabhati': ['капалабхати'],
+    'ujjayi': ['уджайи'],
+    'bhastrika': ['бхастрика'],
+    'nadi shodhana': ['нади шодхана'],
+    'anuloma': ['анулома'],
+    'coherent': ['когерентное'],
+    '4-7-8': ['4-7-8'],
+    'qigong': ['цигун'],
+    'tao': ['дао', 'даосск'],
+    'toltec': ['толтек'],
+};
+
 interface LibraryViewProps {
     selectPattern: (p: BreathingPattern) => void;
     favorites: string[];
     toggleFavorite: (id: string) => void;
+    isPro: boolean;
+    onShowPaywall: () => void;
 }
 
-const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, toggleFavorite }) => {
+const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, toggleFavorite, isPro, onShowPaywall }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
     const [selectedTag, setSelectedTag] = useState<string | null>(null);
@@ -45,14 +67,26 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
             );
         }
 
-        // 2. Search Filter
+        // 2. Search Filter (with English aliases support)
         if (searchQuery) {
             const lowerQuery = searchQuery.toLowerCase();
+
+            // Get Russian aliases for English terms
+            const aliasQueries: string[] = [lowerQuery];
+            for (const [eng, rus] of Object.entries(ENGLISH_ALIASES)) {
+                if (lowerQuery.includes(eng)) {
+                    aliasQueries.push(...rus);
+                }
+            }
+
             patterns = patterns.filter(p =>
-                p.name.toLowerCase().includes(lowerQuery) ||
-                p.description.toLowerCase().includes(lowerQuery) ||
-                p.category.toLowerCase().includes(lowerQuery) ||
-                (p.tags && p.tags.some(t => t.toLowerCase().includes(lowerQuery)))
+                aliasQueries.some(q =>
+                    p.name.toLowerCase().includes(q) ||
+                    p.description.toLowerCase().includes(q) ||
+                    p.category.toLowerCase().includes(q) ||
+                    p.id.toLowerCase().includes(q) ||
+                    (p.tags && p.tags.some(t => t.toLowerCase().includes(q)))
+                )
             );
         }
 
@@ -140,16 +174,24 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
 
                             {/* Cards Grid */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {patterns.map((p) => (
-                                    <TechniqueCard
-                                        key={p.id}
-                                        pattern={p}
-                                        onClick={() => selectPattern(p)}
-                                        isFavorite={favorites.includes(p.id)}
-                                        onToggleFavorite={toggleFavorite}
-                                        searchQuery={searchQuery} // Pass highlight query
-                                    />
-                                ))}
+                                {patterns.map((p) => {
+                                    // 🔒 PREMIUM LOGIC
+                                    // Lock 'wim-hof-session' (King), 'buteyko', 'tummo'
+                                    const LOCKED_IDS = ['wim-hof-session', 'buteyko', 'tummo-inner-fire'];
+                                    const isLocked = !isPro && LOCKED_IDS.includes(p.id);
+
+                                    return (
+                                        <TechniqueCard
+                                            key={p.id}
+                                            pattern={p}
+                                            onClick={() => isLocked ? onShowPaywall() : selectPattern(p)}
+                                            isFavorite={favorites.includes(p.id)}
+                                            onToggleFavorite={toggleFavorite}
+                                            searchQuery={searchQuery}
+                                            isLocked={isLocked}
+                                        />
+                                    );
+                                })}
                             </div>
                         </div>
                     ))}
@@ -175,7 +217,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
             </div>
 
             {/* FOOTER - STEALTH LINKS */}
-            <footer className="mt-8 pb-4 text-center animate-fade-in text-gray-500 dark:text-gray-500 pt-2">
+            <footer className="mt-8 pb-[calc(1rem+env(safe-area-inset-bottom))] text-center animate-fade-in text-gray-500 dark:text-gray-500 pt-2">
                 <div className="flex flex-col items-center gap-6">
                     <div className="text-xs font-bold tracking-[0.2em] opacity-70 uppercase flex items-center gap-2">
                         СОЗДАНО С

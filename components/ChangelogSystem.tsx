@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, Sparkles, Zap, Wrench, Palette, Star, Activity, AudioWaveform } from 'lucide-react';
-import { CHANGELOG } from '../data/changelog';
+import AutoChangelog from '../data/changelog-auto.json';
 
 const MotionDiv = motion.div as any;
 
@@ -19,7 +19,7 @@ const ChangelogSystem: React.FC<Props> = ({ isOpenManual, onCloseManual }) => {
         setMounted(true);
         return () => setMounted(false);
     }, []);
-    
+
     // Close on escape
     useEffect(() => {
         const handleEsc = (e: KeyboardEvent) => {
@@ -33,16 +33,14 @@ const ChangelogSystem: React.FC<Props> = ({ isOpenManual, onCloseManual }) => {
         window.open('https://t.me/nikolaiovchinnikov', '_blank');
     };
 
-    const getFeatureIcon = (type: string) => {
-        switch (type) {
-            case 'new': return <Zap size={14} className="text-amber-400" />;
-            case 'magic': return <Sparkles size={14} className="text-purple-400" />;
-            case 'polish': return <Palette size={14} className="text-cyan-400" />;
-            case 'fix': return <Wrench size={14} className="text-gray-400" />;
-            case 'audio': return <AudioWaveform size={14} className="text-rose-400" />;
-            case 'perf': return <Activity size={14} className="text-emerald-400" />;
-            default: return <Star size={14} className="text-white/50" />;
+    // Helper for rendering icons directly from JSON or fallback
+    const renderIcon = (type: any) => {
+        // If type is object from auto-json
+        if (typeof type === 'object' && type.icon) {
+            return <span className="text-base leading-none">{type.icon}</span>;
         }
+        // Fallback or legacy logic could go here
+        return <span className="text-base leading-none">🔨</span>;
     };
 
     // The Modal Content
@@ -50,20 +48,20 @@ const ChangelogSystem: React.FC<Props> = ({ isOpenManual, onCloseManual }) => {
         <AnimatePresence>
             {isOpenManual && (
                 <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-6 overflow-hidden">
-                    
-                    {/* Backdrop (Dark Deep Liquid Blur) */}
-                    <MotionDiv 
-                        initial={{ opacity: 0 }} 
-                        animate={{ opacity: 1 }} 
+
+                    {/* Backdrop */}
+                    <MotionDiv
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onCloseManual}
                         className="absolute inset-0 bg-black/60 backdrop-blur-3xl transition-all duration-500"
                     />
-                    
-                    {/* LIQUID GLASS CARD */}
-                    <MotionDiv 
-                        initial={{ scale: 0.9, opacity: 0, y: 40 }} 
-                        animate={{ scale: 1, opacity: 1, y: 0 }} 
+
+                    {/* CARD */}
+                    <MotionDiv
+                        initial={{ scale: 0.9, opacity: 0, y: 40 }}
+                        animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.9, opacity: 0, y: 40 }}
                         transition={{ type: "spring", stiffness: 350, damping: 28 }}
                         className="
@@ -80,15 +78,14 @@ const ChangelogSystem: React.FC<Props> = ({ isOpenManual, onCloseManual }) => {
                         <div className="flex items-center justify-between px-6 py-6 md:px-8 shrink-0 bg-gradient-to-b from-white/5 to-transparent border-b border-white/5 relative z-10">
                             <div>
                                 <h2 className="text-2xl md:text-3xl font-display font-bold text-white tracking-tight drop-shadow-md">
-                                    История Версий
+                                    История Развития
                                 </h2>
                                 <p className="text-white/40 text-xs md:text-sm mt-1 font-medium tracking-wide">
-                                    Путь развития EntheoBreath
+                                    Автоматический лог обновлений (GitHub)
                                 </p>
                             </div>
-                            
-                            {/* Close Button */}
-                            <button 
+
+                            <button
                                 onClick={onCloseManual}
                                 className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-center text-white/70 hover:text-white transition-all hover:rotate-90 active:scale-90"
                             >
@@ -98,11 +95,11 @@ const ChangelogSystem: React.FC<Props> = ({ isOpenManual, onCloseManual }) => {
 
                         {/* --- CONTENT SCROLL --- */}
                         <div className="overflow-y-auto custom-scrollbar flex-1 p-6 md:p-8 space-y-12 bg-gradient-to-b from-transparent to-black/40 relative z-0">
-                            {CHANGELOG.map((release, idx) => (
-                                <div key={release.version} className="relative pl-6 sm:pl-8 group">
-                                    
+                            {AutoChangelog.map((release, idx) => (
+                                <div key={release.date} className="relative pl-6 sm:pl-8 group">
+
                                     {/* Timeline Line */}
-                                    {idx !== CHANGELOG.length - 1 && (
+                                    {idx !== AutoChangelog.length - 1 && (
                                         <div className="absolute left-[7px] top-3 bottom-[-60px] w-[2px] bg-gradient-to-b from-white/10 to-transparent rounded-full" />
                                     )}
 
@@ -116,33 +113,33 @@ const ChangelogSystem: React.FC<Props> = ({ isOpenManual, onCloseManual }) => {
                                         {/* Version Row */}
                                         <div className="flex items-center gap-3 flex-wrap">
                                             <span className={`text-xl md:text-2xl font-display font-bold tracking-wide ${idx === 0 ? 'text-white' : 'text-white/60'}`}>
-                                                v{release.version}
+                                                {release.version}
                                             </span>
-                                            {/* DATE PILL - CLEAN STYLE */}
-                                            <span className="text-[10px] md:text-xs font-bold px-2.5 py-0.5 rounded-md uppercase tracking-wider bg-white/10 text-white/80 border border-white/5">
+                                            {/* Hash/Date Pill */}
+                                            <span className="text-[10px] md:text-xs font-bold px-2.5 py-0.5 rounded-md uppercase tracking-wider bg-white/10 text-white/80 border border-white/5 font-mono">
                                                 {release.date}
                                             </span>
                                         </div>
-                                        
-                                        {/* Title & Card */}
-                                        <div>
-                                            <h3 className={`text-sm md:text-lg font-bold mb-3 ${idx === 0 ? 'text-white' : 'text-white/80'}`}>
-                                                {release.title}
-                                            </h3>
-                                            
-                                            <div className="bg-white/5 border border-white/5 rounded-2xl p-4 md:p-5 hover:bg-white/10 transition-colors duration-300">
-                                                <div className="space-y-3">
-                                                    {release.features.map((feat, fIdx) => (
-                                                        <div key={fIdx} className="flex items-start gap-3 text-xs md:text-sm text-gray-300 leading-relaxed group/item">
-                                                            <div className="mt-0.5 p-1.5 rounded-lg bg-black/40 border border-white/5 shrink-0 group-hover/item:bg-black/60 transition-colors">
-                                                                {getFeatureIcon(feat.type)}
-                                                            </div>
-                                                            <span className="opacity-80 group-hover/item:opacity-100 transition-opacity pt-0.5">
-                                                                {feat.text}
+
+                                        {/* Changes Card */}
+                                        <div className="bg-white/5 border border-white/5 rounded-2xl p-4 md:p-5 hover:bg-white/10 transition-colors duration-300">
+                                            <div className="space-y-4">
+                                                {release.changes.map((change, cIdx) => (
+                                                    <div key={cIdx} className="flex items-start gap-3 text-xs md:text-sm text-gray-300 leading-relaxed group/item">
+                                                        <div className="mt-0.5 w-6 h-6 flex items-center justify-center rounded-lg bg-black/40 border border-white/5 shrink-0 group-hover/item:bg-black/60 transition-colors">
+                                                            {renderIcon(change.type)}
+                                                        </div>
+                                                        <div className="flex flex-col gap-0.5">
+                                                            <span className="opacity-90 group-hover/item:opacity-100 transition-opacity">
+                                                                {change.text}
+                                                            </span>
+                                                            {/* Commit Hash - Stealth Mode */}
+                                                            <span className="text-[10px] font-mono text-white/20 group-hover/item:text-cyan-500/50 transition-colors">
+                                                                #{change.hash}
                                                             </span>
                                                         </div>
-                                                    ))}
-                                                </div>
+                                                    </div>
+                                                ))}
                                             </div>
                                         </div>
                                     </div>
@@ -152,7 +149,7 @@ const ChangelogSystem: React.FC<Props> = ({ isOpenManual, onCloseManual }) => {
 
                         {/* --- FOOTER ACTION (DARK LIQUID GLASS BUTTON) --- */}
                         <div className="p-6 md:p-8 bg-[#0a0a0b]/80 border-t border-white/5 shrink-0 backdrop-blur-xl relative z-10">
-                            <button 
+                            <button
                                 onClick={handleSendIdea}
                                 className="
                                     w-full py-4 rounded-2xl 

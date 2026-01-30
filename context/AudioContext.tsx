@@ -267,7 +267,7 @@ export const AudioProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         tickSynthRef.current.volume.value = -4;
 
         setIsReady(true);
-        console.log('🔊 Tone.js Engine Started (Full Suite)');
+
     };
 
     // --- GLOBAL FADE LOGIC ---
@@ -481,7 +481,7 @@ export const AudioProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             const { filter, gain } = windNodesRef.current;
             const newFreq = 0.05 + (windIntensity * 0.55);
             filter.frequency.rampTo(newFreq, 3);
-            filter.max = 600 + (windIntensity * 800);
+            (filter as any).max = 600 + (windIntensity * 800);
             filter.octaves = 2.5 + (windIntensity * 1.5);
             const targetVol = 0.2 + (windIntensity * 0.3);
             gain.gain.rampTo(targetVol, 2);

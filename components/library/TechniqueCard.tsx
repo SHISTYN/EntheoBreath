@@ -11,6 +11,7 @@ interface TechniqueCardProps {
     isFavorite?: boolean;
     onToggleFavorite?: (id: string) => void;
     searchQuery?: string;
+    isLocked?: boolean;
 }
 
 // --- HIGHLIGHTER UTILITY ---
@@ -39,7 +40,8 @@ const TechniqueCard: React.FC<TechniqueCardProps> = React.memo(({
     onClick,
     isFavorite = false,
     onToggleFavorite,
-    searchQuery = ""
+    searchQuery = "",
+    isLocked = false
 }) => {
     // 👑 THE KING CHECK
     const isKing = pattern.id === 'wim-hof-session';
@@ -98,7 +100,7 @@ const TechniqueCard: React.FC<TechniqueCardProps> = React.memo(({
                 </>
             )}
 
-            {/* Favorite Button */}
+            {/* Favorite Button (Hide if locked? No, let them fave it) */}
             <button
                 onClick={handleFavoriteClick}
                 className="absolute top-3 right-3 z-30 p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-all active:scale-90"
@@ -108,6 +110,17 @@ const TechniqueCard: React.FC<TechniqueCardProps> = React.memo(({
                     className={`transition-colors duration-300 ${isFavorite ? 'fill-rose-500 text-rose-500' : 'text-zinc-300 dark:text-zinc-600 hover:text-rose-500'}`}
                 />
             </button>
+
+            {/* 🔒 LOCK OVERLAY */}
+            {isLocked && (
+                <div className="absolute inset-0 z-40 bg-black/40 backdrop-blur-[2px] flex items-center justify-center rounded-3xl group-hover:bg-black/30 transition-colors">
+                    <div className="bg-black/60 p-3 rounded-full border border-white/20 shadow-xl backdrop-blur-md transform group-hover:scale-110 transition-transform">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+                            <Crown size={18} className="text-white" />
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Header */}
             <div className="flex flex-col gap-1.5 mb-2 pr-8 relative z-20">
@@ -137,8 +150,8 @@ const TechniqueCard: React.FC<TechniqueCardProps> = React.memo(({
             <div className="grid grid-cols-2 gap-1.5 mb-3 mt-auto relative z-20 w-full">
                 {pattern.benefits && pattern.benefits.slice(0, 4).map((b, i) => (
                     <div key={i} className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide px-2 py-1.5 rounded border overflow-hidden transition-colors ${isKing
-                            ? 'bg-white/5 border-white/10 text-gray-300 group-hover:border-cyan-500/30'
-                            : 'bg-zinc-50 dark:bg-white/5 border-zinc-100 dark:border-white/5 text-zinc-600 dark:text-zinc-400 group-hover:border-zinc-300 dark:group-hover:border-white/10'
+                        ? 'bg-white/5 border-white/10 text-gray-300 group-hover:border-cyan-500/30'
+                        : 'bg-zinc-50 dark:bg-white/5 border-zinc-100 dark:border-white/5 text-zinc-600 dark:text-zinc-400 group-hover:border-zinc-300 dark:group-hover:border-white/10'
                         }`}>
                         <IconRenderer iconName={b.icon} size={12} className={isKing ? "text-cyan-400 shrink-0" : "text-cyan-600 dark:text-zen-accent shrink-0"} />
                         <span className="truncate">{b.label}</span>

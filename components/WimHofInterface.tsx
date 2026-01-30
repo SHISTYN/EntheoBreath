@@ -334,7 +334,7 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit, isZenMode, onToggle
                     </div>
 
                     {/* CONTROLS AREA */}
-                    <div className="w-full max-w-md bg-white/50 dark:bg-[#050505]/50 backdrop-blur-md border border-zinc-200 dark:border-white/5 p-6 rounded-2xl mb-safe relative group shrink-0">
+                    <div className="w-full max-w-md bg-white/50 dark:bg-[#050505]/50 backdrop-blur-md border border-zinc-200 dark:border-white/5 p-6 rounded-2xl mb-[calc(1rem+env(safe-area-inset-bottom))] relative group shrink-0">
 
                         {/* Header of Card */}
                         <div className="flex items-center justify-between mb-6 pb-4 border-b border-zinc-200 dark:border-white/5">
@@ -432,17 +432,17 @@ const WimHofInterface: React.FC<Props> = ({ pattern, onExit, isZenMode, onToggle
                     </MotionDiv>
 
                     {phase === 'BREATHING' && (
-                        <div className="absolute bottom-10 px-6 py-2 rounded-full bg-white/5 border border-white/5 backdrop-blur-md animate-pulse">
+                        <div className="absolute bottom-[calc(2.5rem+env(safe-area-inset-bottom))] px-6 py-2 rounded-full bg-white/5 border border-white/5 backdrop-blur-md animate-pulse">
                             <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Двойной тап: стоп</span>
                         </div>
                     )}
                     {phase === 'RETENTION' && (
-                        <div className="absolute bottom-10 px-6 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 backdrop-blur-md animate-pulse">
+                        <div className="absolute bottom-[calc(2.5rem+env(safe-area-inset-bottom))] px-6 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 backdrop-blur-md animate-pulse">
                             <span className="text-xs font-bold text-amber-500 uppercase tracking-widest">Тапните для вдоха</span>
                         </div>
                     )}
                     {phase === 'DONE' && (
-                        <div className="absolute bottom-10 w-full px-8 max-w-md">
+                        <div className="absolute bottom-[calc(2.5rem+env(safe-area-inset-bottom))] w-full px-8 max-w-md">
                             <button onClick={onExit} className="w-full py-4 bg-white text-black font-bold rounded-xl shadow-lg uppercase tracking-widest">Завершить</button>
                         </div>
                     )}

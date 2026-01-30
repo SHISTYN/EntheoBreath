@@ -1,0 +1,638 @@
+[
+  {
+    "date": "2026-01-25",
+    "version": "25 ЯНВ",
+    "changes": [
+      {
+        "type": {
+          "icon": "🐞",
+          "label": "Исправления",
+          "priority": 5
+        },
+        "text": "Switch timer controls to flexbox layout - Remove absolute positioning to prevent overlap with visualizer - Move controls outside scrollable area to ensure visibility - Ensure consistent layout on all screen sizes",
+        "hash": "680e876"
+      },
+      {
+        "type": {
+          "icon": "🐞",
+          "label": "Исправления",
+          "priority": 5
+        },
+        "text": "Mobile layout adjustments - Add pb-safe to bottom controls and sidebar button to respect iOS Home Indicator - Add pb-32 to timer view scroll container to prevent content occlusion - Fix timers sticking to bottom on mobile",
+        "hash": "bc8e7c6"
+      }
+    ]
+  },
+  {
+    "date": "2026-01-20",
+    "version": "20 ЯНВ",
+    "changes": [
+      {
+        "type": {
+          "icon": "🐞",
+          "label": "Исправления",
+          "priority": 5
+        },
+        "text": "Исправлено 21 ошибок и недочетов",
+        "hash": "43cc1b4"
+      },
+      {
+        "type": {
+          "icon": "🧹",
+          "label": "Код",
+          "priority": 3
+        },
+        "text": "Оптимизация кода и системные задачи (2)",
+        "hash": "4f42110"
+      }
+    ]
+  },
+  {
+    "date": "2026-01-19",
+    "version": "19 ЯНВ",
+    "changes": [
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Добавлено: Premium Open Graph Banner and Meta Tags",
+        "hash": "808ab52"
+      },
+      {
+        "type": {
+          "icon": "🎨",
+          "label": "Дизайн",
+          "priority": 8
+        },
+        "text": "Обновлено: App Icon: Green Kambo Frog & Red Amanita (Glass Style)",
+        "hash": "dc4bedf"
+      },
+      {
+        "type": {
+          "icon": "🐞",
+          "label": "Исправления",
+          "priority": 5
+        },
+        "text": "Исправлено 5 ошибок и недочетов",
+        "hash": "b95a775"
+      }
+    ]
+  },
+  {
+    "date": "2026-01-03",
+    "version": "3 ЯНВ",
+    "changes": [
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Configure project for IDE and add lockfile",
+        "hash": "f73acfb"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Introduce phase-specific sound effects",
+        "hash": "865ee84"
+      },
+      {
+        "type": {
+          "icon": "🐞",
+          "label": "Исправления",
+          "priority": 5
+        },
+        "text": "Исправлено 3 ошибок и недочетов",
+        "hash": "1117881"
+      }
+    ]
+  },
+  {
+    "date": "2026-01-02",
+    "version": "2 ЯНВ",
+    "changes": [
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Simplify props and imports",
+        "hash": "261302c"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Hide infinite duration indicator",
+        "hash": "c6ecceb"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Добавлено: URL slug mapping for patterns",
+        "hash": "af4c3fc"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Enhance UI and theming for EntheoBreath",
+        "hash": "21e9d17"
+      },
+      {
+        "type": {
+          "icon": "🐞",
+          "label": "Исправления",
+          "priority": 5
+        },
+        "text": "Prevent Rollup build error with dynamic Lucide icons",
+        "hash": "60f6665"
+      },
+      {
+        "type": {
+          "icon": "🐞",
+          "label": "Исправления",
+          "priority": 5
+        },
+        "text": "Enhance timer visualization and controls",
+        "hash": "2f9d584"
+      },
+      {
+        "type": {
+          "icon": "🧹",
+          "label": "Код",
+          "priority": 3
+        },
+        "text": "Оптимизация кода и системные задачи (1)",
+        "hash": "fcf1f0e"
+      }
+    ]
+  },
+  {
+    "date": "2025-12-27",
+    "version": "27 ДЕК",
+    "changes": [
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Integrate Tone.js for advanced audio capabilities",
+        "hash": "1c5d09b"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Implement PWA features and improve audio",
+        "hash": "418ae1d"
+      },
+      {
+        "type": {
+          "icon": "🧹",
+          "label": "Код",
+          "priority": 3
+        },
+        "text": "Оптимизация кода и системные задачи (1)",
+        "hash": "e6afae4"
+      }
+    ]
+  },
+  {
+    "date": "2025-12-26",
+    "version": "26 ДЕК",
+    "changes": [
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Simplify video embedding logic",
+        "hash": "4d03992"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Implement YouTube embed functionality",
+        "hash": "34d135f"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Simplify and reset mode on lang switch",
+        "hash": "940fd88"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Improve media card and add alert icon",
+        "hash": "332a62b"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Обновлено: Wim Hof guide video data",
+        "hash": "38e5d92"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Implement robust lazy loading for routes",
+        "hash": "18dd573"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Добавлено: video player reload functionality for Wim Hof guide",
+        "hash": "772dd68"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Добавлено: play state and reset on lang change",
+        "hash": "1e64e47"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Enhance video error handling and reporting",
+        "hash": "b279f01"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Обновлено: EntheoBreath logo assets to pixel art style",
+        "hash": "0ac25ea"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Добавлено: left-handed support",
+        "hash": "55ed5df"
+      },
+      {
+        "type": {
+          "icon": "🐞",
+          "label": "Исправления",
+          "priority": 5
+        },
+        "text": "Improve visual transition on phase end",
+        "hash": "0c1f7f4"
+      },
+      {
+        "type": {
+          "icon": "🐞",
+          "label": "Исправления",
+          "priority": 5
+        },
+        "text": "Refine UI stability and input control",
+        "hash": "3fa5d50"
+      }
+    ]
+  },
+  {
+    "date": "2025-12-25",
+    "version": "25 ДЕК",
+    "changes": [
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Introduce manual mode and improve timer visualization",
+        "hash": "195cbdc"
+      }
+    ]
+  },
+  {
+    "date": "2025-12-20",
+    "version": "20 ДЕК",
+    "changes": [
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Implement Lenis smooth scrolling",
+        "hash": "3e54c97"
+      },
+      {
+        "type": {
+          "icon": "🐞",
+          "label": "Исправления",
+          "priority": 5
+        },
+        "text": "Refactor WimHofInterface and improve state management",
+        "hash": "6b9731c"
+      }
+    ]
+  },
+  {
+    "date": "2025-12-19",
+    "version": "19 ДЕК",
+    "changes": [
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Reorder and refine technique lists",
+        "hash": "b9c081d"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Добавлено: 'AuthorChoice' category to library",
+        "hash": "a02bae4"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Implement Anuloma Viloma interface",
+        "hash": "a92e6a2"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Implement PWA install functionality and improve UI",
+        "hash": "89783eb"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Enhance PWA, introduce breathing tags, and optimize timers",
+        "hash": "dd596e6"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Refactor Wim Hof interface and library components",
+        "hash": "85e5472"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Integrate Lucide Icons and refactor breathing data",
+        "hash": "af54b52"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Добавлено: philosophy content and refactor components",
+        "hash": "dbacfae"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Refine UI layout and Wim Hof animation",
+        "hash": "d5e962a"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Добавлено: framer-motion for animations",
+        "hash": "bbda132"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Introduce dedicated Wim Hof breathing interface",
+        "hash": "8fffb96"
+      }
+    ]
+  },
+  {
+    "date": "2025-12-18",
+    "version": "18 ДЕК",
+    "changes": [
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Добавлено: custom retention profiles and results storage",
+        "hash": "d53dba2"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Improve timer view responsiveness",
+        "hash": "4f42e19"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Refine Wim Hof controls and wake lock logic",
+        "hash": "38ec23b"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Enhance Gemini AI and clarify Pranayama",
+        "hash": "981800e"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Extend manual breath modes and update constants",
+        "hash": "6b9280b"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Добавлено: Qigong and Tao categories",
+        "hash": "9a5eb46"
+      }
+    ]
+  },
+  {
+    "date": "2025-12-17",
+    "version": "17 ДЕК",
+    "changes": [
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Refine Toltec Recapitulation pattern and UI",
+        "hash": "08a9a43"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Обновлено: OG image cache busting parameter",
+        "hash": "57d5ad0"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Enhance PWA features and social media previews",
+        "hash": "cd85c5c"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Implement ErrorBoundary and update PWA metadata",
+        "hash": "b636982"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Добавлено: favicon to EntheoBreath",
+        "hash": "3c2d867"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Обновлено: app name and branding",
+        "hash": "d3633de"
+      }
+    ]
+  },
+  {
+    "date": "2025-12-16",
+    "version": "16 ДЕК",
+    "changes": [
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Обновлено: dependencies and config for Vite v5",
+        "hash": "9f7496e"
+      },
+      {
+        "type": {
+          "icon": "✨",
+          "label": "Функционал",
+          "priority": 10
+        },
+        "text": "Setup PranaFlow project with Vite and React",
+        "hash": "9787ec6"
+      },
+      {
+        "type": {
+          "icon": "🧹",
+          "label": "Код",
+          "priority": 3
+        },
+        "text": "Оптимизация кода и системные задачи (1)",
+        "hash": "3657428"
+      }
+    ]
+  }
+]

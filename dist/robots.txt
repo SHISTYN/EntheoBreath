@@ -1,0 +1,12 @@
+# EntheoBreath Robots.txt
+# https://entheo-breath.vercel.app/
+
+User-agent: *
+Allow: /
+
+# Disallow build artifacts
+Disallow: /assets/*.js.map
+Disallow: /*.json$
+
+# Sitemap
+Sitemap: https://entheo-breath.vercel.app/sitemap.xml

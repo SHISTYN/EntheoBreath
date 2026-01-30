@@ -79,78 +79,79 @@ export const PHILOSOPHY_CONTENT = `
 
 // --- SHORT URL MAPPING (SLUGS) ---
 export const URL_SLUGS: Record<string, string> = {
-    // Energy
-    'wim-hof-session': 'wh',
-    'tummo': 'tm',
-    'kapalabhati': 'kb',
-    'bhastrika': 'bs',
-    'surya-bhedana': 'sb',
-    'ujjayi': 'uj',
-    
-    // Relax
-    '4-7-8': '478',
-    'chandra-bhedana': 'cb',
-    'sitkari': 'sk',
-    'udgeeth': 'om',
-    '7-11': '711',
-    'bhramari': 'bee',
-    'sitali': 'sl',
+  // Energy
+  'wim-hof-session': 'wh',
+  'tummo': 'tm',
+  'kapalabhati': 'kb',
+  'bhastrika': 'bs',
+  'surya-bhedana': 'sb',
+  'ujjayi': 'uj',
 
-    // Balance
-    'anuloma-viloma-base': 'anu', // Was 'av', changed to 'anu' per request
-    'nadi-shodhana': 'ns',
-    'coherent': 'co',
-    'dirga-pranayama': 'dp',
-    'sama-vritti': 'sv',
-    'kaki-mudra': 'km',
+  // Relax
+  '4-7-8': '478',
+  'chandra-bhedana': 'cb',
+  'sitkari': 'sk',
+  'udgeeth': 'om',
+  '7-11': '711',
+  'bhramari': 'bee',
+  'sitali': 'sl',
 
-    // Focus
-    'box-breathing': 'box',
-    'viloma': 'vl',
-    'triangle': 'tri',
-    'murcha': 'mu',
-    'simhasana': 'sim',
+  // Balance
+  'anuloma-viloma-base': 'anu', // Was 'av', changed to 'anu' per request
+  'nadi-shodhana': 'ns',
+  'coherent': 'co',
+  'dirga-pranayama': 'dp',
+  'sama-vritti': 'sv',
+  'kaki-mudra': 'km',
 
-    // Health
-    'buteyko': 'vlgd',
-    'pursed-lip': 'pl',
-    'vrajana': 'walk',
-    'kumbhaka-training': 'co2',
+  // Focus
+  'box-breathing': 'box',
+  'viloma': 'vl',
+  'triangle': 'tri',
+  'murcha': 'mu',
+  'simhasana': 'sim',
 
-    // Qigong
-    'qigong-ba-duan-jin': 'q8',
-    'qigong-wu-qin-xi': 'q5',
-    'qigong-yi-jin-jing': 'qjj',
-    'qigong-zhan-zhuang': 'zz',
-    'qigong-liu-zi-jue': 'q6',
-    'qigong-xiao-zhou-tian': 'mco',
+  // Health
+  'buteyko': 'vlgd',
+  'pursed-lip': 'pl',
+  'vrajana': 'walk',
+  'kumbhaka-training': 'co2',
 
-    // Toltec
-    'toltec-recapitulation': 'rc',
-    'toltec-pass-35': 'tp35',
-    'toltec-pass-36': 'tp36',
-    'toltec-pass-37': 'tp37',
-    'toltec-infinity': 'inf',
-    'toltec-decision-center': 'tdc',
+  // Qigong
+  'qigong-ba-duan-jin': 'q8',
+  'qigong-wu-qin-xi': 'q5',
+  'qigong-yi-jin-jing': 'qjj',
+  'qigong-zhan-zhuang': 'zz',
+  'qigong-liu-zi-jue': 'q6',
+  'qigong-xiao-zhou-tian': 'mco',
 
-    // Tao
-    'tao-inner-smile': 'is',
-    'tao-turtle-breathing': 'ttr',
-    'tao-deer-breathing': 'tdr',
-    'tao-bone-marrow': 'tbm',
-    'tao-dantian-breathing': 'dt',
-    'tao-wu-ji': 'wj',
-    'tao-spinal-cord': 'tsc',
-    'tao-iron-shirt-packing': 'isp',
-    'tao-soles-breathing': 'tsb',
-    'tao-macrocosmic': 'mac',
+  // Toltec
+  'toltec-recapitulation': 'rc',
+  'toltec-pass-35': 'tp35',
+  'toltec-pass-36': 'tp36',
+  'toltec-pass-37': 'tp37',
+  'toltec-infinity': 'inf',
+  'toltec-decision-center': 'tdc',
 
-    // Transcendence
-    'holotropic': 'holo'
+  // Tao
+  'tao-inner-smile': 'is',
+  'tao-turtle-breathing': 'ttr',
+  'tao-deer-breathing': 'tdr',
+  'tao-bone-marrow': 'tbm',
+  'tao-dantian-breathing': 'dt',
+  'tao-wu-ji': 'wj',
+  'tao-spinal-cord': 'tsc',
+  'tao-iron-shirt-packing': 'isp',
+  'tao-soles-breathing': 'tsb',
+  'tao-macrocosmic': 'mac',
+
+  // Transcendence
+  'holotropic': 'holo',
+  'pineal-activation': 'pin'
 };
 
 export const REVERSE_SLUGS: Record<string, string> = Object.fromEntries(
-    Object.entries(URL_SLUGS).map(([k, v]) => [v, k])
+  Object.entries(URL_SLUGS).map(([k, v]) => [v, k])
 );
 
 // --- MAIN LIST AGGREGATION ---

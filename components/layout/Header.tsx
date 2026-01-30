@@ -13,7 +13,12 @@ import { useAudioEngine, SolfeggioFreq, PlaybackMode, NoiseColor } from '../../c
 import { SoundMode } from '../../hooks/useAudioSystem';
 import YinYangToggle from '../YinYangToggle';
 import ChangelogSystem from '../ChangelogSystem';
-import { CURRENT_VERSION } from '../../data/changelog'; // Import version
+import { CURRENT_VERSION } from '../../data/changelog';
+import { LevelProgress, StreakDisplay } from '../gamification';
+import { useAuth } from '../../hooks/useAuth';
+import { LoginButton, UserMenu } from '../auth';
+import { usePWAInstall } from '../../hooks/usePWAInstall';
+import { liquidVariants } from '../../config/animations';
 
 
 const MotionHeader = motion.header as any;
@@ -25,12 +30,20 @@ interface HeaderProps {
     setView: (v: 'timer' | 'library') => void;
     theme: 'dark' | 'light';
     toggleTheme: () => void;
-    deferredPrompt: any;
-    handleInstallClick: () => void;
+
     handleShare: () => void;
     setShowMobileFaq: (v: boolean) => void;
     soundMode: SoundMode;
     changeSoundMode: (m: SoundMode) => void;
+    // Gamification
+    userLevel: number;
+    userStreak: number;
+    xpProgress: {
+        current: number;
+        needed: number;
+        percentage: number;
+    };
+    isPro: boolean;
 }
 
 
@@ -66,18 +79,25 @@ const HeaderImpl: React.FC<HeaderProps> = ({
     setView,
     theme,
     toggleTheme,
-    deferredPrompt,
-    handleInstallClick,
+
     handleShare,
     setShowMobileFaq,
     soundMode,
-    changeSoundMode
+    changeSoundMode,
+    userLevel,
+    userStreak,
+    xpProgress,
+    isPro
 }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSoundMenuOpen, setIsSoundMenuOpen] = useState(false);
     const [isPhilosophyOpen, setIsPhilosophyOpen] = useState(false);
     const [isChangelogOpen, setIsChangelogOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const { isReady, install } = usePWAInstall();
+
+    // Auth State
+    const { user, loading: authLoading } = useAuth();
 
 
     useEffect(() => {
@@ -135,12 +155,23 @@ const HeaderImpl: React.FC<HeaderProps> = ({
                         onClick={() => handleNavClick('library')}
                         className="flex items-center gap-2 md:gap-3 pl-1 cursor-pointer group shrink-0"
                     >
-                        <div className="relative flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full bg-gradient-to-tr from-cyan-500/10 to-purple-500/10 border border-zinc-200 dark:border-white/5 group-hover:border-cyan-500/30 transition-colors shadow-inner">
+                        <div className="relative flex items-center justify-center w-11 h-11 md:w-10 md:h-10 rounded-full bg-gradient-to-tr from-cyan-500/10 to-purple-500/10 border border-zinc-200 dark:border-white/5 group-hover:border-cyan-500/30 transition-colors shadow-inner">
                             <EntheoLogo className="w-6 h-6 md:w-7 md:h-7" />
                         </div>
-                        <span className="font-display font-bold text-zinc-900 dark:text-white tracking-wide text-sm md:text-base transition-colors duration-500">
+                        <span className="font-display font-bold text-zinc-900 dark:text-white tracking-wide text-sm md:text-base transition-colors duration-500 mr-2">
                             Entheo<span className="text-zinc-400 dark:text-zinc-500">Breath</span>
                         </span>
+
+                        {isPro && (
+                            <MotionDiv
+                                initial={{ scale: 0, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                className="px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-300 to-orange-400 text-[9px] font-black text-black uppercase tracking-wider shadow-[0_0_10px_rgba(251,191,36,0.5)]"
+                            >
+                                PRO
+                            </MotionDiv>
+                        )}
                     </div>
 
 
@@ -188,16 +219,30 @@ const HeaderImpl: React.FC<HeaderProps> = ({
                         </button>
 
 
+                        {/* GAMIFICATION STATS */}
+                        <div className="hidden md:flex items-center gap-2 mr-2">
+                            <LevelProgress level={userLevel} xpProgress={xpProgress} compact />
+                            <StreakDisplay streak={userStreak} compact />
+                        </div>
+
+
+                        {/* AUTH BUTTONS (Hidden for now) */}
+                        {/* 
+                        <div className="hidden md:flex items-center ml-1 mr-2">
+                            {!authLoading && (user ? <UserMenu /> : <LoginButton />)}
+                        </div> 
+                        */}
+
                         {/* Sound Toggle */}
                         <div className="relative">
                             <button
                                 onClick={() => setIsSoundMenuOpen(!isSoundMenuOpen)}
-                                className={`w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-all ${isAudioActive
+                                className={`w-11 h-11 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-all ${isAudioActive
                                     ? 'text-cyan-600 dark:text-cyan-400 bg-cyan-100 dark:bg-cyan-500/10 hover:bg-cyan-200 dark:hover:bg-cyan-500/20 shadow-glow-cyan'
                                     : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
                                     }`}
                             >
-                                <Music size={18} className={isAudioActive ? 'animate-pulse' : ''} />
+                                <Music size={20} className={isAudioActive ? 'animate-pulse' : ''} />
                             </button>
 
 
@@ -287,55 +332,80 @@ const HeaderImpl: React.FC<HeaderProps> = ({
 
                         <button
                             onClick={handleShare}
-                            className="hidden md:flex w-9 h-9 md:w-10 md:h-10 rounded-full items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+                            className="hidden md:flex w-11 h-11 md:w-10 md:h-10 rounded-full items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all"
                         >
-                            <Share2 size={18} />
+                            <Share2 size={20} />
                         </button>
 
 
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="md:hidden w-9 h-9 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-300 bg-black/5 dark:bg-white/5 border border-zinc-200 dark:border-white/10 ml-2"
+                            className="md:hidden w-11 h-11 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-300 bg-black/5 dark:bg-white/5 border border-zinc-200 dark:border-white/10 ml-2"
                         >
-                            {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+                            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
                         </button>
 
 
-                        {isMobileMenuOpen && (
-                            <div className="absolute top-full right-0 mt-4 w-72 bg-[#1c1c1e]/95 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.5)] p-2 z-50 animate-fade-in origin-top-right md:hidden ring-1 ring-white/5">
-                                {/* Mobile Menu Content */}
-                                <div className="flex flex-col gap-1">
-                                    <button onClick={() => { setIsPhilosophyOpen(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-sm font-bold bg-white/5 text-white hover:bg-white/10 transition-all active:scale-98 border border-transparent hover:border-white/5">
-                                        <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400">
-                                            <BookOpen size={18} />
+                        {/* --- MOBILE MENU WITH LIQUID MOTION --- */}
+                        <AnimatePresence>
+                            {isMobileMenuOpen && (
+                                <>
+                                    <div className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px]" onClick={() => setIsMobileMenuOpen(false)} />
+
+                                    <MotionDiv
+                                        variants={liquidVariants.menu}
+                                        initial="hidden"
+                                        animate="visible"
+                                        exit="exit"
+                                        className="absolute top-full right-0 mt-4 w-72 bg-[#1c1c1e]/90 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.5)] p-2 z-50 origin-top-right ring-1 ring-white/5 overflow-hidden"
+                                    >
+                                        {/* Mobile Menu Content */}
+                                        <div className="flex flex-col gap-1">
+                                            {isReady && (
+                                                <motion.button
+                                                    whileTap={{ scale: 0.96 }}
+                                                    onClick={() => { install(); setIsMobileMenuOpen(false); }}
+                                                    className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-sm font-bold bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-white hover:bg-white/10 transition-all border border-white/10 mb-2 shadow-[0_4px_20px_rgba(0,0,0,0.2)] group"
+                                                >
+                                                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white transition-colors">
+                                                        <Download size={18} />
+                                                    </div>
+                                                    <span className="tracking-wide bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent font-display font-black uppercase text-xs group-hover:text-white">Установить App</span>
+                                                </motion.button>
+                                            )}
+                                            <motion.button whileTap={{ scale: 0.98 }} onClick={() => { setIsPhilosophyOpen(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-sm font-bold bg-white/5 text-white hover:bg-white/10 transition-all border border-transparent hover:border-white/5 group">
+                                                <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
+                                                    <BookOpen size={18} />
+                                                </div>
+                                                <span className="tracking-wide font-display">Философия</span>
+                                            </motion.button>
+
+                                            <motion.button whileTap={{ scale: 0.98 }} onClick={() => { handleShare(); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-sm font-bold bg-white/5 text-white hover:bg-white/10 transition-all border border-transparent hover:border-white/5 group">
+                                                <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
+                                                    <Share2 size={18} />
+                                                </div>
+                                                <span className="tracking-wide font-display">Поделиться</span>
+                                            </motion.button>
+
+                                            <motion.button whileTap={{ scale: 0.98 }} onClick={() => { setShowMobileFaq(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-sm font-bold bg-white/5 text-white hover:bg-white/10 transition-all border border-transparent hover:border-white/5 group">
+                                                <div className="w-8 h-8 rounded-full bg-zinc-500/20 flex items-center justify-center text-zinc-400 group-hover:scale-110 transition-transform">
+                                                    <HelpCircle size={18} />
+                                                </div>
+                                                <span className="tracking-wide font-display">Помощь</span>
+                                            </motion.button>
+
+                                            <div className="h-px bg-white/10 my-1 mx-2"></div>
+
+                                            {/* Version in Menu */}
+                                            <div className="px-4 py-2 flex justify-between items-center text-[10px] text-zinc-500 font-bold uppercase tracking-widest font-mono">
+                                                <span>EntheoBreath</span>
+                                                <span>v{CURRENT_VERSION}</span>
+                                            </div>
                                         </div>
-                                        <span className="tracking-wide">Философия</span>
-                                    </button>
-
-                                    <button onClick={() => { handleShare(); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-sm font-bold bg-white/5 text-white hover:bg-white/10 transition-all active:scale-98 border border-transparent hover:border-white/5">
-                                        <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400">
-                                            <Share2 size={18} />
-                                        </div>
-                                        <span className="tracking-wide">Поделиться</span>
-                                    </button>
-
-                                    <button onClick={() => { setShowMobileFaq(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-sm font-bold bg-white/5 text-white hover:bg-white/10 transition-all active:scale-98 border border-transparent hover:border-white/5">
-                                        <div className="w-8 h-8 rounded-full bg-zinc-500/20 flex items-center justify-center text-zinc-400">
-                                            <HelpCircle size={18} />
-                                        </div>
-                                        <span className="tracking-wide">Помощь</span>
-                                    </button>
-
-                                    <div className="h-px bg-white/10 my-1 mx-2"></div>
-
-                                    {/* Version in Menu */}
-                                    <div className="px-4 py-2 flex justify-between items-center text-[10px] text-zinc-500 font-medium uppercase tracking-widest">
-                                        <span>EntheoBreath</span>
-                                        <span>v{CURRENT_VERSION}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                                    </MotionDiv>
+                                </>
+                            )}
+                        </AnimatePresence>
                     </div>
                 </div>
             </MotionHeader>

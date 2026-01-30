@@ -7,11 +7,34 @@
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 
   <!-- Основные мета-теги -->
-  <title>EntheoBreath — Дыхание и Сознание</title>
-  <meta name="title" content="EntheoBreath — Дыхание и Сознание" />
+  <title>EntheoBreath — Дыхательные практики | Wim Hof, Box Breathing, Пранаяма</title>
+  <meta name="title" content="EntheoBreath — Дыхательные практики для здоровья и сознания" />
   <meta name="description"
-    content="Био-цифровая платформа для дыхательных практик. Таймеры, AI-анализ и генеративное аудио." />
+    content="Бесплатная платформа для дыхательных практик: Wim Hof, Box Breathing, Pranayama, Holotropic. Таймеры, AI-анализ и генеративное аудио. 50+ научно обоснованных техник." />
+  <meta name="keywords"
+    content="дыхательные практики, пранаяма, Wim Hof, Box Breathing, медитация, релаксация, стресс, здоровье, йога, холотропное дыхание, Бутейко, таймер дыхания" />
+  <meta name="author" content="EntheoBreath" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://entheo-breath.vercel.app/" />
   <meta name="theme-color" content="#000000" />
+
+  <!-- Open Graph (Facebook, LinkedIn, Telegram) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://entheo-breath.vercel.app/" />
+  <meta property="og:title" content="EntheoBreath — Дыхательные практики" />
+  <meta property="og:description"
+    content="50+ дыхательных техник: Wim Hof, Box Breathing, Pranayama. Бесплатно, без регистрации." />
+  <meta property="og:image" content="https://entheo-breath.vercel.app/og-image.png" />
+  <meta property="og:locale" content="ru_RU" />
+  <meta property="og:site_name" content="EntheoBreath" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://entheo-breath.vercel.app/" />
+  <meta name="twitter:title" content="EntheoBreath — Дыхательные практики" />
+  <meta name="twitter:description" content="50+ дыхательных техник для здоровья, фокуса и релаксации. Бесплатно." />
+  <meta name="twitter:image" content="https://entheo-breath.vercel.app/og-image.png" />
+
 
   <!-- PWA & Mobile (iOS Optimized) -->
   <link rel="manifest" href="/manifest.json" />
@@ -83,6 +106,20 @@
       overscroll-behavior: none;
       touch-action: manipulation;
       -webkit-touch-callout: none;
+    }
+
+    /* Noise Texture */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
     }
 
     .pt-safe {

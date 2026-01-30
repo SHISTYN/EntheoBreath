@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
 import { AudioProvider } from './context/AudioContext';
+import { GamificationProvider } from './contexts/GamificationContext';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -14,9 +15,11 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <ErrorBoundary>
-        <AudioProvider>
-            <App />
-        </AudioProvider>
+      <AudioProvider>
+        <GamificationProvider>
+          <App />
+        </GamificationProvider>
+      </AudioProvider>
     </ErrorBoundary>
   </React.StrictMode>
 );
