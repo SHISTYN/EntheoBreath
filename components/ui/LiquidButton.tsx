@@ -3,7 +3,7 @@ import { motion, HTMLMotionProps } from 'framer-motion';
 
 interface LiquidButtonProps extends HTMLMotionProps<"button"> {
     variant?: 'primary' | 'secondary' | 'ghost' | 'glass';
-    size?: 'sm' | 'md' | 'lg';
+    size?: 'sm' | 'md' | 'lg' | 'icon';
     glowColor?: string;
     icon?: React.ReactNode;
     children: React.ReactNode;
@@ -25,7 +25,8 @@ export const LiquidButton: React.FC<LiquidButtonProps> = ({
     const sizes = {
         sm: "px-4 py-2 text-xs",
         md: "px-6 py-3.5 text-sm",
-        lg: "px-8 py-4 text-base"
+        lg: "px-8 py-4 text-base",
+        icon: "w-10 h-10 p-0"
     };
 
     // Variants

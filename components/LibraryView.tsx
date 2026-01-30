@@ -5,6 +5,7 @@ import { DEFAULT_PATTERNS, CATEGORY_NAMES, CATEGORY_ICONS } from '../constants';
 import TechniqueCard from './library/TechniqueCard';
 import LibraryHeader from './library/LibraryHeader';
 import { Heart, Wind, Zap } from 'lucide-react';
+import GlassCard from './ui/GlassCard';
 
 // High Impact Techniques selected by Author (Ordered)
 const POWER_PACK_IDS = [
@@ -143,7 +144,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
                 {/* UX EXPLANATION FOR AUTHOR CHOICE */}
                 {selectedCategory === 'AuthorChoice' && !selectedTag && (
                     <div className="max-w-3xl mx-auto mb-12 text-center animate-fade-in mt-8">
-                        <div className="inline-block p-6 rounded-3xl bg-gradient-to-br from-amber-500/10 to-orange-600/10 border border-amber-500/20 backdrop-blur-md shadow-[0_0_30px_rgba(245,158,11,0.1)]">
+                        <GlassCard variant="heavy" className="inline-block p-6 rounded-3xl shadow-[0_0_30px_rgba(245,158,11,0.1)] border-amber-500/20">
                             <div className="flex items-center justify-center gap-2 mb-2">
                                 <Zap className="text-amber-500" size={20} />
                                 <h3 className="text-xl font-display font-bold text-amber-500">Золотой Стандарт</h3>
@@ -151,7 +152,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ selectPattern, favorites, tog
                             <p className="text-amber-800 dark:text-amber-200 font-medium text-sm md:text-base leading-relaxed opacity-80">
                                 "Эти 5 практик дают 80% результата за 20% усилий. Если у вас мало времени — делайте только их."
                             </p>
-                        </div>
+                        </GlassCard>
                     </div>
                 )}
 

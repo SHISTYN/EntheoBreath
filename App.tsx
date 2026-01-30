@@ -642,12 +642,14 @@ const App: React.FC = () => {
 
                             {isZenMode && (
                                 <div className="lg:hidden absolute top-4 left-4 z-50">
-                                    <button
+                                    <LiquidButton
                                         onClick={() => setZenMode(false)}
-                                        className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/70 hover:text-white transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] active:scale-95"
+                                        variant="glass"
+                                        size="icon"
+                                        className="rounded-full"
                                     >
                                         <SlidersHorizontal size={18} />
-                                    </button>
+                                    </LiquidButton>
                                 </div>
                             )}
 

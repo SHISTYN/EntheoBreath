@@ -239,7 +239,7 @@ const EntheoForest: React.FC<{ className?: string }> = ({ className }) => {
 
             <svg
                 viewBox={`0 0 ${W * S} ${H * S}`}
-                className="absolute -inset-4 w-[calc(100%+2rem)] h-[calc(100%+2rem)]"
+                className="absolute inset-0 w-full h-full"
                 preserveAspectRatio="xMidYMax slice"
                 shapeRendering="crispEdges"
             >

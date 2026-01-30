@@ -19,6 +19,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { LoginButton, UserMenu } from '../auth';
 import { usePWAInstall } from '../../hooks/usePWAInstall';
 import { liquidVariants } from '../../config/animations';
+import { LiquidButton } from '../ui/LiquidButton';
 
 
 const MotionHeader = motion.header as any;
@@ -211,12 +212,15 @@ const HeaderImpl: React.FC<HeaderProps> = ({
                     <div className="flex items-center gap-1 md:gap-2 pr-1 shrink-0">
 
                         {/* VERSION PILL */}
-                        <button
+                        {/* VERSION PILL */}
+                        <LiquidButton
+                            variant="ghost"
+                            size="sm"
                             onClick={() => setIsChangelogOpen(!isChangelogOpen)}
-                            className="px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/5 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-white/10 transition-all uppercase tracking-wider"
+                            className="bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/5 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-white/10"
                         >
                             v{CURRENT_VERSION.split('.')[0]}.{CURRENT_VERSION.split('.')[1]}
-                        </button>
+                        </LiquidButton>
 
 
                         {/* GAMIFICATION STATS */}
@@ -235,15 +239,16 @@ const HeaderImpl: React.FC<HeaderProps> = ({
 
                         {/* Sound Toggle */}
                         <div className="relative">
-                            <button
+                            <LiquidButton
                                 onClick={() => setIsSoundMenuOpen(!isSoundMenuOpen)}
-                                className={`w-11 h-11 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-all ${isAudioActive
+                                size="icon"
+                                className={`rounded-full transition-all ${isAudioActive
                                     ? 'text-cyan-600 dark:text-cyan-400 bg-cyan-100 dark:bg-cyan-500/10 hover:bg-cyan-200 dark:hover:bg-cyan-500/20 shadow-glow-cyan'
-                                    : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
+                                    : 'bg-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
                                     }`}
                             >
                                 <Music size={20} className={isAudioActive ? 'animate-pulse' : ''} />
-                            </button>
+                            </LiquidButton>
 
 
                             <AnimatePresence>
@@ -330,20 +335,24 @@ const HeaderImpl: React.FC<HeaderProps> = ({
                         <YinYangToggle theme={theme} toggleTheme={toggleTheme} className="ml-1" />
 
 
-                        <button
+                        <LiquidButton
                             onClick={handleShare}
-                            className="hidden md:flex w-11 h-11 md:w-10 md:h-10 rounded-full items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+                            variant="ghost"
+                            size="icon"
+                            className="hidden md:flex rounded-full text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5"
                         >
                             <Share2 size={20} />
-                        </button>
+                        </LiquidButton>
 
 
-                        <button
+                        <LiquidButton
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="md:hidden w-11 h-11 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-300 bg-black/5 dark:bg-white/5 border border-zinc-200 dark:border-white/10 ml-2"
+                            variant="ghost"
+                            size="icon"
+                            className="md:hidden rounded-full text-zinc-500 dark:text-zinc-300 bg-black/5 dark:bg-white/5 border border-zinc-200 dark:border-white/10 ml-2"
                         >
                             {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-                        </button>
+                        </LiquidButton>
 
 
                         {/* --- MOBILE MENU WITH LIQUID MOTION --- */}

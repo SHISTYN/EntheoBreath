@@ -108,6 +108,20 @@
       -webkit-touch-callout: none;
     }
 
+    /* Noise Texture */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
     .pt-safe {
       padding-top: env(safe-area-inset-top);
     }
@@ -158,6 +172,31 @@
     .animate-shimmer-slow {
       animation: shimmer 8s linear infinite;
     }
+
+    /* --- TYPOGRAPHY 2.0 (Premium Readability) --- */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      letter-spacing: -0.025em;
+      /* tracking-tight */
+    }
+
+    p,
+    li,
+    span,
+    div {
+      /* Subtly improve readability */
+    }
+
+    /* Premium Text Gradients Utility */
+    .text-premium-gradient {
+      background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.7) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
   </style>
 
   <script type="importmap">
@@ -177,12 +216,12 @@
   }
 }
 </script>
-  <script type="module" crossorigin src="/assets/index-kZLVH7V4.js"></script>
+  <script type="module" crossorigin src="/assets/index--3gKLTMM.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/vendor-react-OXzYy3Vh.js">
   <link rel="modulepreload" crossorigin href="/assets/vendor-motion-BZnxEU2V.js">
   <link rel="modulepreload" crossorigin href="/assets/vendor-ai-D7YN6fPx.js">
   <link rel="modulepreload" crossorigin href="/assets/vendor-audio-vXGIxFqf.js">
-  <link rel="modulepreload" crossorigin href="/assets/vendor-icons-CZBwbNoe.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-icons-LBODLYEr.js">
 <link rel="manifest" href="/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/registerSW.js"></script></head>
 
 <body>
