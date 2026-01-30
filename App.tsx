@@ -57,7 +57,7 @@ const AnalysisModal = lazyWithRetry(() => import('./components/AnalysisModal'));
 const PrivacyPolicy = lazyWithRetry(() => import('./components/legal/PrivacyPolicy').then(module => ({ default: module.PrivacyPolicy })));
 const NotificationRequest = lazyWithRetry(() => import('./components/retention/NotificationRequest').then(module => ({ default: module.NotificationRequest })));
 const PaywallModal = lazyWithRetry(() => import('./components/paywall/PaywallModal').then(module => ({ default: module.PaywallModal })));
-const InstallGuide = lazyWithRetry(() => import('./components/pwa/InstallGuide'));
+const InstallGuide = lazyWithRetry(() => import('./components/pwa/InstallGuide').then(module => ({ default: module.InstallGuide })));
 
 import { notificationService } from './services/notificationService';
 import { usePro } from './hooks/usePro';

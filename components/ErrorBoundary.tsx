@@ -3,12 +3,12 @@ import React, { Component, ErrorInfo, ReactNode, useState } from "react";
 import { Copy, Check, Send } from "lucide-react";
 
 interface Props {
-  children?: ReactNode;
+    children?: ReactNode;
 }
 
 interface State {
-  hasError: boolean;
-  error: Error | null;
+    hasError: boolean;
+    error: Error | null;
 }
 
 // --- FUNCTIONAL COMPONENT FOR UI (To use Hooks) ---
@@ -29,11 +29,11 @@ const ErrorView: React.FC<{ error: Error | null }> = ({ error }) => {
 
     const handleSendToTg = () => {
         if (!error) return;
-        
+
         const greeting = "Приветствую! 👋\nОбнаружил ошибку на сайте EntheoBreath. Вот лог:";
         const errorDetails = `\n\nError: ${error.toString()}\n\nStack:\n${error.stack?.slice(0, 500) || 'N/A'}...`;
         const fullMessage = encodeURIComponent(greeting + errorDetails);
-        
+
         // Open Telegram with pre-filled message
         window.open(`https://t.me/nikolaiovchinnikov?text=${fullMessage}`, '_blank');
     };
@@ -44,35 +44,42 @@ const ErrorView: React.FC<{ error: Error | null }> = ({ error }) => {
                 <div className="absolute inset-0 bg-rose-500/20 blur-[60px] rounded-full animate-pulse-slow"></div>
                 <i className="fas fa-biohazard text-6xl text-rose-500 relative z-10 drop-shadow-[0_0_15px_rgba(244,63,94,0.5)]"></i>
             </div>
-          
+
             <h1 className="text-3xl md:text-4xl font-display font-bold mb-3 tracking-tight">Сбой в Матрице</h1>
-            
+
             <div className="max-w-md space-y-4 mb-8">
                 <p className="text-gray-400 leading-relaxed text-sm md:text-base">
-                    Энергетический поток прерван программной аномалией. 
-                    <br className="hidden md:block"/>
+                    Энергетический поток прерван программной аномалией.
+                    <br className="hidden md:block" />
                     Дышите глубже, это всего лишь код.
                 </p>
             </div>
 
-            {/* ERROR CODE BLOCK */}
-            <div className="bg-[#121212] rounded-xl border border-white/10 mb-6 max-w-lg w-full overflow-hidden relative group">
+            {/* ERROR CODE BLOCK - УЛУЧШЕН СКРОЛЛ */}
+            <div className="bg-[#121212] rounded-xl border border-white/10 mb-6 max-w-2xl w-full overflow-hidden relative group">
                 <div className="absolute top-2 right-2 z-10">
-                    <button 
+                    <button
                         onClick={handleCopy}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
-                            copied 
-                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
-                            : 'bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border border-transparent'
-                        }`}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 ${copied
+                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                : 'bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border border-transparent'
+                            }`}
                     >
                         {copied ? <Check size={14} /> : <Copy size={14} />}
                         {copied ? 'Скопировано' : 'Копировать'}
                     </button>
                 </div>
-                <div className="p-4 pt-10 md:pt-4 max-h-[200px] overflow-y-auto custom-scrollbar text-left">
-                    <code className="text-[10px] md:text-xs text-rose-400 font-mono break-all whitespace-pre-wrap block font-bold opacity-90">
-                        {error?.toString()}
+                <div className="p-4 pt-12 max-h-[350px] overflow-y-auto custom-scrollbar text-left">
+                    <code className="text-xs md:text-sm text-rose-400 font-mono break-all whitespace-pre-wrap block font-bold opacity-90 leading-relaxed">
+                        <span className="text-white/60">Error: </span>{error?.message || error?.toString()}
+                        {error?.stack && (
+                            <>
+                                <br /><br />
+                                <span className="text-white/40">Stack Trace:</span>
+                                <br />
+                                <span className="text-rose-300/80">{error.stack}</span>
+                            </>
+                        )}
                     </code>
                 </div>
             </div>
@@ -86,7 +93,7 @@ const ErrorView: React.FC<{ error: Error | null }> = ({ error }) => {
                     <Send size={18} className="group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
                     <span>Отправить в Telegram</span>
                 </button>
-                
+
                 <button
                     onClick={() => window.location.reload()}
                     className="flex-1 px-6 py-3.5 bg-white text-black font-bold rounded-xl hover:bg-gray-200 hover:scale-[1.02] transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]"
@@ -101,26 +108,26 @@ const ErrorView: React.FC<{ error: Error | null }> = ({ error }) => {
 
 // --- CLASS COMPONENT (LOGIC) ---
 class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false,
-    error: null,
-  };
+    public state: State = {
+        hasError: false,
+        error: null,
+    };
 
-  public static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
-  }
-
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("Uncaught error:", error, errorInfo);
-  }
-
-  public render() {
-    if (this.state.hasError) {
-        return <ErrorView error={this.state.error} />;
+    public static getDerivedStateFromError(error: Error): State {
+        return { hasError: true, error };
     }
 
-    return (this as any).props.children;
-  }
+    public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+        console.error("Uncaught error:", error, errorInfo);
+    }
+
+    public render() {
+        if (this.state.hasError) {
+            return <ErrorView error={this.state.error} />;
+        }
+
+        return (this as any).props.children;
+    }
 }
 
 export default ErrorBoundary;

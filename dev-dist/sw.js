@@ -67,7 +67,7 @@ if (!self.define) {
     });
   };
 }
-define(['./workbox-2ae722a1'], (function (workbox) { 'use strict';
+define(['./workbox-96fc63c4'], (function (workbox) { 'use strict';
 
   self.skipWaiting();
   workbox.clientsClaim();
@@ -81,17 +81,43 @@ define(['./workbox-2ae722a1'], (function (workbox) { 'use strict';
     "url": "registerSW.js",
     "revision": "3ca0b8505b4bec776b69afdba2768812"
   }, {
-    "url": "index.html",
-    "revision": "0.qlldfslb4b8"
+    "url": "/index.html",
+    "revision": "0.cpm83ea7pf8"
   }], {});
   workbox.cleanupOutdatedCaches();
-  workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {
-    allowlist: [/^\/$/]
+  workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("/index.html"), {
+    allowlist: [/^\/$/],
+    denylist: [/^\/api/]
   }));
+  workbox.registerRoute(/^https:\/\/fonts\.googleapis\.com\/.*/i, new workbox.StaleWhileRevalidate({
+    "cacheName": "google-fonts-stylesheets",
+    plugins: []
+  }), 'GET');
+  workbox.registerRoute(/^https:\/\/fonts\.gstatic\.com\/.*/i, new workbox.CacheFirst({
+    "cacheName": "google-fonts-webfonts",
+    plugins: [new workbox.ExpirationPlugin({
+      maxEntries: 30,
+      maxAgeSeconds: 31536000
+    })]
+  }), 'GET');
+  workbox.registerRoute(/^https:\/\/(cdn\.tailwindcss\.com|cdnjs\.cloudflare\.com|esm\.sh)\/.*/i, new workbox.StaleWhileRevalidate({
+    "cacheName": "cdn-cache",
+    plugins: [new workbox.ExpirationPlugin({
+      maxEntries: 100,
+      maxAgeSeconds: 604800
+    })]
+  }), 'GET');
   workbox.registerRoute(/\.(?:mp3|wav|ogg)$/, new workbox.CacheFirst({
     "cacheName": "audio-cache",
     plugins: [new workbox.ExpirationPlugin({
       maxEntries: 50,
+      maxAgeSeconds: 2592000
+    })]
+  }), 'GET');
+  workbox.registerRoute(/\.(?:png|jpg|jpeg|svg|gif|webp)$/, new workbox.CacheFirst({
+    "cacheName": "images-cache",
+    plugins: [new workbox.ExpirationPlugin({
+      maxEntries: 100,
       maxAgeSeconds: 2592000
     })]
   }), 'GET');
