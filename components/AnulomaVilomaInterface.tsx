@@ -42,8 +42,8 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
     const STROKE_WIDTH = 24;
 
     // Единый путь: 0.0 (Низ Лев) -> 0.5 (Верх Центр) -> 1.0 (Низ Прав)
-    // Расширен для размещения HUD между линиями
-    const combinedPath = "M 50 380 C 50 180 50 60 150 60 C 250 60 250 180 250 380";
+    // Расширен для размещения HUD между линиями (240px gap)
+    const combinedPath = "M 30 380 C 30 180 30 60 150 60 C 270 60 270 180 270 380";
 
     // Прогресс фазы: 0 -> 1
     const p = totalTime > 0 ? Math.min(Math.max((totalTime - timeLeft) / totalTime, 0), 1) : 1;
@@ -218,7 +218,7 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
     const rightFingerLabel = isLeftHanded ? "БЕЗЫМЯННЫЙ" : "БОЛЬШОЙ";
 
     // --- ЛОГИКА БЕСШОВНОГО ШАРА ---
-    const startNodeX = isOddRound ? 50 : 250;
+    const startNodeX = isOddRound ? 30 : 270;
 
     let circleScale = 0;
     let circleOpacity = 0;
@@ -295,7 +295,7 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
                     <circle cx="150" cy="60" r="4" fill="white" opacity="0.3" />
 
                     {/* Левый замок */}
-                    <foreignObject x="10" y="350" width="80" height="90">
+                    <foreignObject x="-10" y="350" width="80" height="90">
                         <div className="flex flex-col items-center justify-center h-full">
                             <MotionDiv
                                 animate={{
@@ -334,7 +334,7 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
                     </foreignObject>
 
                     {/* Правый замок */}
-                    <foreignObject x="210" y="350" width="80" height="90">
+                    <foreignObject x="230" y="350" width="80" height="90">
                         <div className="flex flex-col items-center justify-center h-full">
                             <MotionDiv
                                 animate={{
