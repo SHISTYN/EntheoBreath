@@ -805,11 +805,11 @@ const App: React.FC = () => {
 
                                     {/* 3. HISTORY - скрываем во время активной практики */}
                                     {currentPatternHistory.length > 0 && isSetupControlsVisible && (
-                                        <div className="w-full bg-white/5 border border-white/10 rounded-3xl p-5 mt-2 backdrop-blur-md shadow-lg">
-                                            <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
-                                                <div className="flex items-center gap-2 text-zinc-400"><History size={14} /><span className="text-[10px] font-bold uppercase tracking-widest">История</span></div>
+                                        <div className="w-full bg-white/5 border border-white/10 rounded-2xl p-3 mt-2 backdrop-blur-md shadow-lg">
+                                            <div className="flex items-center justify-between mb-2 border-b border-white/10 pb-1">
+                                                <div className="flex items-center gap-2 text-zinc-400"><History size={12} /><span className="text-[9px] font-bold uppercase tracking-widest">История</span></div>
                                             </div>
-                                            <div className="space-y-2 max-h-[160px] overflow-y-auto custom-scrollbar">
+                                            <div className="space-y-1.5 max-h-[100px] overflow-y-auto custom-scrollbar">
                                                 {currentPatternHistory.map((item) => (
                                                     <div key={item.id} className="flex items-center justify-between p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
                                                         <span className="text-xs font-bold text-zinc-200">{formatDate(item.date)}</span>
