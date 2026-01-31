@@ -684,7 +684,7 @@ const App: React.FC = () => {
                                 )}
 
                                 {/* B. VISUALIZER */}
-                                <div className="flex-1 w-full flex items-center justify-center min-h-[320px] mb-4 mt-8 shrink-0">
+                                <div className="flex-1 w-full flex items-center justify-center min-h-[200px] sm:min-h-[280px] md:min-h-[320px] mb-4 mt-4 sm:mt-8 shrink-0">
                                     <Suspense fallback={<LoadingFallback />}>
                                         {isHolotropic ? (
                                             <div className="w-[300px] h-[300px] flex flex-col items-center justify-center relative overflow-hidden rounded-full border border-white/5">
@@ -803,9 +803,9 @@ const App: React.FC = () => {
                                         )}
                                     </div>
 
-                                    {/* 3. HISTORY - скрываем во время активной практики */}
+                                    {/* 3. HISTORY - скрываем на маленьких экранах и во время практики */}
                                     {currentPatternHistory.length > 0 && isSetupControlsVisible && (
-                                        <div className="w-full bg-white/5 border border-white/10 rounded-2xl p-3 mt-2 backdrop-blur-md shadow-lg">
+                                        <div className="hidden sm:block w-full bg-white/5 border border-white/10 rounded-2xl p-3 mt-2 backdrop-blur-md shadow-lg">
                                             <div className="flex items-center justify-between mb-2 border-b border-white/10 pb-1">
                                                 <div className="flex items-center gap-2 text-zinc-400"><History size={12} /><span className="text-[9px] font-bold uppercase tracking-widest">История</span></div>
                                             </div>
