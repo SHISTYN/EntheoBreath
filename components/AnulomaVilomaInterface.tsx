@@ -363,18 +363,12 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
                             <span className="text-[11px] font-black text-gray-100 uppercase tracking-widest">{mainText}</span>
                         </div>
 
-                        {/* ROUND COUNTER - Show during Ready and active phases */}
-                        {!isDoneState && (
-                            <motion.div
-                                className="flex items-center gap-1 opacity-50 mt-1"
-                                animate={{ opacity: [0.3, 0.6, 0.3] }}
-                                transition={{ duration: 4, repeat: Infinity }}
-                            >
-                                <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">
-                                    Раунд {currentRound} / {totalRounds === 0 ? '∞' : totalRounds}
-                                </span>
-                            </motion.div>
-                        )}
+                        {/* ROUND COUNTER - Always visible */}
+                        <div className="flex items-center gap-1 mt-1">
+                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+                                Раунд {currentRound} / {totalRounds === 0 ? '∞' : totalRounds}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
