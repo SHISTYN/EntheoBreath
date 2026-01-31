@@ -1,8 +1,6 @@
 #profile-title: base64:VlBORC5pbyB2bGVzcyDwn5qA
 #profile-update-interval: 1
 #subscription-userinfo: upload=0; download=0; total=0; expire=1793124176
-#support-url: https://t.me/vpnd_support_bot
-#profile-web-page-url: https://vpnd.io
 
 vless://9a84cef1-3d6a-4830-813c-83ebfdb57c26@ae-2-tun.directly.chat:1049?type=tcp&security=reality&encryption=none&pbk=Ir14NibCqNaMOuYJ4D9bLQow0_hDf63_4vOl1RWxwEU&fp=random&sni=yahoo.com&sid=c3fa0e855674&spx=%2F&flow=xtls-rprx-vision#🇦🇪 United Arab Emirates - Dubai
 vless://993cc88a-6e2a-47a4-818b-4498338d9909@ar-2.vpnd.io:50511?type=tcp&security=reality&encryption=none&pbk=Q8pf5QRKvPD59Wyci3M0toQIBgu_LRCo4ho8PX_0xzE&fp=random&sni=otus.ru&sid=19ee&spx=%2F&flow=xtls-rprx-vision#🇦🇷 Argentina - Buenos Aires
