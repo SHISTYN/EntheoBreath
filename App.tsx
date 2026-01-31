@@ -684,7 +684,7 @@ const App: React.FC = () => {
                                 )}
 
                                 {/* B. VISUALIZER */}
-                                <div className="flex-1 w-full flex items-center justify-center min-h-[320px] mb-4 shrink-0">
+                                <div className="flex-1 w-full flex items-center justify-center min-h-[320px] mb-4 mt-8 shrink-0">
                                     <Suspense fallback={<LoadingFallback />}>
                                         {isHolotropic ? (
                                             <div className="w-[300px] h-[300px] flex flex-col items-center justify-center relative overflow-hidden rounded-full border border-white/5">
