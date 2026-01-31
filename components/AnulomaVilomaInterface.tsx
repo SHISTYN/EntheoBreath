@@ -363,8 +363,8 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
                             <span className="text-[11px] font-black text-gray-100 uppercase tracking-widest">{mainText}</span>
                         </div>
 
-                        {/* ROUND COUNTER - MOVED INSIDE */}
-                        {!isReadyState && !isDoneState && (
+                        {/* ROUND COUNTER - Show during Ready and active phases */}
+                        {!isDoneState && (
                             <motion.div
                                 className="flex items-center gap-1 opacity-50 mt-1"
                                 animate={{ opacity: [0.3, 0.6, 0.3] }}
