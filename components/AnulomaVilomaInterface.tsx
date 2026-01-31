@@ -351,7 +351,7 @@ const AnulomaVilomaInterface: React.FC<Props> = ({
                 </svg>
 
                 {/* Центр таймер */}
-                <div className="absolute top-[42%] flex flex-col items-center z-50 pointer-events-none">
+                <div className="absolute top-[35%] flex flex-col items-center z-50 pointer-events-none">
                     <span className="text-7xl font-display font-bold text-white tabular-nums mb-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                         {Math.ceil(timeLeft)}
                     </span>
