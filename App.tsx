@@ -655,10 +655,10 @@ const App: React.FC = () => {
 
                             <div className="flex-1 w-full flex flex-col p-4 relative z-10 overflow-y-auto custom-scrollbar overscroll-y-none pb-32">
 
-                                {/* A. TOP HUD (Floating Island) */}
+                                {/* A. TOP HUD (Floating Island) - Sticky */}
                                 {!isWimHof && (
                                     <div className={`
-                                relative z-30 mb-2 mt-4 shrink-0 self-center
+                                sticky top-0 z-40 mb-2 pt-4 pb-2 shrink-0 self-center bg-gradient-to-b from-black via-black/80 to-transparent
                                 transition-all duration-500 ease-out
                             `}>
                                         <div className="flex items-center gap-0 bg-black/60 backdrop-blur-3xl rounded-full border border-white/10 shadow-[0_0_20px_-5px_rgba(0,0,0,0.5)] overflow-hidden">
