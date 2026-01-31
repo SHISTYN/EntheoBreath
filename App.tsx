@@ -803,8 +803,8 @@ const App: React.FC = () => {
                                         )}
                                     </div>
 
-                                    {/* 3. HISTORY */}
-                                    {currentPatternHistory.length > 0 && (
+                                    {/* 3. HISTORY - скрываем во время активной практики */}
+                                    {currentPatternHistory.length > 0 && isSetupControlsVisible && (
                                         <div className="w-full bg-white/5 border border-white/10 rounded-3xl p-5 mt-2 backdrop-blur-md shadow-lg">
                                             <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
                                                 <div className="flex items-center gap-2 text-zinc-400"><History size={14} /><span className="text-[10px] font-bold uppercase tracking-widest">История</span></div>
