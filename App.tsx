@@ -702,7 +702,7 @@ const App: React.FC = () => {
                                                 onToggleZen={() => setZenMode(!isZenMode)}
                                             />
                                         ) : isAnulomaOrNadi ? (
-                                            <div className="transform scale-100 lg:scale-125 origin-center transition-transform duration-700">
+                                            <div className="transform scale-75 sm:scale-90 md:scale-100 lg:scale-125 origin-center transition-transform duration-700">
                                                 <AnulomaVilomaInterface
                                                     phase={timerState.currentPhase}
                                                     timeLeft={timerState.secondsRemaining}
